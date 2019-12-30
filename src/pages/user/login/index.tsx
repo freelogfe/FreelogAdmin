@@ -1,5 +1,6 @@
 import {
-  Alert, Checkbox,
+  Alert,
+  // Checkbox,
   // Icon
 } from 'antd';
 import {FormattedMessage, formatMessage} from 'umi-plugin-react/locale';
