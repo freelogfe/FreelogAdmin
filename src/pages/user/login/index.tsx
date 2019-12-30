@@ -99,7 +99,10 @@ class Login extends Component<LoginProps, LoginState> {
   render() {
     const {userLogin = {}, submitting} = this.props;
     const {status, type: loginType} = userLogin;
-    const {type, autoLogin} = this.state;
+    const {
+      type,
+      // autoLogin
+    } = this.state;
     return (
       <div className={styles.main}>
         <LoginComponents
@@ -110,7 +113,10 @@ class Login extends Component<LoginProps, LoginState> {
             this.loginForm = form;
           }}
         >
-          <Tab key="account" tab={formatMessage({id: 'user-login.login.tab-login-credentials'})}>
+          <Tab
+            key="account"
+            tab={formatMessage({id: 'user-login.login.tab-login-credentials'})}
+          >
             {status === 'error' &&
             loginType === 'account' &&
             !submitting &&
@@ -180,14 +186,14 @@ class Login extends Component<LoginProps, LoginState> {
           {/*    ]}*/}
           {/*  />*/}
           {/*</Tab>*/}
-          <div>
-            <Checkbox checked={autoLogin} onChange={this.changeAutoLogin}>
-              <FormattedMessage id="user-login.login.remember-me"/>
-            </Checkbox>
-            <a style={{float: 'right'}} href="">
-              <FormattedMessage id="user-login.login.forgot-password"/>
-            </a>
-          </div>
+          {/*<div>*/}
+          {/*  <Checkbox checked={autoLogin} onChange={this.changeAutoLogin}>*/}
+          {/*    <FormattedMessage id="user-login.login.remember-me"/>*/}
+          {/*  </Checkbox>*/}
+          {/*  <a style={{float: 'right'}} href="">*/}
+          {/*    <FormattedMessage id="user-login.login.forgot-password"/>*/}
+          {/*  </a>*/}
+          {/*</div>*/}
           <Submit loading={submitting}>
             <FormattedMessage id="user-login.login.login"/>
           </Submit>
