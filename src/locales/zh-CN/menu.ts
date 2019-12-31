@@ -48,4 +48,13 @@ export default {
   'menu.editor.flow': '流程编辑器',
   'menu.editor.mind': '脑图编辑器',
   'menu.editor.koni': '拓扑编辑器',
+
+
+  'menu.user': '用户',
+  'menu.user.management': '用户管理',
+  'menu.user.beta-application': '内测申请审核',
+  'menu.user.invite-code-management': '邀请码管理',
+  'menu.node': '节点',
+  'menu.node.management': '节点管理',
+  'menu.node.audited': '节点审核',
 };

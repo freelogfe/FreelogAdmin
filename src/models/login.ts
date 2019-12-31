@@ -38,7 +38,7 @@ const Model: LoginModelType = {
       // const rrr = yield fakeAccountLogin(payload);
       // console.log(rrr.response.headers, 'rrr')
       const response = yield call(fakeAccountLogin, payload);
-      console.log(response, 'responseresponse');
+      // console.log(response, 'responseresponse');
       yield put({
         type: 'changeLoginStatus',
         payload: response,

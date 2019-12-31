@@ -113,7 +113,7 @@ export default {
             // },
             {
               path: '/admin',
-              name: '用户',
+              name: 'user',
               icon: 'crown',
               // component: './Admin',
               // authority: ['admin'],
@@ -121,19 +121,19 @@ export default {
               routes: [
                 {
                   path: '/admin/ManageUsers',
-                  name: '用户管理',
+                  name: 'management',
                   icon: 'redo',
                   component: './admin/ManageUsers',
                 },
                 {
                   path: '/admin/Application',
-                  name: '内测申请审核',
+                  name: 'beta-application',
                   icon: 'redo',
                   component: './admin/Application',
                 },
                 {
                   path: '/admin/InviteCode',
-                  name: '邀请码管理',
+                  name: 'invite-code-management',
                   icon: 'redo',
                   component: './admin/InviteCode',
                 },
@@ -141,17 +141,17 @@ export default {
             },
             {
               path: '/node',
-              name: '节点',
+              name: 'node',
               icon: 'crown',
               routes: [
                 {
-                  name: '节点管理',
+                  name: 'management',
                   icon: 'crown',
                   path: '/node/ManageNodes',
                   component: './node/ManageNodes',
                 },
                 {
-                  name: '节点审核',
+                  name: 'audited',
                   icon: 'crown',
                   path: '/node/ReviewNodes',
                   component: './node/ReviewNodes',
