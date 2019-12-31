@@ -1,15 +1,14 @@
-import { IConfig, IPlugin } from 'umi-types';
+import {IConfig, IPlugin} from 'umi-types';
 import defaultSettings from './defaultSettings'; // https://umijs.org/config/
+
 import slash from 'slash2';
 import themePluginConfig from './themePluginConfig';
 
-const { pwa } = defaultSettings;
-
-// preview.pro.ant.design only do not use in your production ;
+const {pwa} = defaultSettings; // preview.pro.ant.design only do not use in your production ;
 // preview.pro.ant.design 专用环境变量，请不要在你的项目中使用它。
-const { ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION } = process.env;
-const isAntDesignProPreview = ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION === 'site';
 
+const {ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION} = process.env;
+const isAntDesignProPreview = ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION === 'site';
 const plugins: IPlugin[] = [
   [
     'umi-plugin-react',
@@ -33,11 +32,11 @@ const plugins: IPlugin[] = [
       },
       pwa: pwa
         ? {
-            workboxPluginMode: 'InjectManifest',
-            workboxOptions: {
-              importWorkboxFrom: 'local',
-            },
-          }
+          workboxPluginMode: 'InjectManifest',
+          workboxOptions: {
+            importWorkboxFrom: 'local',
+          },
+        }
         : false, // default close dll, because issue https://github.com/ant-design/ant-design-pro/issues/4665
       // dll features https://webpack.js.org/plugins/dll-plugin/
       // dll: {
@@ -94,25 +93,72 @@ export default {
         {
           path: '/',
           component: '../layouts/BasicLayout',
-          authority: ['admin', 'user'],
+          // authority: ['admin', 'user'],
           routes: [
             {
               path: '/',
-              redirect: '/welcome',
+              redirect: '/admin/ManageUsers',
             },
-            {
-              path: '/welcome',
-              name: 'welcome',
-              icon: 'smile',
-              component: './Welcome',
-            },
+            // {
+            //   path: '/home',
+            //   name: 'home',
+            //   icon: 'home',
+            //   component: './Home',
+            // },
+            // {
+            //   path: '/welcome',
+            //   name: 'welcome',
+            //   icon: 'smile',
+            //   component: './Welcome',
+            // },
             {
               path: '/admin',
-              name: 'admin',
+              name: '用户',
               icon: 'crown',
-              component: './Admin',
-              authority: ['admin'],
+              // component: './Admin',
+              // authority: ['admin'],
+              // redirect: '/admin/ManageUsers',
+              routes: [
+                {
+                  path: '/admin/ManageUsers',
+                  name: '用户管理',
+                  icon: 'redo',
+                  component: './admin/ManageUsers',
+                },
+                {
+                  path: '/admin/Application',
+                  name: '内测申请审核',
+                  icon: 'redo',
+                  component: './admin/Application',
+                },
+                {
+                  path: '/admin/InviteCode',
+                  name: '邀请码管理',
+                  icon: 'redo',
+                  component: './admin/InviteCode',
+                },
+              ]
             },
+            {
+              path: '/node',
+              name: '节点',
+              icon: 'crown',
+              routes: [
+                {
+                  name: '节点管理',
+                  icon: 'crown',
+                  path: '/node/ManageNodes',
+                  component: './node/ManageNodes',
+                },
+                {
+                  name: '节点审核',
+                  icon: 'crown',
+                  path: '/node/ReviewNodes',
+                  component: './node/ReviewNodes',
+                },
+              ]
+            },
+
             {
               component: './404',
             },
@@ -123,7 +169,6 @@ export default {
         },
       ],
     },
-
     {
       component: './404',
     },
@@ -148,7 +193,7 @@ export default {
         resourcePath: string;
       },
       _: string,
-      localName: string,
+      localName: string
     ) => {
       if (
         context.resourcePath.includes('node_modules') ||
@@ -176,11 +221,15 @@ export default {
     basePath: '/',
   },
   // chainWebpack: webpackPlugin,
-  // proxy: {
-  //   '/server/api/': {
-  //     target: 'https://preview.pro.ant.design/',
-  //     changeOrigin: true,
-  //     pathRewrite: { '^/server': '' },
-  //   },
-  // },
+  proxy: {
+    // '/server/api/': {
+    //   target: 'https://preview.pro.ant.design/',
+    //   changeOrigin: true,
+    //   pathRewrite: { '^/server': '' },
+    // },
+    '/v1': {
+      target: 'http://api.testfreelog.com',
+      changeOrigin: true, // pathRewrite: { '^/server': '' },
+    },
+  },
 } as IConfig;

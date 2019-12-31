@@ -6,7 +6,7 @@ import {
 import {FormattedMessage, formatMessage} from 'umi-plugin-react/locale';
 import React, {Component} from 'react';
 
-import {CheckboxChangeEvent} from 'antd/es/checkbox';
+// import {CheckboxChangeEvent} from 'antd/es/checkbox';
 import {Dispatch, AnyAction} from 'redux';
 import {FormComponentProps} from 'antd/es/form';
 // import Link from 'umi/link';
@@ -42,21 +42,25 @@ class Login extends Component<LoginProps, LoginState> {
     autoLogin: true,
   };
 
-  changeAutoLogin = (e: CheckboxChangeEvent) => {
-    this.setState({
-      autoLogin: e.target.checked,
-    });
-  };
+  // changeAutoLogin = (e: CheckboxChangeEvent) => {
+  //   this.setState({
+  //     autoLogin: e.target.checked,
+  //   });
+  // };
 
   handleSubmit = (err: unknown, values: LoginParamsType) => {
-    const {type} = this.state;
+    // console.log(values, 'valuesvaluesvaluesvaluesvalues');
+    // const {type} = this.state;
     if (!err) {
       const {dispatch} = this.props;
       dispatch({
         type: 'login/login',
         payload: {
-          ...values,
-          type,
+          // ...values,
+          loginName: values.userName,
+          password: values.password,
+          jwtType: 'header',
+          // type,
         },
       });
     }
@@ -94,7 +98,12 @@ class Login extends Component<LoginProps, LoginState> {
     });
 
   renderMessage = (content: string) => (
-    <Alert style={{marginBottom: 24}} message={content} type="error" showIcon/>
+    <Alert
+      style={{marginBottom: 24}}
+      message={content}
+      type="error"
+      showIcon
+    />
   );
 
   render() {
