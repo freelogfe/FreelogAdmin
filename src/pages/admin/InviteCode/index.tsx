@@ -143,7 +143,11 @@ export default function () {
       fixed: 'right',
       render: (text: any, record: any) => {
         return (
-          <Button style={{padding: 0}} type="link">更改状态</Button>
+          <Button
+            style={{padding: 0}}
+            type="link"
+            disabled={record.status === 2}
+          >更改状态</Button>
         )
       }
     },
@@ -157,10 +161,10 @@ export default function () {
       console.log(selectedRowKeys, 'selectedRowKeys');
       setsSelectedRowKeys(selectedRowKeys);
     },
-    // getCheckboxProps: (record: any) => ({
-    //   disabled: record.name === 'Disabled User', // Column configuration not to be checked
-    //   name: record.name,
-    // }),
+    getCheckboxProps: (record: any) => ({
+      disabled: record.status === 2, // Column configuration not to be checked
+      // name: record.name,
+    }),
   };
 
   const handleOk = async () => {
