@@ -30,8 +30,9 @@ export default function () {
       return message.error(response.msg);
     }
     const data = response.data;
-    setCurrent(data.page);
-    setPageSize(data.pageSize);
+    setsSelectedRowKeys([]);
+    // setCurrent(data.page);
+    // setPageSize(data.pageSize);
     setTotal(data.totalItem);
     setDataSource(data.dataList);
   };
@@ -60,7 +61,7 @@ export default function () {
             setStatus(value);
           }}
         >
-          <Select.Option value={-1}>全部</Select.Option>
+          <Select.Option value={-1}>全部状态</Select.Option>
           <Select.Option value={0}>未使用</Select.Option>
           <Select.Option value={1}>已分发</Select.Option>
           <Select.Option value={2}>已核销</Select.Option>
@@ -158,7 +159,7 @@ export default function () {
     selectedRowKeys: selectedRowKeys,
     onChange: (selectedRowKeys: any, selectedRows: any) => {
       // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-      console.log(selectedRowKeys, 'selectedRowKeys');
+      // console.log(selectedRowKeys, 'selectedRowKeys');
       setsSelectedRowKeys(selectedRowKeys);
     },
     getCheckboxProps: (record: any) => ({
@@ -196,8 +197,11 @@ export default function () {
         >批量生成邀请码</Button>
       </div>
       <div style={{padding: '8px 0'}}>
-        <span>已选中 10 条</span>
-        <Button type="link">批量更改状态</Button>
+        <span>已选中 {selectedRowKeys.length} 条</span>
+        <Button
+          type="link"
+          disabled={selectedRowKeys.length === 0}
+        >批量更改状态</Button>
       </div>
       <Table
         rowSelection={rowSelection}
