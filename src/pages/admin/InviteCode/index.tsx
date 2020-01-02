@@ -14,6 +14,7 @@ export default function () {
   const [current, setCurrent] = React.useState<number>(1);
   const [total, setTotal] = React.useState<number>(0);
   const [status, setStatus] = React.useState<number>(-1);
+  const [selectedRowKeys, setsSelectedRowKeys] = React.useState<string[]>([]);
 
   React.useEffect(() => {
     handleData();
@@ -150,13 +151,16 @@ export default function () {
 
   const rowSelection = {
     fixed: true,
+    selectedRowKeys: selectedRowKeys,
     onChange: (selectedRowKeys: any, selectedRows: any) => {
-      console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+      // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+      console.log(selectedRowKeys, 'selectedRowKeys');
+      setsSelectedRowKeys(selectedRowKeys);
     },
-    getCheckboxProps: (record: any) => ({
-      disabled: record.name === 'Disabled User', // Column configuration not to be checked
-      name: record.name,
-    }),
+    // getCheckboxProps: (record: any) => ({
+    //   disabled: record.name === 'Disabled User', // Column configuration not to be checked
+    //   name: record.name,
+    // }),
   };
 
   const handleOk = async () => {
@@ -187,7 +191,7 @@ export default function () {
           onClick={() => setVisible(true)}
         >批量生成邀请码</Button>
       </div>
-      <div>
+      <div style={{padding: '8px 0'}}>
         <span>已选中 10 条</span>
         <Button type="link">批量更改状态</Button>
       </div>
@@ -203,7 +207,7 @@ export default function () {
 
       {
         total !== 0 ?
-          (<div style={{display: 'flex', justifyContent: 'flex-end', paddingTop: 20}}>
+          (<div style={{display: 'flex', justifyContent: 'flex-end', paddingTop: 16}}>
             <Pagination
               showSizeChanger
               current={current}
