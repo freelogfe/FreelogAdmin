@@ -1,5 +1,7 @@
 import React from 'react';
 import {message, Table, Button} from 'antd';
+import moment from 'moment';
+
 import {applyRecords} from '@/services/admin';
 
 import styles from './index.less';
@@ -26,11 +28,17 @@ export default function () {
       title: '申请日期',
       dataIndex: 'createDate',
       key: 'createDate',
+      render: (text: string) => {
+        return moment(text).format('YYYY-MM-DD');
+      }
     },
     {
       title: '申请信息',
       dataIndex: 'description',
       key: 'description',
+      // render: (text: string) => {
+      //   return moment(text).format('YYYY-MM-DD');
+      // }
     },
     {
       title: '用户名',
@@ -92,26 +100,7 @@ export default function () {
       </div>
       <Table
         rowSelection={rowSelection}
-        dataSource={[
-          ...(dataSource || []),
-          {
-            "recordId": "5e047e3b509201111476b722",
-            "auditMsg": "审核通过",
-            "operationUserId": 50003,
-            "status": 1,
-            "auditCount": 0,
-            "userId": 50003,
-            "username": "yuliang",
-            "province": "广东",
-            "city": "深圳",
-            "phone": '178565684090',
-            "email": '1025234234@qq.com',
-            "occupation": "软件开发",
-            "description": "公众号:abcd",
-            "createDate": "2019-12-26T09:32:43.667Z",
-            "updateDate": "2019-12-26T09:48:04.931Z"
-          }
-        ] || []}
+        dataSource={dataSource || []}
         columns={columns}
         rowKey={'recordId'}
       />
