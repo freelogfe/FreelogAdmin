@@ -42,3 +42,18 @@ export async function selectBetaCodes(params: ISelectBetaCodesType) {
     // getResponse: true,
   });
 }
+
+
+interface IBetaAuditType {
+  recordIds: string[];
+  // 审核状态 ( 1:审核通过 2:审核不通过 )
+  status: number;
+  auditMsg?: string;
+}
+
+export async function betaAudit(params: IBetaAuditType) {
+  return request('/v1/testQualifications/beta/audit', {
+    method: 'PUT',
+    params: params,
+  });
+}

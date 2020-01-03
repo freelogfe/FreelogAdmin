@@ -1,8 +1,8 @@
 import React from 'react';
-import {message, Table, Button, Pagination, Select, Input} from 'antd';
+import {message, Table, Button, Pagination, Select, Input, Modal, Radio} from 'antd';
 import moment from 'moment';
 
-import {applyRecords} from '@/services/admin';
+import {applyRecords, betaAudit} from '@/services/admin';
 
 import styles from './index.less';
 
@@ -13,7 +13,10 @@ export default function () {
   const [current, setCurrent] = React.useState<number>(1);
   const [total, setTotal] = React.useState<number>(0);
   const [status, setStatus] = React.useState<number>(-1);
-  const [selectedRowKeys, setsSelectedRowKeys] = React.useState<string[]>([]);
+  const [selectedRowKeys, setSelectedRowKeys] = React.useState<string[]>([]);
+  const [handledRecordIds, setHandledRecordIds] = React.useState<string[]>([]);
+  const [auditValue, setAuditValue] = React.useState<number>(1);
+  const [otherReasonValue, setOtherReasonValue] = React.useState<string>('');
 
   React.useEffect(() => {
     handleData();
@@ -30,7 +33,7 @@ export default function () {
       return message.error(response.msg);
     }
     const data = response.data;
-    setsSelectedRowKeys([]);
+    setSelectedRowKeys([]);
     setTotal(data.totalItem);
     setDataSource(data.dataList);
   };
@@ -118,7 +121,10 @@ export default function () {
       render: (text: any, record: any) => {
         switch (record.status) {
           case 0:
-            return <Button type="link">审核</Button>;
+            return (<Button
+              type="link"
+              onClick={() => setHandledRecordIds([record.recordId])}
+            >审核</Button>);
           case 2:
             return <Button type="link">详情</Button>;
           case 1:
@@ -134,11 +140,58 @@ export default function () {
     selectedRowKeys: selectedRowKeys,
     onChange: (selectedRowKeys: any, selectedRows: any) => {
       // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-      setsSelectedRowKeys(selectedRowKeys);
+      setSelectedRowKeys(selectedRowKeys);
     },
     getCheckboxProps: (record: any) => ({
       disabled: record.status !== 0, // Column configuration not to be checked
     }),
+  };
+
+  const handleOk = async () => {
+    console.log(handledRecordIds, 'handledRecordIds');
+    let status: 1 | 2 = 1;
+    let auditMsg: string = '';
+    switch (auditValue) {
+      case 2:
+        status = 2;
+        auditMsg = '链接无法打开';
+        break;
+      case 3:
+        status = 2;
+        auditMsg = '公众号ID不存在';
+        break;
+      case 4:
+        status = 2;
+        auditMsg = otherReasonValue ? otherReasonValue : '其它原因';
+        break;
+      default:
+        break;
+    }
+    // console.log({
+    //   recordIds: handledRecordIds,
+    //   status: status,
+    //   auditMsg: auditMsg,
+    // }, '!@#@#@#@#@#');
+    // return ;
+    const response = await betaAudit({
+      recordIds: handledRecordIds,
+      status: status,
+      auditMsg: auditMsg,
+    });
+    if (response.errcode !== 0 || response.ret !== 0) {
+      return message.error(response.msg);
+    }
+    message.success('修改状态成功');
+  };
+
+  const handleCancel = () => {
+    setHandledRecordIds([]);
+  };
+
+  const radioStyle = {
+    display: 'block',
+    height: '30px',
+    lineHeight: '30px',
   };
 
   return (
@@ -149,6 +202,7 @@ export default function () {
           <Button
             type="link"
             disabled={selectedRowKeys.length === 0}
+            onClick={() => setHandledRecordIds(selectedRowKeys)}
           >批量审核</Button>
         </div>
         <Input.Search
@@ -189,6 +243,33 @@ export default function () {
           </div>)
           : null
       }
+
+      <Modal
+        title="审核内测资格"
+        visible={handledRecordIds.length !== 0}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        // okText="生成"
+      >
+        <Radio.Group
+          value={auditValue}
+          onChange={(e) => setAuditValue(e.target.value)}
+        >
+          <Radio style={radioStyle} value={1}>通过</Radio>
+          <Radio style={radioStyle} value={2}>拒绝通过：链接无法打开</Radio>
+          <Radio style={radioStyle} value={3}>拒绝通过：公众号ID不存在</Radio>
+          <Radio style={radioStyle} value={4}>拒绝通过：其它原因</Radio>
+        </Radio.Group>
+        {auditValue === 4
+          ? <Input.TextArea
+            value={otherReasonValue}
+            onChange={(e) => setOtherReasonValue(e.target.value)}
+            style={{display: 'block'}}
+            placeholder="请输入拒绝通过原因（非必填）"
+            rows={4}
+          />
+          : null}
+      </Modal>
     </div>
   );
 }
