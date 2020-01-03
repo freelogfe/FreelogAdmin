@@ -54,6 +54,6 @@ interface IBetaAuditType {
 export async function betaAudit(params: IBetaAuditType) {
   return request('/v1/testQualifications/beta/audit', {
     method: 'PUT',
-    params: params,
+    data: params,
   });
 }

@@ -5,9 +5,11 @@ import moment from 'moment';
 import {applyRecords, betaAudit} from '@/services/admin';
 
 import styles from './index.less';
+import {searchUser} from "@/services/user";
 
 export default function () {
 
+  // const [isMount, setIsMount] = React.useState<boolean>(true);
   const [dataSource, setDataSource] = React.useState<any[] | null>(null);
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [current, setCurrent] = React.useState<number>(1);
@@ -17,17 +19,40 @@ export default function () {
   const [handledRecordIds, setHandledRecordIds] = React.useState<string[]>([]);
   const [auditValue, setAuditValue] = React.useState<number>(1);
   const [otherReasonValue, setOtherReasonValue] = React.useState<string>('');
+  // 0 不用限用户 -1 用户不存在 other 用户 id
+  const [searchedUserID, setSearchedUserID] = React.useState<number>(0);
+
+  // React.useEffect(() => {
+  //   setIsMount(false);
+  // }, []);
 
   React.useEffect(() => {
     handleData();
-  }, [current, pageSize, status]);
+  }, [current, pageSize, status, searchedUserID]);
+
+  // React.useEffect(() => {
+  //   if (!isMount) {
+  //     console.log(searchUserValue, 'searchUserValue');
+  //     // searchUserID();
+  //   }
+  // }, [searchUserValue]);
 
   const handleData = async () => {
-    const response = await applyRecords({
+    if (searchedUserID === -1) {
+      setSelectedRowKeys([]);
+      setTotal(0);
+      setDataSource([]);
+      return;
+    }
+    const params: any = {
       page: current,
       pageSize: pageSize,
       status: status,
-    });
+    };
+    if (searchedUserID !== 0) {
+      params.userId = searchedUserID;
+    }
+    const response = await applyRecords(params);
     // console.log(response, 'responseresponse');
     if (response.errcode !== 0 || response.ret !== 0) {
       return message.error(response.msg);
@@ -36,6 +61,25 @@ export default function () {
     setSelectedRowKeys([]);
     setTotal(data.totalItem);
     setDataSource(data.dataList);
+  };
+
+  const searchUserID = async (keyword: string) => {
+    if (!keyword) {
+      return setSearchedUserID(0);
+    }
+    // setSearchUserValue(keyword);
+    const response = await searchUser({
+      keywords: keyword,
+    });
+    if (response.errcode !== 0 || response.ret !== 0) {
+      return message.error(response.msg);
+    }
+
+    if (response.data) {
+      setSearchedUserID(response.data.userId);
+    } else {
+      setSearchedUserID(-1);
+    }
   };
 
   const columns = [
@@ -206,11 +250,11 @@ export default function () {
           >批量审核</Button>
         </div>
         <Input.Search
+          onSearch={value => searchUserID(value)}
           placeholder="请输入用户名、注册邮箱/手机号进行搜索"
           enterButton="搜索"
           size="large"
           style={{width: 400}}
-          onSearch={value => console.log(value)}
         />
       </div>
       <Table
