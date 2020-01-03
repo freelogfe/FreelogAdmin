@@ -23,7 +23,8 @@ export async function fakeAccountLogin(params: LoginParamsType) {
   return request('/v1/passport/login', {
     method: 'POST',
     data: params,
-    // getResponse: true,
+    getResponse: true,
+    // getResponse: true
   });
 }
 
