@@ -1,5 +1,5 @@
 import React from 'react';
-import {message, Table, Button, Pagination, Select} from 'antd';
+import {message, Table, Button, Pagination, Select, Input} from 'antd';
 import moment from 'moment';
 
 import {applyRecords} from '@/services/admin';
@@ -48,9 +48,13 @@ export default function () {
       title: '申请信息',
       dataIndex: 'description',
       key: 'description',
-      // render: (text: string) => {
-      //   return moment(text).format('YYYY-MM-DD');
-      // }
+      render: (text: string, record: any) => {
+        return (<div style={{width: 300, lineHeight: '24px'}}>
+          <div>职业：{record.occupation}</div>
+          <div>区域：{record.province}-{record.city}</div>
+          <div>其它：{record.auditMsg}</div>
+        </div>)
+      }
     },
     {
       title: '用户名',
@@ -139,12 +143,21 @@ export default function () {
 
   return (
     <div className={styles.normal}>
-      <div style={{padding: '8px 0'}}>
-        <span>已选中 {selectedRowKeys.length} 条</span>
-        <Button
-          type="link"
-          disabled={selectedRowKeys.length === 0}
-        >批量审核</Button>
+      <div style={{padding: '8px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+        <div>
+          <span>已选中 {selectedRowKeys.length} 条</span>
+          <Button
+            type="link"
+            disabled={selectedRowKeys.length === 0}
+          >批量审核</Button>
+        </div>
+        <Input.Search
+          placeholder="请输入用户名、注册邮箱/手机号进行搜索"
+          enterButton="搜索"
+          size="large"
+          style={{width: 400}}
+          onSearch={value => console.log(value)}
+        />
       </div>
       <Table
         rowSelection={rowSelection}
