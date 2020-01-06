@@ -5,7 +5,7 @@ import moment from 'moment';
 import {applyRecords, betaAudit} from '@/services/admin';
 
 import styles from './index.less';
-import {searchUser} from "@/services/user";
+import {searchUser, userinfos} from "@/services/user";
 
 export default function () {
 
@@ -60,7 +60,23 @@ export default function () {
     const data = response.data;
     setSelectedRowKeys([]);
     setTotal(data.totalItem);
-    setDataSource(data.dataList);
+
+    if (data.totalItem === 0) {
+      return setDataSource([]);
+    }
+
+    const response1 = await userinfos({
+      userIds: data.dataList.map((i: any) => i.userId).join(','),
+    });
+
+    if (response1.errcode !== 0 || response1.ret !== 0) {
+      return message.error(response1.msg);
+    }
+    setDataSource(data.dataList.map((i: any) => ({
+      ...i,
+      userInfo: response1.data.find((j: any) => j.userId === i.userId),
+    })));
+
   };
 
   const searchUserID = async (keyword: string) => {
@@ -112,11 +128,17 @@ export default function () {
       title: '手机',
       dataIndex: 'phone',
       key: 'phone',
+      render: (text: number, record: any) => {
+        return (record.userInfo ? record.userInfo.mobile : '');
+      }
     },
     {
       title: '邮箱',
       dataIndex: 'email',
       key: 'email',
+      render: (text: number, record: any) => {
+        return (record.userInfo ? record.userInfo.email : '');
+      }
     },
     // {
     //   title: '最后登录',

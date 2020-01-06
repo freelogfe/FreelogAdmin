@@ -5,6 +5,7 @@ import moment from 'moment';
 import {batchCreate, batchUpdate, selectBetaCodes} from '@/services/admin';
 
 import styles from './index.less';
+import {userinfos} from "@/services/user";
 
 export default function () {
 
@@ -35,6 +36,32 @@ export default function () {
     // setPageSize(data.pageSize);
     setTotal(data.totalItem);
     setDataSource(data.dataList);
+
+    if (data.totalItem === 0) {
+      return;
+    }
+
+    const userIds = data.dataList
+      .filter((j: any) => j.usedUsers.length > 0)
+      .map((i: any) => i.usedUsers[0]);
+
+    // console.log('#######');
+    if (userIds.length === 0) {
+      return;
+    }
+    // return;
+    // console.log(data.dataList, ' data.dataList');
+    const response1 = await userinfos({
+      userIds: userIds.join(','),
+    });
+
+    if (response1.errcode !== 0 || response1.ret !== 0) {
+      return message.error(response1.msg);
+    }
+    setDataSource(data.dataList.map((i: any) => ({
+      ...i,
+      userInfo: response1.data.find((j: any) => j.userId === i.usedUsers[0]),
+    })));
   };
 
   const columns = [
@@ -123,16 +150,27 @@ export default function () {
       title: '核销用户',
       dataIndex: 'username',
       key: 'username',
+      render: (text: any, record: any) => {
+        console.log(record, 'recordrecord');
+        return record.userInfo ? record.userInfo.username : '';
+      }
     },
     {
       title: '手机号',
       dataIndex: 'phone',
       key: 'phone',
+      render: (text: any, record: any) => {
+        console.log(record, 'recordrecord');
+        return record.userInfo ? record.userInfo.mobile : '';
+      }
     },
     {
       title: '邮箱',
       dataIndex: 'email',
       key: 'email',
+      render: (text: any, record: any) => {
+        return record.userInfo ? record.userInfo.email : '';
+      }
     },
     // {
     //   title: '最后登录',

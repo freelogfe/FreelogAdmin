@@ -11,7 +11,16 @@ export async function searchUser(params: ISearchUserType) {
   });
 }
 
+interface IUserinfosType {
+  userIds: string;
+}
 
+export async function userinfos(params: IUserinfosType) {
+  return request('/v1/userinfos', {
+    method: 'GET',
+    params: params,
+  });
+}
 
 
 export async function query(): Promise<any> {
