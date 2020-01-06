@@ -228,7 +228,7 @@ export default {
     //   pathRewrite: { '^/server': '' },
     // },
     '/v1': {
-      target: 'http://api.testfreelog.com',
+      target: 'http://qi.testfreelog.com',
       changeOrigin: true, // pathRewrite: { '^/server': '' },
     },
   },

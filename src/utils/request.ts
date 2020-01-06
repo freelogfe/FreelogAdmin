@@ -55,7 +55,8 @@ const request = extend({
   // @ts-ignore
   headers: {
     authorization: window.localStorage.getItem('authorization'),
-  }
+  },
+  prefix: 'http://qi.testfreelog.com'
 });
 
 // @ts-ignore
