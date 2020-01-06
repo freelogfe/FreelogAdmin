@@ -1,5 +1,5 @@
 import React from 'react';
-import {message, Table, Button, Pagination, Select, Input, Modal, Radio} from 'antd';
+import {message, Table, Button, Pagination, Select, Input, Modal, Radio, Popover} from 'antd';
 import moment from 'moment';
 
 import {applyRecords, betaAudit} from '@/services/admin';
@@ -170,7 +170,12 @@ export default function () {
               onClick={() => setHandledRecordIds([record.recordId])}
             >审核</Button>);
           case 2:
-            return <Button type="link">详情</Button>;
+            return (<Popover
+              content={record.auditMsg}
+              title="拒绝通过的原因"
+            >
+              <Button type="link">详情</Button>
+            </Popover>);
           case 1:
           default:
             return <span>--</span>;
@@ -192,7 +197,7 @@ export default function () {
   };
 
   const handleOk = async () => {
-    console.log(handledRecordIds, 'handledRecordIds');
+    // console.log(handledRecordIds, 'handledRecordIds');
     let status: 1 | 2 = 1;
     let auditMsg: string = '';
     switch (auditValue) {
@@ -225,6 +230,8 @@ export default function () {
     if (response.errcode !== 0 || response.ret !== 0) {
       return message.error(response.msg);
     }
+    setHandledRecordIds([]);
+    handleData();
     message.success('修改状态成功');
   };
 
