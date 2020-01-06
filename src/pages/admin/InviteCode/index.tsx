@@ -151,7 +151,7 @@ export default function () {
       dataIndex: 'username',
       key: 'username',
       render: (text: any, record: any) => {
-        console.log(record, 'recordrecord');
+        // console.log(record, 'recordrecord');
         return record.userInfo ? record.userInfo.username : '';
       }
     },
@@ -160,7 +160,7 @@ export default function () {
       dataIndex: 'phone',
       key: 'phone',
       render: (text: any, record: any) => {
-        console.log(record, 'recordrecord');
+        // console.log(record, 'recordrecord');
         return record.userInfo ? record.userInfo.mobile : '';
       }
     },
