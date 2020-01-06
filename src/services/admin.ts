@@ -57,3 +57,19 @@ export async function betaAudit(params: IBetaAuditType) {
     data: params,
   });
 }
+
+
+interface IBatchUpdateType {
+  codes: string[];
+  // 审核状态 ( 1:审核通过 2:审核不通过 )
+  status: number;
+}
+
+export async function batchUpdate(params: IBatchUpdateType) {
+  return request('/v1/testQualifications/beta/codes/batchUpdate', {
+    method: 'PUT',
+    data: params,
+  });
+}
+
+

@@ -1,8 +1,8 @@
 import React from 'react';
-import {Button, Table, Modal, InputNumber, message, Pagination, Select} from 'antd';
+import {Button, Table, Modal, InputNumber, message, Pagination, Select, Dropdown, Menu} from 'antd';
 import moment from 'moment';
 
-import {batchCreate, selectBetaCodes} from '@/services/admin';
+import {batchCreate, batchUpdate, selectBetaCodes} from '@/services/admin';
 
 import styles from './index.less';
 
@@ -107,13 +107,16 @@ export default function () {
       title: '分发时间',
       dataIndex: 'distributeDate',
       key: 'distributeDate',
+      render: (text: string) => {
+        return text ? moment(text).format('YYYY-MM-DD') : '---';
+      }
     },
     {
       title: '核销时间',
-      dataIndex: 'updateDate',
-      key: 'updateDate',
+      dataIndex: 'destroyDate',
+      key: 'destroyDate',
       render: (text: string) => {
-        return moment(text).format('YYYY-MM-DD');
+        return text ? moment(text).format('YYYY-MM-DD') : '---';
       }
     },
     {
@@ -143,13 +146,35 @@ export default function () {
       width: 90,
       fixed: 'right',
       render: (text: any, record: any) => {
-        return (
+        return (<Dropdown
+          disabled={record.status === 2}
+          overlay={<Menu>
+            {
+              record.status === 0
+                ? (<Menu.Item>
+                  <a onClick={() => updateStatus([record.code], 1)}>
+                    已分发
+                  </a>
+                </Menu.Item>)
+                : null
+            }
+
+            {
+              record.status === 1
+                ? (<Menu.Item>
+                  <a onClick={() => updateStatus([record.code], 0)}>
+                    未分发
+                  </a>
+                </Menu.Item>)
+                : null
+            }
+          </Menu>}>
           <Button
             style={{padding: 0}}
             type="link"
             disabled={record.status === 2}
           >更改状态</Button>
-        )
+        </Dropdown>)
       }
     },
   ];
@@ -187,6 +212,34 @@ export default function () {
 
   };
 
+  const updateStatus = async (codes: string[], status: number) => {
+    const response = await batchUpdate({
+      codes,
+      status,
+    });
+    if (response.ret !== 0 || response.errcode !== 0) {
+      return message.error(response.msg);
+    }
+    message.success('修改状态成功');
+    handleData();
+  };
+
+  const menu = (
+    <Menu>
+      <Menu.Item>
+        <a onClick={() => updateStatus(selectedRowKeys, 1)}>
+          已分发
+        </a>
+      </Menu.Item>
+      <Menu.Divider/>
+      <Menu.Item>
+        <a onClick={() => updateStatus(selectedRowKeys, 0)}>
+          未分发
+        </a>
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
     <div className={styles.normal}>
       <div style={{display: 'flex', justifyContent: 'flex-end'}}>
@@ -198,10 +251,13 @@ export default function () {
       </div>
       <div style={{padding: '8px 0'}}>
         <span>已选中 {selectedRowKeys.length} 条</span>
-        <Button
-          type="link"
-          disabled={selectedRowKeys.length === 0}
-        >批量更改状态</Button>
+        <Dropdown
+          overlay={menu}>
+          <Button
+            type="link"
+            disabled={selectedRowKeys.length === 0}
+          >批量更改状态</Button>
+        </Dropdown>
       </div>
       <Table
         rowSelection={rowSelection}
