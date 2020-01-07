@@ -59,7 +59,7 @@ class Login extends Component<LoginProps, LoginState> {
           // ...values,
           loginName: values.userName,
           password: values.password,
-          jwtType: 'header',
+          // jwtType: 'header',
           // type,
         },
       });
