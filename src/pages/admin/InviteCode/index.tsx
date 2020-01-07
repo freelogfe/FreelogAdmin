@@ -16,6 +16,7 @@ export default function () {
   const [total, setTotal] = React.useState<number>(0);
   const [status, setStatus] = React.useState<number>(-1);
   const [selectedRowKeys, setsSelectedRowKeys] = React.useState<string[]>([]);
+  const [createQuantity, setCreateQuantity] = React.useState<number>(10);
 
   React.useEffect(() => {
     handleData();
@@ -232,7 +233,9 @@ export default function () {
   };
 
   const handleOk = async () => {
-    const response = await batchCreate({});
+    const response = await batchCreate({
+      createQuantity
+    });
     if (response.ret !== 0 || response.errcode !== 0) {
       return message.error(response.msg);
     }
@@ -246,8 +249,8 @@ export default function () {
     setVisible(false);
   };
 
-  const onChange = () => {
-
+  const onChange = (value: number | undefined) => {
+    setCreateQuantity(value || 10);
   };
 
   const updateStatus = async (codes: string[], status: number) => {
@@ -338,7 +341,7 @@ export default function () {
         <InputNumber
           min={1}
           max={50}
-          defaultValue={10}
+          value={createQuantity}
           onChange={onChange}
         />
       </Modal>
