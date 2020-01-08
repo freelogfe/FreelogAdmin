@@ -115,7 +115,7 @@ export default function () {
         return (<div style={{width: 300, lineHeight: '24px'}}>
           <div>职业：{record.occupation}</div>
           <div>区域：{record.province}-{record.city}</div>
-          <div>其它：{record.auditMsg}</div>
+          <div>其它：{record.description}</div>
         </div>)
       }
     },
