@@ -234,14 +234,18 @@ export default function () {
 
   const handleOk = async () => {
     const response = await batchCreate({
-      createQuantity
+      quantity: createQuantity,
     });
     if (response.ret !== 0 || response.errcode !== 0) {
       return message.error(response.msg);
     }
     message.success('生成成功');
     setVisible(false);
-    setCurrent(1);
+    if (current === 1) {
+      handleData();
+    } else {
+      setCurrent(1);
+    }
     // console.log(response, '#######');
   };
 
@@ -314,6 +318,7 @@ export default function () {
         total !== 0 ?
           (<div style={{display: 'flex', justifyContent: 'flex-end', paddingTop: 16}}>
             <Pagination
+              showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
               showSizeChanger
               current={current}
               onChange={(current: number) => {

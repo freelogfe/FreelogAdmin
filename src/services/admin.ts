@@ -16,10 +16,11 @@ export async function applyRecords(params: IApplyRecordsType) {
 }
 
 interface IBatchCreateType {
-  createQuantity?: number;
+  quantity?: number;
 }
 
 export async function batchCreate(params: IBatchCreateType) {
+  // console.log(params, 'paramsparams');
   return request('/v1/testQualifications/beta/codes/batchCreate', {
     method: 'POST',
     data: params,

@@ -300,6 +300,7 @@ export default function () {
         total !== 0 ?
           (<div style={{display: 'flex', justifyContent: 'flex-end', paddingTop: 16}}>
             <Pagination
+              showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
               showSizeChanger
               current={current}
               onChange={(current: number) => {
