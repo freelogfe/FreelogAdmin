@@ -114,7 +114,7 @@ export default {
             {
               path: '/admin',
               name: 'user',
-              icon: 'crown',
+              icon: 'user',
               // component: './Admin',
               // authority: ['admin'],
               // redirect: '/admin/ManageUsers',
@@ -122,19 +122,19 @@ export default {
                 {
                   path: '/admin/ManageUsers',
                   name: 'management',
-                  icon: 'redo',
+                  icon: 'usergroup-delete',
                   component: './admin/ManageUsers',
                 },
                 {
                   path: '/admin/Application',
                   name: 'beta-application',
-                  icon: 'redo',
+                  icon: 'usergroup-add',
                   component: './admin/Application',
                 },
                 {
                   path: '/admin/InviteCode',
                   name: 'invite-code-management',
-                  icon: 'redo',
+                  icon: 'user-add',
                   component: './admin/InviteCode',
                 },
               ]
@@ -142,17 +142,17 @@ export default {
             {
               path: '/node',
               name: 'node',
-              icon: 'crown',
+              icon: 'global',
               routes: [
                 {
                   name: 'management',
-                  icon: 'crown',
+                  icon: 'edit',
                   path: '/node/ManageNodes',
                   component: './node/ManageNodes',
                 },
                 {
                   name: 'audited',
-                  icon: 'crown',
+                  icon: 'check-circle',
                   path: '/node/ReviewNodes',
                   component: './node/ReviewNodes',
                 },
