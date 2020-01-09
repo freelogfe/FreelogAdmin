@@ -4,6 +4,7 @@ import {PageLoading} from '@ant-design/pro-layout';
 import {Redirect} from 'umi';
 import {stringify} from 'querystring';
 import {ConnectState, ConnectProps} from '@/models/connect';
+import {getCookiesUserInfo, getLocalStorageUserInfo} from "@/utils/utils";
 
 // import { CurrentUser } from '@/models/user';
 
@@ -44,9 +45,10 @@ class SecurityLayout extends React.Component<SecurityLayoutProps, SecurityLayout
     // You can replace it to your authentication rule (such as check token exists)
     // 你可以把它替换成你自己的登录认证规则（比如判断 token 是否存在）
     // const isLogin = currentUser && currentUser.userId;
-    const cookieUserInfo: any = Buffer.from(document.cookie.split('.')[1], 'base64').toString();
+    // const cookieUserInfo: any = Buffer.from(document.cookie.split('.')[1], 'base64').toString();
+    const cookieUserInfo: any = getCookiesUserInfo() || getLocalStorageUserInfo();
     // console.log(cookieUserInfo, 'cookieUserInfocookieUserInfo');
-    const isLogin = (cookieUserInfo && JSON.parse(cookieUserInfo).email === 'support@freelog.com') || window.localStorage.getItem('authorization') !== 'null';
+    const isLogin = (cookieUserInfo && cookieUserInfo.email === 'support@freelog.com');
     const queryString = stringify({
       redirect: window.location.href,
     });
