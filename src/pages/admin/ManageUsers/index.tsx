@@ -16,7 +16,7 @@ function ManageUsers({ applyRecords, dispatch }: any) {
   return (
     <div className={styles.normal}>
       <h1>Page ManageUsers</h1>
-      <pre>{applyRecords}</pre>
+      <pre>{JSON.stringify(applyRecords)}</pre>
     </div>
   );
 }

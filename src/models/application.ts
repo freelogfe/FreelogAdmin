@@ -35,10 +35,10 @@ const Model: ApplicationModelType = {
     // * getAllUsers({payload}, {call, put}) {
     * getApplyRecords(_, { call, put }) {
       const response = yield call(applyRecordsAPI);
-      console.log(response, 'response');
+      // console.log(response, 'response');
       yield put({
-        type: 'changeApplyRecordsStatus',
-        applyRecords: response,
+        type: 'application/changeApplyRecordsStatus',
+        applyRecords: response.data.dataList,
       });
     },
 
@@ -46,6 +46,8 @@ const Model: ApplicationModelType = {
 
   reducers: {
     changeApplyRecordsStatus(state, { applyRecords }) {
+      console.log(applyRecords, 'applyRecords');
+      console.log(state, 'state');
       return {
         ...state,
         applyRecords: [
