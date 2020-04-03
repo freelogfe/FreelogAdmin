@@ -10,7 +10,7 @@ interface IApplyRecordsType {
 export async function applyRecords(params: IApplyRecordsType) {
   return request('/v1/testQualifications/beta/applyRecords', {
     method: 'GET',
-    params: params,
+    params,
     // getResponse: true,
   });
 }
@@ -39,7 +39,7 @@ interface ISelectBetaCodesType {
 export async function selectBetaCodes(params: ISelectBetaCodesType) {
   return request('/v1/testQualifications/beta/codes', {
     method: 'GET',
-    params: params,
+    params,
     // getResponse: true,
   });
 }

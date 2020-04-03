@@ -7,7 +7,7 @@ interface ISearchUserType {
 export async function searchUser(params: ISearchUserType) {
   return request('/v1/userinfos/detail', {
     method: 'GET',
-    params: params,
+    params,
   });
 }
 
@@ -18,7 +18,7 @@ interface IUserinfosType {
 export async function userinfos(params: IUserinfosType) {
   return request('/v1/userinfos', {
     method: 'GET',
-    params: params,
+    params,
   });
 }
 

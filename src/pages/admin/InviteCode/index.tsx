@@ -6,6 +6,8 @@ import {batchCreate, batchUpdate, selectBetaCodes} from '@/services/admin';
 
 import styles from './index.less';
 import {userinfos} from "@/services/user";
+import { connect } from 'dva';
+import { ConnectState } from '@/models/connect';
 
 export default function () {
 
