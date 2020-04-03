@@ -45,7 +45,8 @@ const Model: LoginModelType = {
       // });
       // Login successfully
       if (data.errcode === 0 && data.ret === 0) {
-        window.localStorage.setItem('authorization', response.headers.get('authorization'));
+        // window.localStorage.setItem('authorization', '');
+        window.document.cookie = `authInfo=${response.headers.get('authorization').replace('Bearer ', '')}; path=/`;
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
         let {redirect} = params as { redirect: string };
