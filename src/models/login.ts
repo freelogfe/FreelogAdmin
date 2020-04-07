@@ -1,11 +1,11 @@
-import {Reducer} from 'redux';
-import {Effect} from 'dva';
-import {stringify} from 'querystring';
+import { Reducer } from 'redux';
+import { Effect } from 'dva';
+import { stringify } from 'querystring';
 import router from 'umi/router';
 
-import {fakeAccountLogin, getFakeCaptcha} from '@/services/login';
+import { fakeAccountLogin, getFakeCaptcha } from '@/services/login';
 // import {setAuthority} from '@/utils/authority';
-import {getPageQuery} from '@/utils/utils';
+import { getPageQuery, isDevelopmentEnv } from '@/utils/utils';
 
 export interface StateType {
   status?: 'ok' | 'error';
@@ -34,10 +34,10 @@ const Model: LoginModelType = {
   },
 
   effects: {
-    * login({payload}, {call, put}) {
+    * login({ payload }, { call, put }) {
       // const rrr = yield fakeAccountLogin(payload);
       // console.log(rrr.response.headers, 'rrr')
-      const {response, data} = yield call(fakeAccountLogin, payload);
+      const { response, data } = yield call(fakeAccountLogin, payload);
       // console.log(response.headers.get('authorization'), 'responseresponse');
       // yield put({
       //   type: 'changeLoginStatus',
@@ -46,10 +46,13 @@ const Model: LoginModelType = {
       // Login successfully
       if (data.errcode === 0 && data.ret === 0) {
         // window.localStorage.setItem('authorization', '');
-        window.document.cookie = `authInfo=${response.headers.get('authorization').replace('Bearer ', '')}; path=/`;
+        if (isDevelopmentEnv()) {
+          window.document.cookie = `authInfo=${response.headers.get('authorization').replace('Bearer ', '')}; path=/`;
+        }
+
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
-        let {redirect} = params as { redirect: string };
+        let { redirect } = params as { redirect: string };
         if (redirect) {
           const redirectUrlParams = new URL(redirect);
           if (redirectUrlParams.origin === urlParams.origin) {
@@ -66,12 +69,12 @@ const Model: LoginModelType = {
       }
     },
 
-    * getCaptcha({payload}, {call}) {
+    * getCaptcha({ payload }, { call }) {
       yield call(getFakeCaptcha, payload);
     },
 
     logout() {
-      const {redirect} = getPageQuery();
+      const { redirect } = getPageQuery();
       // Note: There may be security issues, please note
       if (window.location.pathname !== '/user/login' && !redirect) {
         router.replace({
@@ -85,7 +88,7 @@ const Model: LoginModelType = {
   },
 
   reducers: {
-    changeLoginStatus(state, {payload}) {
+    changeLoginStatus(state, { payload }) {
       // setAuthority(payload.currentAuthority);
       // setAuthority(payload.headers.get('authorization'));
       return {

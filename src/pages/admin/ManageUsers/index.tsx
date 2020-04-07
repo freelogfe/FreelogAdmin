@@ -5,7 +5,7 @@ import { connect } from 'dva';
 import { ConnectState } from '@/models/connect';
 
 function ManageUsers({ applyRecords, dispatch }: any) {
-  console.log(applyRecords, 'applyRecords');
+  // console.log(applyRecords, 'applyRecords');
 
   React.useEffect(() => {
     dispatch({

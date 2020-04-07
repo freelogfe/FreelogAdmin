@@ -4,6 +4,7 @@
  */
 import { extend } from 'umi-request';
 import { notification } from 'antd';
+import { isDevelopmentEnv } from '@/utils/utils';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -56,7 +57,7 @@ const request = extend({
   // headers: {
   //   authorization: window.localStorage.getItem('authorization'),
   // },
-  prefix: process.env.NODE_ENV === 'development' ? '' : window.location.hostname.replace('admin', 'qi'),
+  prefix: isDevelopmentEnv() ? '' : window.location.origin.replace('admin', 'qi'),
 });
 
 // @ts-ignore

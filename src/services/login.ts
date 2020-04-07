@@ -1,4 +1,5 @@
 import request from '@/utils/request';
+import { isDevelopmentEnv } from '@/utils/utils';
 // import axios from 'axios';
 
 export interface LoginParamsType {
@@ -23,7 +24,7 @@ export async function fakeAccountLogin(params: LoginParamsType) {
   return request('/v1/passport/login', {
     method: 'POST',
     data: params,
-    getResponse: true,
+    getResponse: isDevelopmentEnv(),
     // getResponse: true
   });
 }

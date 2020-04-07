@@ -46,8 +46,8 @@ const Model: ApplicationModelType = {
 
   reducers: {
     changeApplyRecordsStatus(state, { applyRecords }) {
-      console.log(applyRecords, 'applyRecords');
-      console.log(state, 'state');
+      // console.log(applyRecords, 'applyRecords');
+      // console.log(state, 'state');
       return {
         ...state,
         applyRecords: [
