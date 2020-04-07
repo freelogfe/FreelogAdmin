@@ -35,19 +35,8 @@ const Model: LoginModelType = {
 
   effects: {
     * login({ payload }, { call, put }) {
-      // console.log(payload, 'payload');
-      // const rrr = yield fakeAccountLogin(payload);
-      // console.log(rrr.response.headers, 'rrr')
       const { response, data } = yield call(fakeAccountLogin, payload);
-      // console.log(response.headers.get('authorization'), 'responseresponse');
-      // yield put({
-      //   type: 'changeLoginStatus',
-      //   payload: response,
-      // });
-      // Login successfully
-      // console.log(response, data, 'datadatadatadata');
       if (response === undefined || (data.errcode === 0 && data.ret === 0)) {
-        // window.localStorage.setItem('authorization', '');
         if (isDevelopmentEnv()) {
           window.document.cookie = `authInfo=${response.headers.get('authorization').replace('Bearer ', '')}; path=/`;
         }
@@ -55,7 +44,6 @@ const Model: LoginModelType = {
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
         let { redirect } = params as { redirect: string };
-        // console.log(redirect, router, '???????????');
         if (redirect) {
           const redirectUrlParams = new URL(redirect);
           if (redirectUrlParams.origin === urlParams.origin) {
