@@ -7,7 +7,7 @@ import { UserModelState } from './user';
 import { StateType } from './login';
 import { StateType as ApplicationStateType } from './application';
 
-export { GlobalModelState, SettingModelState, UserModelState };
+export { GlobalModelState, SettingModelState, UserModelState, ApplicationStateType };
 
 export interface Loading {
   global: boolean;

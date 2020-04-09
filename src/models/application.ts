@@ -14,6 +14,7 @@ export interface StateType {
   pageSize: number;
   current: number;
   total: number;
+  status: number;
 }
 
 export interface ApplicationModelType {
@@ -27,6 +28,7 @@ export interface ApplicationModelType {
     changeDataSourceStatus: Reducer<StateType>;
     changePageSizeStatus: Reducer<StateType>;
     changeTotalStatus: Reducer<StateType>;
+    changeStatusStatus: Reducer<StateType>;
   };
 }
 
@@ -35,14 +37,20 @@ const Model: ApplicationModelType = {
 
   state: {
     dataSource: [],
-    pageSize: 20,
+    pageSize: 10,
     current: 1,
     total: -1,
+
+    status: -1,
   },
 
   effects: {
     // * getAllUsers({payload}, {call, put}) {
-    * getDataSource({ params }, { call, put }) {
+    * getDataSource(_, { call, put, select }) {
+      const params = yield select(({ application }: any) => ({
+        pageSize: application.pageSize,
+        page: application.current,
+      }));
       const response = yield call(applyRecordsAPI, params);
       // console.log(response, 'response');
       yield put({
@@ -52,18 +60,23 @@ const Model: ApplicationModelType = {
       });
     },
     * changePage({ payload }, { put }) {
-      console.log(payload, 'type, payloadtype, payload');
+      // console.log(payload, 'type, payloadtype, payload');
       if (payload.current) {
         yield put({ type: 'changePageStatus', type2: 'CURRENT', current: payload.current });
       } else {
         yield put({ type: 'changePageStatus', type2: 'PAGE_SIZE', pageSize: payload.pageSize });
       }
 
+      yield put({ type: 'getDataSource' });
+      // yield call(this.getDataSource);
+      // yield select((state: any) => {
+      //   console.log(state, 'state');
+      // });
     },
   },
 
   reducers: {
-    changeDataSourceStatus(state: StateType, { dataSource, total }: any) {
+    changeDataSourceStatus(state: StateType, { dataSource, total }: any): StateType {
       // console.log(applyRecords, 'applyRecords');
       // console.log(state, 'state');
       return {
@@ -71,9 +84,9 @@ const Model: ApplicationModelType = {
         dataSource,
         total,
       };
+
     },
     changePageStatus(state: StateType, { type2, pageSize, current }: any) {
-      console.log(type2, current, 'currentcurrent');
       switch (type2) {
         case 'CURRENT':
           return {
@@ -84,12 +97,28 @@ const Model: ApplicationModelType = {
           return {
             ...state,
             pageSize,
+            current: 1,
           };
         default:
           return state;
       }
     },
+
+    changeStatusStatus(state: StateType, { status }: any) {
+      return {
+        ...state,
+        status,
+      };
+
+    },
   },
+  // subscriptions: {
+  //   setup(action: any, error: any) {
+  //     console.log(this, 'TTTT');
+  //     console.log(action);
+  //     console.log(error);
+  //   },
+  // },
 };
 
 export default Model;

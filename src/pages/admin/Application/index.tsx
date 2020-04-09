@@ -156,7 +156,7 @@ function Application({ dataSource, pageSize, current, total, getDataSource, chan
       title: () =>
         // 0:待审核 1:审核通过 2:审核不通过 默认全部
         (<Select
-          // value={status}
+          value={status}
           style={{ width: 120 }}
           // onChange={(value: number) => {
           // setCurrent(1);
