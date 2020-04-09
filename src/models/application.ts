@@ -1,5 +1,5 @@
 import { Reducer } from 'redux';
-import { Effect } from 'dva';
+import { Effect, EffectsCommandMap } from 'dva';
 // import { query as queryUsers } from '../services/user';
 import { applyRecords as applyRecordsAPI } from '../services/admin';
 // import {stringify} from 'querystring';
@@ -50,6 +50,7 @@ const Model: ApplicationModelType = {
       const params = yield select(({ application }: any) => ({
         pageSize: application.pageSize,
         page: application.current,
+        status: application.status,
       }));
       const response = yield call(applyRecordsAPI, params);
       // console.log(response, 'response');
@@ -68,10 +69,11 @@ const Model: ApplicationModelType = {
       }
 
       yield put({ type: 'getDataSource' });
-      // yield call(this.getDataSource);
-      // yield select((state: any) => {
-      //   console.log(state, 'state');
-      // });
+    },
+
+    * changeStatus({ payload }: any, { put }: EffectsCommandMap) {
+      yield put({ type: 'changeStatusStatus', status: payload });
+      yield put({ type: 'getDataSource' });
     },
   },
 
@@ -109,7 +111,6 @@ const Model: ApplicationModelType = {
         ...state,
         status,
       };
-
     },
   },
   // subscriptions: {

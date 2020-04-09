@@ -14,11 +14,13 @@ interface IApplication {
   pageSize: number;
   current: number;
   total: number;
+  status: number;
   getDataSource: (params: { pageSize: number, current: number }) => void;
   changePage: (payload: { current?: number, pageSize?: number }) => void;
+  changeStatus: (payload: { status: number }) => void;
 }
 
-function Application({ dataSource, pageSize, current, total, getDataSource, changePage }: IApplication) {
+function Application({ dataSource, pageSize, current, total, getDataSource, changePage, status, changeStatus }: IApplication) {
 
   // const [isMount, setIsMount] = React.useState<boolean>(true);
   // const [dataSource, setDataSource] = React.useState<any[] | null>(null);
@@ -158,10 +160,9 @@ function Application({ dataSource, pageSize, current, total, getDataSource, chan
         (<Select
           value={status}
           style={{ width: 120 }}
-          // onChange={(value: number) => {
-          // setCurrent(1);
-          // setStatus(value);
-          // }}
+          onChange={(value: number) => {
+            changeStatus(value);
+          }}
         >
           <Select.Option value={-1}>全部状态</Select.Option>
           <Select.Option value={0}>待审核</Select.Option>
@@ -298,7 +299,7 @@ function Application({ dataSource, pageSize, current, total, getDataSource, chan
         dataSource={dataSource || []}
         // @ts-ignore
         columns={columns}
-        rowKey={'recordId'}
+        rowKey="recordId"
         pagination={false}
         scroll={{ x: true }}
       />
@@ -311,11 +312,11 @@ function Application({ dataSource, pageSize, current, total, getDataSource, chan
               showSizeChanger
               current={current}
               onChange={(current1: number) => {
-                changePage({current: current1});
+                changePage({ current: current1 });
               }}
               pageSize={pageSize}
               onShowSizeChange={(_current: number, size: number) => {
-                changePage({pageSize: size});
+                changePage({ pageSize: size });
               }}
               total={total}
               pageSizeOptions={['10', '20', '30', '40', '50']}
@@ -362,6 +363,7 @@ export default connect(
     pageSize: application.pageSize,
     current: application.current,
     total: application.total,
+    status: application.status,
   }),
   {
     getDataSource: (params: any) => ({
@@ -370,6 +372,10 @@ export default connect(
     }),
     changePage: (payload: any) => ({
       type: 'application/changePage',
+      payload,
+    }),
+    changeStatus: (payload: any) => ({
+      type: 'application/changeStatus',
       payload,
     }),
   },
