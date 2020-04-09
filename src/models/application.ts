@@ -46,7 +46,7 @@ const Model: ApplicationModelType = {
 
   effects: {
     // * getAllUsers({payload}, {call, put}) {
-    * getDataSource(_, { call, put, select }) {
+    * getDataSource(_, { call, put, select }): Generator<any, void, any> {
       const params = yield select(({ application }: any) => ({
         pageSize: application.pageSize,
         page: application.current,
@@ -60,7 +60,7 @@ const Model: ApplicationModelType = {
         total: response.data.totalItem,
       });
     },
-    * changePage({ payload }, { put }) {
+    * changePage({ payload }, { put }): Generator<any, void, any> {
       // console.log(payload, 'type, payloadtype, payload');
       if (payload.current) {
         yield put({ type: 'changePageStatus', type2: 'CURRENT', current: payload.current });
@@ -71,13 +71,15 @@ const Model: ApplicationModelType = {
       yield put({ type: 'getDataSource' });
     },
 
-    * changeStatus({ payload }: any, { put }: EffectsCommandMap) {
+    // @ts-ignore
+    * changeStatus({ payload }: any, { put }: EffectsCommandMap): Generator<any, void, any> {
       yield put({ type: 'changeStatusStatus', status: payload });
       yield put({ type: 'getDataSource' });
     },
   },
 
   reducers: {
+    // @ts-ignore
     changeDataSourceStatus(state: StateType, { dataSource, total }: any): StateType {
       // console.log(applyRecords, 'applyRecords');
       // console.log(state, 'state');
@@ -88,7 +90,7 @@ const Model: ApplicationModelType = {
       };
 
     },
-    changePageStatus(state: StateType, { type2, pageSize, current }: any) {
+    changePageStatus(state: StateType, { type2, pageSize, current }: any): StateType {
       switch (type2) {
         case 'CURRENT':
           return {
@@ -106,10 +108,12 @@ const Model: ApplicationModelType = {
       }
     },
 
-    changeStatusStatus(state: StateType, { status }: any) {
+    // @ts-ignore
+    changeStatusStatus(state: StateType, { status }: any): StateType {
       return {
         ...state,
         status,
+        current: 1,
       };
     },
   },

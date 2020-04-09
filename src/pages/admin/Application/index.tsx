@@ -17,7 +17,7 @@ interface IApplication {
   status: number;
   getDataSource: (params: { pageSize: number, current: number }) => void;
   changePage: (payload: { current?: number, pageSize?: number }) => void;
-  changeStatus: (payload: { status: number }) => void;
+  changeStatus: (payload: number) => void;
 }
 
 function Application({ dataSource, pageSize, current, total, getDataSource, changePage, status, changeStatus }: IApplication) {
@@ -269,11 +269,11 @@ function Application({ dataSource, pageSize, current, total, getDataSource, chan
   //   setHandledRecordIds([]);
   // };
 
-  const radioStyle = {
-    display: 'block',
-    height: '30px',
-    lineHeight: '30px',
-  };
+  // const radioStyle = {
+  //   display: 'block',
+  //   height: '30px',
+  //   lineHeight: '30px',
+  // };
 
   return (
     <div className={styles.normal}>
