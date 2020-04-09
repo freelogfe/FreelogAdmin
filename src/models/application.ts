@@ -10,17 +10,23 @@ import { applyRecords as applyRecordsAPI } from '../services/admin';
 // import {getPageQuery} from '@/utils/utils';
 
 export interface StateType {
-  applyRecords: any[];
+  dataSource: any[];
+  pageSize: number;
+  current: number;
+  total: number;
 }
 
 export interface ApplicationModelType {
   namespace: string;
   state: StateType;
   effects: {
-    getApplyRecords: Effect,
+    getDataSource: Effect,
+    changePage: Effect,
   };
   reducers: {
-    changeApplyRecordsStatus: Reducer<StateType>;
+    changeDataSourceStatus: Reducer<StateType>;
+    changePageSizeStatus: Reducer<StateType>;
+    changeTotalStatus: Reducer<StateType>;
   };
 }
 
@@ -28,33 +34,60 @@ const Model: ApplicationModelType = {
   namespace: 'application',
 
   state: {
-    applyRecords: [],
+    dataSource: [],
+    pageSize: 20,
+    current: 1,
+    total: -1,
   },
 
   effects: {
     // * getAllUsers({payload}, {call, put}) {
-    * getApplyRecords(_, { call, put }) {
-      const response = yield call(applyRecordsAPI);
+    * getDataSource({ params }, { call, put }) {
+      const response = yield call(applyRecordsAPI, params);
       // console.log(response, 'response');
       yield put({
-        type: 'application/changeApplyRecordsStatus',
-        applyRecords: response.data.dataList,
+        type: 'changeDataSourceStatus',
+        dataSource: response.data.dataList,
+        total: response.data.totalItem,
       });
     },
+    * changePage({ payload }, { put }) {
+      console.log(payload, 'type, payloadtype, payload');
+      if (payload.current) {
+        yield put({ type: 'changePageStatus', type2: 'CURRENT', current: payload.current });
+      } else {
+        yield put({ type: 'changePageStatus', type2: 'PAGE_SIZE', pageSize: payload.pageSize });
+      }
 
+    },
   },
 
   reducers: {
-    changeApplyRecordsStatus(state, { applyRecords }) {
+    changeDataSourceStatus(state: StateType, { dataSource, total }: any) {
       // console.log(applyRecords, 'applyRecords');
       // console.log(state, 'state');
       return {
         ...state,
-        applyRecords: [
-          ...(state?.applyRecords || []),
-          ...applyRecords,
-        ],
+        dataSource,
+        total,
       };
+    },
+    changePageStatus(state: StateType, { type2, pageSize, current }: any) {
+      console.log(type2, current, 'currentcurrent');
+      switch (type2) {
+        case 'CURRENT':
+          return {
+            ...state,
+            current,
+          };
+        case 'PAGE_SIZE':
+          return {
+            ...state,
+            pageSize,
+          };
+        default:
+          return state;
+      }
     },
   },
 };

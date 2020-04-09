@@ -1,34 +1,49 @@
 import React from 'react';
-import {message, Table, Button, Pagination, Select, Input, Modal, Radio, Popover} from 'antd';
+import { Table, Button, Select, Input, Popover, Pagination } from 'antd';
 import moment from 'moment';
 
-import {applyRecords, betaAudit} from '@/services/admin';
+// import { applyRecords, betaAudit } from '@/services/admin';
 
 import styles from './index.less';
-import {searchUser, userinfos} from "@/services/user";
+// import { searchUser, userinfos } from '@/services/user';
+import { connect } from 'dva';
+import { ConnectState } from '@/models/connect';
 
-export default function () {
+interface IApplication {
+  dataSource: any[];
+  pageSize: number;
+  current: number;
+  total: number;
+  getDataSource: (params: { pageSize: number, current: number }) => void;
+  changePage: (payload: { current?: number, pageSize?: number }) => void;
+}
+
+function Application({ dataSource, pageSize, current, total, getDataSource, changePage }: IApplication) {
 
   // const [isMount, setIsMount] = React.useState<boolean>(true);
-  const [dataSource, setDataSource] = React.useState<any[] | null>(null);
-  const [pageSize, setPageSize] = React.useState<number>(10);
-  const [current, setCurrent] = React.useState<number>(1);
-  const [total, setTotal] = React.useState<number>(0);
-  const [status, setStatus] = React.useState<number>(-1);
-  const [selectedRowKeys, setSelectedRowKeys] = React.useState<string[]>([]);
-  const [handledRecordIds, setHandledRecordIds] = React.useState<string[]>([]);
-  const [auditValue, setAuditValue] = React.useState<number>(1);
-  const [otherReasonValue, setOtherReasonValue] = React.useState<string>('');
-  // 0 不用限用户 -1 用户不存在 other 用户 id
-  const [searchedUserID, setSearchedUserID] = React.useState<number>(0);
+  // const [dataSource, setDataSource] = React.useState<any[] | null>(null);
+  // const [pageSize, setPageSize] = React.useState<number>(10);
+  // const [current, setCurrent] = React.useState<number>(1);
+  // const [total, setTotal] = React.useState<number>(0);
+  // const [status, setStatus] = React.useState<number>(-1);
+  // const [selectedRowKeys, setSelectedRowKeys] = React.useState<string[]>([]);
+  // const [handledRecordIds, setHandledRecordIds] = React.useState<string[]>([]);
+  // const [auditValue, setAuditValue] = React.useState<number>(1);
+  // const [otherReasonValue, setOtherReasonValue] = React.useState<string>('');
+  // // 0 不用限用户 -1 用户不存在 other 用户 id
+  // const [searchedUserID, setSearchedUserID] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    getDataSource({ pageSize, current });
+  }, []);
 
   // React.useEffect(() => {
   //   setIsMount(false);
   // }, []);
 
-  React.useEffect(() => {
-    handleData();
-  }, [current, pageSize, status, searchedUserID]);
+  // React.useEffect(() => {
+  //   handleData();
+  // }, [current, pageSize, status, searchedUserID]);
 
   // React.useEffect(() => {
   //   if (!isMount) {
@@ -37,87 +52,83 @@ export default function () {
   //   }
   // }, [searchUserValue]);
 
-  const handleData = async () => {
-    if (searchedUserID === -1) {
-      setSelectedRowKeys([]);
-      setTotal(0);
-      setDataSource([]);
-      return;
-    }
-    const params: any = {
-      page: current,
-      pageSize: pageSize,
-      status: status,
-    };
-    if (searchedUserID !== 0) {
-      params.userId = searchedUserID;
-    }
-    const response = await applyRecords(params);
-    // console.log(response, 'responseresponse');
-    if (response.errcode !== 0 || response.ret !== 0) {
-      return message.error(response.msg);
-    }
-    const data = response.data;
-    setSelectedRowKeys([]);
-    setTotal(data.totalItem);
+  // const handleData = async () => {
+  //   if (searchedUserID === -1) {
+  //     setSelectedRowKeys([]);
+  //     setTotal(0);
+  //     // setDataSource([]);
+  //     return;
+  //   }
+  //   const params: any = {
+  //     page: current,
+  //     pageSize: pageSize,
+  //     status: status,
+  //   };
+  //   if (searchedUserID !== 0) {
+  //     params.userId = searchedUserID;
+  //   }
+  //   const response = await applyRecords(params);
+  //   // console.log(response, 'responseresponse');
+  //   if (response.errcode !== 0 || response.ret !== 0) {
+  //     return message.error(response.msg);
+  //   }
+  //   const data = response.data;
+  //   setSelectedRowKeys([]);
+  //   setTotal(data.totalItem);
+  //
+  //   // if (data.totalItem === 0) {
+  //   //   return setDataSource([]);
+  //   // }
+  //
+  //   const response1 = await userinfos({
+  //     userIds: data.dataList.map((i: any) => i.userId).join(','),
+  //   });
+  //
+  //   if (response1.errcode !== 0 || response1.ret !== 0) {
+  //     return message.error(response1.msg);
+  //   }
+  //   // setDataSource(data.dataList.map((i: any) => ({
+  //   //   ...i,
+  //   //   userInfo: response1.data.find((j: any) => j.userId === i.userId),
+  //   // })));
+  //
+  // };
 
-    if (data.totalItem === 0) {
-      return setDataSource([]);
-    }
-
-    const response1 = await userinfos({
-      userIds: data.dataList.map((i: any) => i.userId).join(','),
-    });
-
-    if (response1.errcode !== 0 || response1.ret !== 0) {
-      return message.error(response1.msg);
-    }
-    setDataSource(data.dataList.map((i: any) => ({
-      ...i,
-      userInfo: response1.data.find((j: any) => j.userId === i.userId),
-    })));
-
-  };
-
-  const searchUserID = async (keyword: string) => {
-    if (!keyword) {
-      return setSearchedUserID(0);
-    }
-    // setSearchUserValue(keyword);
-    const response = await searchUser({
-      keywords: keyword,
-    });
-    if (response.errcode !== 0 || response.ret !== 0) {
-      return message.error(response.msg);
-    }
-
-    if (response.data) {
-      setSearchedUserID(response.data.userId);
-    } else {
-      setSearchedUserID(-1);
-    }
-  };
+  // const searchUserID = async (keyword: string) => {
+  //   if (!keyword) {
+  //     return setSearchedUserID(0);
+  //   }
+  //   // setSearchUserValue(keyword);
+  //   const response = await searchUser({
+  //     keywords: keyword,
+  //   });
+  //   if (response.errcode !== 0 || response.ret !== 0) {
+  //     return message.error(response.msg);
+  //   }
+  //
+  //   if (response.data) {
+  //     setSearchedUserID(response.data.userId);
+  //   } else {
+  //     setSearchedUserID(-1);
+  //   }
+  // };
 
   const columns = [
     {
       title: '申请日期',
       dataIndex: 'createDate',
       key: 'createDate',
-      render: (text: string) => {
-        return moment(text).format('YYYY-MM-DD');
-      }
+      render: (text: string) => moment(text).format('YYYY-MM-DD'),
     },
     {
       title: '申请信息',
       dataIndex: 'description',
       key: 'description',
-      render: (text: string, record: any) => {
-        return (<div style={{width: 300, lineHeight: '24px'}}>
-          <div>职业：{record.occupation}</div>
-          <div>区域：{record.province}-{record.city}</div>
-          <div>其它：{record.description}</div>
-        </div>)
-      }
+      render: (text: string, record: any) => (<div style={{ width: 300, lineHeight: '24px' }}>
+        <div>职业：{record.occupation}</div>
+        <div>区域：{record.province}-{record.city}</div>
+        <div>其它：{record.description}</div>
+      </div>),
     },
     {
       title: '用户名',
@@ -128,17 +139,13 @@ export default function () {
       title: '手机',
       dataIndex: 'phone',
       key: 'phone',
-      render: (text: number, record: any) => {
-        return (record.userInfo ? record.userInfo.mobile : '');
-      }
+      render: (text: number, record: any) => (record.userInfo ? record.userInfo.mobile : ''),
     },
     {
       title: '邮箱',
       dataIndex: 'email',
       key: 'email',
-      render: (text: number, record: any) => {
-        return (record.userInfo ? record.userInfo.email : '');
-      }
+      render: (text: number, record: any) => (record.userInfo ? record.userInfo.email : ''),
     },
     // {
     //   title: '最后登录',
@@ -146,22 +153,22 @@ export default function () {
     //   key: 'address',
     // },
     {
-      title: () => {
+      title: () =>
         // 0:待审核 1:审核通过 2:审核不通过 默认全部
-        return (<Select
-          value={status}
-          style={{width: 120}}
-          onChange={(value: number) => {
-            setCurrent(1);
-            setStatus(value);
-          }}
+        (<Select
+          // value={status}
+          style={{ width: 120 }}
+          // onChange={(value: number) => {
+          // setCurrent(1);
+          // setStatus(value);
+          // }}
         >
           <Select.Option value={-1}>全部状态</Select.Option>
           <Select.Option value={0}>待审核</Select.Option>
           <Select.Option value={1}>审核通过</Select.Option>
           <Select.Option value={2}>审核不通过</Select.Option>
-        </Select>);
-      },
+        </Select>)
+      ,
       dataIndex: 'status',
       key: 'status',
       render: (text: number) => {
@@ -176,7 +183,7 @@ export default function () {
           default:
             return '---';
         }
-      }
+      },
     },
     {
       title: '操作',
@@ -189,7 +196,7 @@ export default function () {
           case 0:
             return (<Button
               type="link"
-              onClick={() => setHandledRecordIds([record.recordId])}
+              // onClick={() => setHandledRecordIds([record.recordId])}
             >审核</Button>);
           case 2:
             return (<Popover
@@ -208,58 +215,58 @@ export default function () {
 
   const rowSelection = {
     fixed: true,
-    selectedRowKeys: selectedRowKeys,
-    onChange: (selectedRowKeys: any, selectedRows: any) => {
-      // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-      setSelectedRowKeys(selectedRowKeys);
-    },
+    // selectedRowKeys: selectedRowKeys,
+    // onChange: (selectedRowKeys: any, selectedRows: any) => {
+    // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+    // setSelectedRowKeys(selectedRowKeys);
+    // },
     getCheckboxProps: (record: any) => ({
       disabled: record.status !== 0, // Column configuration not to be checked
     }),
   };
 
-  const handleOk = async () => {
-    // console.log(handledRecordIds, 'handledRecordIds');
-    let status: 1 | 2 = 1;
-    let auditMsg: string = '';
-    switch (auditValue) {
-      case 2:
-        status = 2;
-        auditMsg = '链接无法打开';
-        break;
-      case 3:
-        status = 2;
-        auditMsg = '公众号ID不存在';
-        break;
-      case 4:
-        status = 2;
-        auditMsg = otherReasonValue ? otherReasonValue : '其它原因';
-        break;
-      default:
-        break;
-    }
-    // console.log({
-    //   recordIds: handledRecordIds,
-    //   status: status,
-    //   auditMsg: auditMsg,
-    // }, '!@#@#@#@#@#');
-    // return ;
-    const response = await betaAudit({
-      recordIds: handledRecordIds,
-      status: status,
-      auditMsg: auditMsg,
-    });
-    if (response.errcode !== 0 || response.ret !== 0) {
-      return message.error(response.msg);
-    }
-    setHandledRecordIds([]);
-    handleData();
-    message.success('修改状态成功');
-  };
-
-  const handleCancel = () => {
-    setHandledRecordIds([]);
-  };
+  // const handleOk = async () => {
+  //   // console.log(handledRecordIds, 'handledRecordIds');
+  //   let status: 1 | 2 = 1;
+  //   let auditMsg: string = '';
+  //   switch (auditValue) {
+  //     case 2:
+  //       status = 2;
+  //       auditMsg = '链接无法打开';
+  //       break;
+  //     case 3:
+  //       status = 2;
+  //       auditMsg = '公众号ID不存在';
+  //       break;
+  //     case 4:
+  //       status = 2;
+  //       auditMsg = otherReasonValue ? otherReasonValue : '其它原因';
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  //   // console.log({
+  //   //   recordIds: handledRecordIds,
+  //   //   status: status,
+  //   //   auditMsg: auditMsg,
+  //   // }, '!@#@#@#@#@#');
+  //   // return ;
+  //   const response = await betaAudit({
+  //     recordIds: handledRecordIds,
+  //     status: status,
+  //     auditMsg: auditMsg,
+  //   });
+  //   if (response.errcode !== 0 || response.ret !== 0) {
+  //     return message.error(response.msg);
+  //   }
+  //   setHandledRecordIds([]);
+  //   handleData();
+  //   message.success('修改状态成功');
+  // };
+  //
+  // const handleCancel = () => {
+  //   setHandledRecordIds([]);
+  // };
 
   const radioStyle = {
     display: 'block',
@@ -269,21 +276,21 @@ export default function () {
 
   return (
     <div className={styles.normal}>
-      <div style={{padding: '8px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+      <div style={{ padding: '8px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <span>已选中 {selectedRowKeys.length} 条</span>
-          <Button
-            type="link"
-            disabled={selectedRowKeys.length === 0}
-            onClick={() => setHandledRecordIds(selectedRowKeys)}
-          >批量审核</Button>
+          {/*<span>已选中 {selectedRowKeys.length} 条</span>*/}
+          {/*<Button*/}
+          {/*  type="link"*/}
+          {/*  disabled={selectedRowKeys.length === 0}*/}
+          {/*  onClick={() => setHandledRecordIds(selectedRowKeys)}*/}
+          {/*>批量审核</Button>*/}
         </div>
         <Input.Search
-          onSearch={value => searchUserID(value)}
+          // onSearch={value => searchUserID(value)}
           placeholder="请输入用户名、注册邮箱/手机号进行搜索"
           enterButton="搜索"
           size="large"
-          style={{width: 400}}
+          style={{ width: 400 }}
         />
       </div>
       <Table
@@ -293,23 +300,22 @@ export default function () {
         columns={columns}
         rowKey={'recordId'}
         pagination={false}
-        scroll={{x: true}}
+        scroll={{ x: true }}
       />
 
       {
         total !== 0 ?
-          (<div style={{display: 'flex', justifyContent: 'flex-end', paddingTop: 16}}>
+          (<div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 16 }}>
             <Pagination
-              showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+              showTotal={(total1, range) => `${range[0]}-${range[1]} of ${total1} items`}
               showSizeChanger
               current={current}
-              onChange={(current: number) => {
-                setCurrent(current);
+              onChange={(current1: number) => {
+                changePage({current: current1});
               }}
               pageSize={pageSize}
-              onShowSizeChange={(current: number, size: number) => {
-                setPageSize(size);
-                setCurrent(1);
+              onShowSizeChange={(_current: number, size: number) => {
+                changePage({pageSize: size});
               }}
               total={total}
               pageSizeOptions={['10', '20', '30', '40', '50']}
@@ -318,32 +324,53 @@ export default function () {
           : null
       }
 
-      <Modal
-        title="审核内测资格"
-        visible={handledRecordIds.length !== 0}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        // okText="生成"
-      >
-        <Radio.Group
-          value={auditValue}
-          onChange={(e) => setAuditValue(e.target.value)}
-        >
-          <Radio style={radioStyle} value={1}>通过</Radio>
-          <Radio style={radioStyle} value={2}>拒绝通过：链接无法打开</Radio>
-          <Radio style={radioStyle} value={3}>拒绝通过：公众号ID不存在</Radio>
-          <Radio style={radioStyle} value={4}>拒绝通过：其它原因</Radio>
-        </Radio.Group>
-        {auditValue === 4
-          ? <Input.TextArea
-            value={otherReasonValue}
-            onChange={(e) => setOtherReasonValue(e.target.value)}
-            style={{display: 'block'}}
-            placeholder="请输入拒绝通过原因（非必填）"
-            rows={4}
-          />
-          : null}
-      </Modal>
+      {/*<Modal*/}
+      {/*  title="审核内测资格"*/}
+      {/*  // visible={handledRecordIds.length !== 0}*/}
+      {/*  // onOk={handleOk}*/}
+      {/*  // onCancel={handleCancel}*/}
+      {/*  // okText="生成"*/}
+      {/*>*/}
+      {/*  <Radio.Group*/}
+      {/*    value={auditValue}*/}
+      {/*    onChange={(e) => setAuditValue(e.target.value)}*/}
+      {/*  >*/}
+      {/*    <Radio style={radioStyle} value={1}>通过</Radio>*/}
+      {/*    <Radio style={radioStyle} value={2}>拒绝通过：链接无法打开</Radio>*/}
+      {/*    <Radio style={radioStyle} value={3}>拒绝通过：公众号ID不存在</Radio>*/}
+      {/*    <Radio style={radioStyle} value={4}>拒绝通过：其它原因</Radio>*/}
+      {/*  </Radio.Group>*/}
+      {/*  {auditValue === 4*/}
+      {/*    ? <Input.TextArea*/}
+      {/*      value={otherReasonValue}*/}
+      {/*      onChange={(e) => setOtherReasonValue(e.target.value)}*/}
+      {/*      style={{ display: 'block' }}*/}
+      {/*      placeholder="请输入拒绝通过原因（非必填）"*/}
+      {/*      rows={4}*/}
+      {/*    />*/}
+      {/*    : null}*/}
+      {/*</Modal>*/}
     </div>
   );
 }
+
+// export default Application;
+
+export default connect(
+  ({ application }: ConnectState) => ({
+    dataSource: application.dataSource,
+    pageSize: application.pageSize,
+    current: application.current,
+    total: application.total,
+  }),
+  {
+    getDataSource: (params: any) => ({
+      type: 'application/getDataSource',
+      params,
+    }),
+    changePage: (payload: any) => ({
+      type: 'application/changePage',
+      payload,
+    }),
+  },
+)(Application);

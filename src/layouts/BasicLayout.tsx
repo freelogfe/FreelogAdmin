@@ -10,18 +10,18 @@ import ProLayout, {
   Settings,
   DefaultFooter,
 } from '@ant-design/pro-layout';
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import Link from 'umi/link';
-import {Dispatch} from 'redux';
-import {connect} from 'dva';
-import {Icon, Result, Button} from 'antd';
-import {formatMessage} from 'umi-plugin-react/locale';
+import { Dispatch } from 'redux';
+import { connect } from 'dva';
+import { Icon, Result, Button } from 'antd';
+import { formatMessage } from 'umi-plugin-react/locale';
 
 import Authorized from '@/utils/Authorized';
 import RightContent from '@/components/GlobalHeader/RightContent';
-import {ConnectState} from '@/models/connect';
-import {isAntDesignPro, getAuthorityFromRouter} from '@/utils/utils';
-import logo from '../assets/logo.svg';
+import { ConnectState } from '@/models/connect';
+import { isAntDesignPro, getAuthorityFromRouter } from '@/utils/utils';
+import logo from '@/assets/logo.svg';
 
 const noMatch = (
   <Result
@@ -45,6 +45,7 @@ export interface BasicLayoutProps extends ProLayoutProps {
   };
   settings: Settings;
   dispatch: Dispatch;
+  fetchCurrent: () => void;
 }
 
 export type BasicLayoutContext = { [K in 'location']: BasicLayoutProps[K] } & {
@@ -117,17 +118,13 @@ const footerRender: BasicLayoutProps['footerRender'] = () => {
 };
 
 const BasicLayout: React.FC<BasicLayoutProps> = props => {
-  const {dispatch, children, settings, location = {pathname: '/'}} = props;
+  const { dispatch, children, settings, location = { pathname: '/' }, fetchCurrent } = props;
   /**
    * constructor
    */
 
   useEffect(() => {
-    if (dispatch) {
-      dispatch({
-        type: 'user/fetchCurrent',
-      });
-    }
+    fetchCurrent();
   }, []);
   /**
    * init variables
@@ -195,7 +192,13 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
   );
 };
 
-export default connect(({global, settings}: ConnectState) => ({
+export default connect(({ global, settings }: ConnectState) => ({
   collapsed: global.collapsed,
   settings,
-}))(BasicLayout);
+}), {
+  fetchCurrent: () => {
+    return {
+      type: 'user/fetchCurrent',
+    };
+  },
+})(BasicLayout);
