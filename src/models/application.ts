@@ -1,8 +1,9 @@
-import { Reducer } from 'redux';
+import { AnyAction, Reducer } from 'redux';
 import { Effect, EffectsCommandMap } from 'dva';
 // import { query as queryUsers } from '../services/user';
-import { applyRecords as applyRecordsAPI } from '../services/admin';
+import { applyRecords as applyRecordsAPI, betaAudit } from '@/services/admin';
 import { searchUser } from '@/services/user';
+import { message } from 'antd';
 
 // import {stringify} from 'querystring';
 // import router from 'umi/router';
@@ -22,6 +23,9 @@ export interface StateType {
   searchedUserID: number;
 
   selectedRowKeys: string[];
+  handledRecordIds: string[];
+  auditValue: number;
+  otherReasonValue: string;
 }
 
 export interface ApplicationModelType {
@@ -30,34 +34,51 @@ export interface ApplicationModelType {
   effects: {
     getDataSource: Effect,
     changePage: Effect,
+    changeStatus: Effect,
+    filterUser: Effect,
+    approvals: Effect,
   };
   reducers: {
     changeDataSourceStatus: Reducer<StateType>;
     changePageSizeStatus: Reducer<StateType>;
     changeTotalStatus: Reducer<StateType>;
     changeStatusStatus: Reducer<StateType>;
+    changeSearchedTextStatus: Reducer<StateType>;
+    changeSearchedUserIDStatus: Reducer<StateType>;
+    changeSelectedRowKeysStatus: Reducer<StateType>;
+    changeHandledRecordIdsStatus: Reducer<StateType>;
+    changeAuditValueStatus: Reducer<StateType>;
+    changeOtherReasonValueStatus: Reducer<StateType>;
   };
 }
 
+const defaultState: StateType = {
+  dataSource: [],
+  pageSize: 10,
+  current: 1,
+  total: -1,
+  status: -1,
+
+  searchedText: '',
+  searchedUserID: 0,
+
+  selectedRowKeys: [],
+  handledRecordIds: [],
+  auditValue: 1,
+  otherReasonValue: '',
+};
+
+// @ts-ignore
 const Model: ApplicationModelType = {
   namespace: 'application',
 
   state: {
-    dataSource: [],
-    pageSize: 10,
-    current: 1,
-    total: -1,
-    status: -1,
-
-    searchedText: '',
-    searchedUserID: 0,
-
-    selectedRowKeys: [],
+    ...defaultState,
   },
 
   effects: {
     // * getAllUsers({payload}, {call, put}) {
-    * getDataSource(_, { call, put, select }): Generator<any, void, any> {
+    * getDataSource(_, { call, put, select }: EffectsCommandMap): Generator<any, void, any> {
       const params = yield select(({ application }: any) => ({
         pageSize: application.pageSize,
         page: application.current,
@@ -72,7 +93,7 @@ const Model: ApplicationModelType = {
         total: response.data.totalItem,
       });
     },
-    * changePage({ payload }, { put }): Generator<any, void, any> {
+    * changePage({ payload }, { put }: EffectsCommandMap): Generator<any, void, any> {
       // console.log(payload, 'type, payloadtype, payload');
       if (payload.current) {
         yield put({ type: 'changePageStatus', type2: 'CURRENT', current: payload.current });
@@ -83,14 +104,12 @@ const Model: ApplicationModelType = {
       yield put({ type: 'getDataSource' });
     },
 
-    // @ts-ignore
     * changeStatus({ payload }: any, { put }: EffectsCommandMap): Generator<any, void, any> {
       yield put({ type: 'changeStatusStatus', status: payload });
       yield put({ type: 'getDataSource' });
     },
 
-    // eslint-disable-next-line consistent-return
-    * filterUser({ payload }: any, { put, call }: EffectsCommandMap): Generator<any, any, any> {
+    * filterUser({ payload }: any, { put, call }: EffectsCommandMap): Generator<any, void, any> {
       // console.log(payload, 'payloadpayload');
       if (!payload) {
         yield put({ type: 'changeSearchedUserIDStatus', payload: 0 });
@@ -108,11 +127,56 @@ const Model: ApplicationModelType = {
 
       yield put({ type: 'getDataSource' });
     },
+
+    * approvals(_: any, { put, call, select }: EffectsCommandMap): Generator<any, any, any> {
+
+      let status: 1 | 2 = 1;
+      let auditMsg: string = '';
+      const {auditValue, otherReasonValue, handledRecordIds} = yield select(({ application }: any) => ({
+        auditValue: application.auditValue,
+        otherReasonValue: application.otherReasonValue,
+        handledRecordIds: application.handledRecordIds,
+      }));
+      switch (auditValue) {
+        case 2:
+          status = 2;
+          auditMsg = '链接无法打开';
+          break;
+        case 3:
+          status = 2;
+          auditMsg = '公众号ID不存在';
+          break;
+        case 4:
+          status = 2;
+          auditMsg = otherReasonValue || '其它原因';
+          break;
+        default:
+          break;
+      }
+      // console.log({
+      //   recordIds: handledRecordIds,
+      //   status: status,
+      //   auditMsg: auditMsg,
+      // }, '!@#@#@#@#@#');
+      // return ;
+      const response = yield call(betaAudit, {
+        recordIds: handledRecordIds,
+        status,
+        auditMsg,
+      });
+      if (response.errcode !== 0 || response.ret !== 0) {
+        message.error(response.msg);
+      } else {
+        yield put({type: 'changeHandledRecordIdsStatus', payload: []});
+        yield put({ type: 'getDataSource' });
+        message.success('修改状态成功');
+      }
+
+    },
   },
 
   reducers: {
-    // @ts-ignore
-    changeDataSourceStatus(state: StateType, { dataSource, total }: any): StateType {
+    changeDataSourceStatus(state: StateType = defaultState, { dataSource, total }: AnyAction): StateType {
       // console.log(applyRecords, 'applyRecords');
       // console.log(state, 'state');
       return {
@@ -122,7 +186,8 @@ const Model: ApplicationModelType = {
       };
 
     },
-    changePageStatus(state: StateType, { type2, pageSize, current }: any): StateType {
+    // @ts-ignore
+    changePageStatus(state: StateType, { type2, pageSize, current }: AnyAction): StateType {
       switch (type2) {
         case 'CURRENT':
           return {
@@ -140,33 +205,48 @@ const Model: ApplicationModelType = {
       }
     },
 
-    // @ts-ignore
-    changeStatusStatus(state: StateType, { status }: any): StateType {
+    changeStatusStatus(state: StateType = defaultState, { status }: AnyAction): StateType {
       return {
         ...state,
         status,
         current: 1,
       };
     },
-
-    changeSearchedTextStatus(state: StateType, { payload }: any): StateType{
+    changeSearchedTextStatus(state: StateType = defaultState, { payload }: AnyAction): StateType {
       return {
         ...state,
         searchedText: payload,
       };
     },
-    changeSearchedUserIDStatus(state: StateType, { payload }: any): StateType {
+    changeSearchedUserIDStatus(state: StateType = defaultState, { payload }: AnyAction): StateType {
       return {
         ...state,
         searchedUserID: payload,
         current: 1,
       };
     },
-
-    changeSelectedRowKeysStatus(state: StateType, { payload }: any): StateType {
+    changeSelectedRowKeysStatus(state: StateType = defaultState, { payload }: AnyAction): StateType {
       return {
         ...state,
         selectedRowKeys: payload,
+      };
+    },
+    changeHandledRecordIdsStatus(state: StateType = defaultState, { payload }: AnyAction): StateType {
+      return {
+        ...state,
+        handledRecordIds: payload,
+      };
+    },
+    changeAuditValueStatus(state: StateType = defaultState, { payload }: AnyAction): StateType {
+      return {
+        ...state,
+        auditValue: payload,
+      };
+    },
+    changeOtherReasonValueStatus(state: StateType = defaultState, { payload }: AnyAction): StateType {
+      return {
+        ...state,
+        otherReasonValue: payload,
       };
     },
   },

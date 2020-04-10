@@ -1,5 +1,5 @@
-import React from 'react';
-import { Table, Button, Select, Input, Popover, Pagination } from 'antd';
+import React, { ChangeEvent } from 'react';
+import { Table, Button, Select, Input, Popover, Pagination, Modal, Radio } from 'antd';
 import moment from 'moment';
 
 // import { applyRecords, betaAudit } from '@/services/admin';
@@ -24,61 +24,20 @@ interface IApplication {
 
   selectedRowKeys: string[];
   changeSelectedRowKeys: (payload: string[]) => void;
+  handledRecordIds: string[];
+  changeHandledRecordIds: (payload: string[]) => void;
+  auditValue: number;
+  changeAuditValue: (payload: number) => void;
+  otherReasonValue: string;
+  changeOtherReasonValue: (payload: string) => void;
+  handleOk: () => void;
 }
 
-function Application({ dataSource, pageSize, current, total, getDataSource, changePage, status, changeStatus, searchedText, changeSearchText, filterUser, selectedRowKeys, changeSelectedRowKeys }: IApplication) {
-
-  // const [selectedRowKeys, setSelectedRowKeys] = React.useState<string[]>([]);
-  // const [handledRecordIds, setHandledRecordIds] = React.useState<string[]>([]);
-  // const [auditValue, setAuditValue] = React.useState<number>(1);
-  // const [otherReasonValue, setOtherReasonValue] = React.useState<string>('');
+function Application({ dataSource, pageSize, current, total, getDataSource, changePage, status, changeStatus, searchedText, changeSearchText, filterUser, selectedRowKeys, changeSelectedRowKeys, handledRecordIds, changeHandledRecordIds, auditValue, changeAuditValue, otherReasonValue, changeOtherReasonValue, handleOk }: IApplication) {
 
   React.useEffect(() => {
     getDataSource({ pageSize, current });
   }, []);
-
-
-  // const handleData = async () => {
-  //   if (searchedUserID === -1) {
-  //     setSelectedRowKeys([]);
-  //     setTotal(0);
-  //     // setDataSource([]);
-  //     return;
-  //   }
-  //   const params: any = {
-  //     page: current,
-  //     pageSize: pageSize,
-  //     status: status,
-  //   };
-  //   if (searchedUserID !== 0) {
-  //     params.userId = searchedUserID;
-  //   }
-  //   const response = await applyRecords(params);
-  //   // console.log(response, 'responseresponse');
-  //   if (response.errcode !== 0 || response.ret !== 0) {
-  //     return message.error(response.msg);
-  //   }
-  //   const data = response.data;
-  //   setSelectedRowKeys([]);
-  //   setTotal(data.totalItem);
-  //
-  //   // if (data.totalItem === 0) {
-  //   //   return setDataSource([]);
-  //   // }
-  //
-  //   const response1 = await userinfos({
-  //     userIds: data.dataList.map((i: any) => i.userId).join(','),
-  //   });
-  //
-  //   if (response1.errcode !== 0 || response1.ret !== 0) {
-  //     return message.error(response1.msg);
-  //   }
-  //   // setDataSource(data.dataList.map((i: any) => ({
-  //   //   ...i,
-  //   //   userInfo: response1.data.find((j: any) => j.userId === i.userId),
-  //   // })));
-  //
-  // };
 
   const columns = [
     {
@@ -162,7 +121,7 @@ function Application({ dataSource, pageSize, current, total, getDataSource, chan
           case 0:
             return (<Button
               type="link"
-              // onClick={() => setHandledRecordIds([record.recordId])}
+              onClick={() => changeHandledRecordIds([record.recordId])}
             >审核</Button>);
           case 2:
             return (<Popover
@@ -179,68 +138,26 @@ function Application({ dataSource, pageSize, current, total, getDataSource, chan
     },
   ];
 
-  const rowSelection = {
+  const rowSelection: any = {
     fixed: true,
     selectedRowKeys,
     onChange: changeSelectedRowKeys,
-    // onChange: (selectedRowKeys: any, selectedRows: any) => {
-    // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-    // setSelectedRowKeys(selectedRowKeys);
-    // },
     getCheckboxProps: (record: any) => ({
       disabled: record.status !== 0, // Column configuration not to be checked
     }),
   };
 
-  // const handleOk = async () => {
-  //   // console.log(handledRecordIds, 'handledRecordIds');
-  //   let status: 1 | 2 = 1;
-  //   let auditMsg: string = '';
-  //   switch (auditValue) {
-  //     case 2:
-  //       status = 2;
-  //       auditMsg = '链接无法打开';
-  //       break;
-  //     case 3:
-  //       status = 2;
-  //       auditMsg = '公众号ID不存在';
-  //       break;
-  //     case 4:
-  //       status = 2;
-  //       auditMsg = otherReasonValue ? otherReasonValue : '其它原因';
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  //   // console.log({
-  //   //   recordIds: handledRecordIds,
-  //   //   status: status,
-  //   //   auditMsg: auditMsg,
-  //   // }, '!@#@#@#@#@#');
-  //   // return ;
-  //   const response = await betaAudit({
-  //     recordIds: handledRecordIds,
-  //     status: status,
-  //     auditMsg: auditMsg,
-  //   });
-  //   if (response.errcode !== 0 || response.ret !== 0) {
-  //     return message.error(response.msg);
-  //   }
-  //   setHandledRecordIds([]);
-  //   handleData();
-  //   message.success('修改状态成功');
-  // };
-  //
-  // const handleCancel = () => {
-  //   setHandledRecordIds([]);
-  // };
+  const handleCancel = () => {
+    changeHandledRecordIds([]);
+  };
 
-  // const radioStyle = {
-  //   display: 'block',
-  //   height: '30px',
-  //   lineHeight: '30px',
-  // };
+  const radioStyle = {
+    display: 'block',
+    height: '30px',
+    lineHeight: '30px',
+  };
 
+  // @ts-ignore
   return (
     <div className={styles.normal}>
       <div style={{ padding: '8px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -249,12 +166,12 @@ function Application({ dataSource, pageSize, current, total, getDataSource, chan
           <Button
             type="link"
             disabled={selectedRowKeys.length === 0}
-            // onClick={() => setHandledRecordIds(selectedRowKeys)}
+            onClick={() => changeHandledRecordIds([...selectedRowKeys])}
           >批量审核</Button>
         </div>
         <Input.Search
           value={searchedText}
-          onChange={(e) => changeSearchText(e.target.value)}
+          onChange={e => changeSearchText(e.target.value)}
           onSearch={filterUser}
           placeholder="请输入用户名、注册邮箱/手机号进行搜索"
           enterButton="搜索"
@@ -293,32 +210,32 @@ function Application({ dataSource, pageSize, current, total, getDataSource, chan
           : null
       }
 
-      {/*<Modal*/}
-      {/*  title="审核内测资格"*/}
-      {/*  // visible={handledRecordIds.length !== 0}*/}
-      {/*  // onOk={handleOk}*/}
-      {/*  // onCancel={handleCancel}*/}
-      {/*  // okText="生成"*/}
-      {/*>*/}
-      {/*  <Radio.Group*/}
-      {/*    value={auditValue}*/}
-      {/*    onChange={(e) => setAuditValue(e.target.value)}*/}
-      {/*  >*/}
-      {/*    <Radio style={radioStyle} value={1}>通过</Radio>*/}
-      {/*    <Radio style={radioStyle} value={2}>拒绝通过：链接无法打开</Radio>*/}
-      {/*    <Radio style={radioStyle} value={3}>拒绝通过：公众号ID不存在</Radio>*/}
-      {/*    <Radio style={radioStyle} value={4}>拒绝通过：其它原因</Radio>*/}
-      {/*  </Radio.Group>*/}
-      {/*  {auditValue === 4*/}
-      {/*    ? <Input.TextArea*/}
-      {/*      value={otherReasonValue}*/}
-      {/*      onChange={(e) => setOtherReasonValue(e.target.value)}*/}
-      {/*      style={{ display: 'block' }}*/}
-      {/*      placeholder="请输入拒绝通过原因（非必填）"*/}
-      {/*      rows={4}*/}
-      {/*    />*/}
-      {/*    : null}*/}
-      {/*</Modal>*/}
+      <Modal
+        title="审核内测资格"
+        visible={handledRecordIds.length !== 0}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        okText="生成"
+      >
+        <Radio.Group
+          value={auditValue}
+          onChange={(e) => changeAuditValue(Number(e.target.value))}
+        >
+          <Radio style={radioStyle} value={1}>通过</Radio>
+          <Radio style={radioStyle} value={2}>拒绝通过：链接无法打开</Radio>
+          <Radio style={radioStyle} value={3}>拒绝通过：公众号ID不存在</Radio>
+          <Radio style={radioStyle} value={4}>拒绝通过：其它原因</Radio>
+        </Radio.Group>
+        {auditValue === 4
+          ? <Input.TextArea
+            value={otherReasonValue}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => changeOtherReasonValue(e.target.value)}
+            style={{ display: 'block' }}
+            placeholder="请输入拒绝通过原因（非必填）"
+            rows={4}
+          />
+          : null}
+      </Modal>
     </div>
   );
 }
@@ -334,6 +251,9 @@ export default connect(
     status: application.status,
     searchedText: application.searchedText,
     selectedRowKeys: application.selectedRowKeys,
+    handledRecordIds: application.handledRecordIds,
+    auditValue: application.auditValue,
+    otherReasonValue: application.otherReasonValue,
   }),
   {
     getDataSource: (params: any) => ({
@@ -362,5 +282,23 @@ export default connect(
       type: 'application/changeSelectedRowKeysStatus',
       payload,
     }),
+    changeHandledRecordIds: (payload: string[]) => ({
+      type: 'application/changeHandledRecordIdsStatus',
+      payload,
+    }),
+
+    changeAuditValue: (payload: number) => ({
+      type: 'application/changeAuditValueStatus',
+      payload,
+    }),
+    changeOtherReasonValue: (payload: string) => ({
+      type: 'application/changeOtherReasonValueStatus',
+      payload,
+    }),
+
+    handleOk: () => ({
+      type: 'application/approvals',
+    }),
+
   },
 )(Application);
