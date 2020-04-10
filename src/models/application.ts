@@ -2,6 +2,8 @@ import { Reducer } from 'redux';
 import { Effect, EffectsCommandMap } from 'dva';
 // import { query as queryUsers } from '../services/user';
 import { applyRecords as applyRecordsAPI } from '../services/admin';
+import { searchUser } from '@/services/user';
+
 // import {stringify} from 'querystring';
 // import router from 'umi/router';
 
@@ -15,6 +17,9 @@ export interface StateType {
   current: number;
   total: number;
   status: number;
+
+  searchedText: string;
+  searchedUserID: number;
 }
 
 export interface ApplicationModelType {
@@ -40,8 +45,10 @@ const Model: ApplicationModelType = {
     pageSize: 10,
     current: 1,
     total: -1,
-
     status: -1,
+
+    searchedText: '',
+    searchedUserID: 0,
   },
 
   effects: {
@@ -51,6 +58,7 @@ const Model: ApplicationModelType = {
         pageSize: application.pageSize,
         page: application.current,
         status: application.status,
+        userId: application.searchedUserID,
       }));
       const response = yield call(applyRecordsAPI, params);
       // console.log(response, 'response');
@@ -74,6 +82,26 @@ const Model: ApplicationModelType = {
     // @ts-ignore
     * changeStatus({ payload }: any, { put }: EffectsCommandMap): Generator<any, void, any> {
       yield put({ type: 'changeStatusStatus', status: payload });
+      yield put({ type: 'getDataSource' });
+    },
+
+    // eslint-disable-next-line consistent-return
+    * filterUser({ payload }: any, { put, call }: EffectsCommandMap): Generator<any, any, any> {
+      // console.log(payload, 'payloadpayload');
+      if (!payload) {
+        yield put({ type: 'changeSearchedUserIDStatus', payload: 0 });
+      } else {
+        const response = yield call(searchUser, { keywords: payload });
+        // if (response.errcode !== 0 || response.ret !== 0) {
+        //   return message.error(response.msg);
+        // }
+        if (response.data) {
+          yield put({ type: 'changeSearchedUserIDStatus', payload: response.data.userId });
+        } else {
+          yield put({ type: 'changeSearchedUserIDStatus', payload: -1 });
+        }
+      }
+
       yield put({ type: 'getDataSource' });
     },
   },
@@ -113,6 +141,20 @@ const Model: ApplicationModelType = {
       return {
         ...state,
         status,
+        current: 1,
+      };
+    },
+
+    changeSearchedTextStatus(state: StateType, { payload }: any): StateType{
+      return {
+        ...state,
+        searchedText: payload,
+      };
+    },
+    changeSearchedUserIDStatus(state: StateType, { payload }: any): StateType {
+      return {
+        ...state,
+        searchedUserID: payload,
         current: 1,
       };
     },

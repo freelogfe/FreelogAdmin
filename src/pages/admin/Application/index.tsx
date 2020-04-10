@@ -18,9 +18,12 @@ interface IApplication {
   getDataSource: (params: { pageSize: number, current: number }) => void;
   changePage: (payload: { current?: number, pageSize?: number }) => void;
   changeStatus: (payload: number) => void;
+  searchedText: string;
+  changeSearchText: (value: string) => void;
+  filterUser: (filterUser: string) => void;
 }
 
-function Application({ dataSource, pageSize, current, total, getDataSource, changePage, status, changeStatus }: IApplication) {
+function Application({ dataSource, pageSize, current, total, getDataSource, changePage, status, changeStatus, searchedText, changeSearchText, filterUser }: IApplication) {
 
   // const [isMount, setIsMount] = React.useState<boolean>(true);
   // const [dataSource, setDataSource] = React.useState<any[] | null>(null);
@@ -287,7 +290,9 @@ function Application({ dataSource, pageSize, current, total, getDataSource, chan
           {/*>批量审核</Button>*/}
         </div>
         <Input.Search
-          // onSearch={value => searchUserID(value)}
+          value={searchedText}
+          onChange={(e) => changeSearchText(e.target.value)}
+          onSearch={filterUser}
           placeholder="请输入用户名、注册邮箱/手机号进行搜索"
           enterButton="搜索"
           size="large"
@@ -364,6 +369,7 @@ export default connect(
     current: application.current,
     total: application.total,
     status: application.status,
+    searchedText: application.searchedText,
   }),
   {
     getDataSource: (params: any) => ({
@@ -376,6 +382,15 @@ export default connect(
     }),
     changeStatus: (payload: any) => ({
       type: 'application/changeStatus',
+      payload,
+    }),
+
+    changeSearchText: (payload: any) => ({
+      type: 'application/changeSearchedTextStatus',
+      payload,
+    }),
+    filterUser: (payload: any) => ({
+      type: 'application/filterUser',
       payload,
     }),
   },
