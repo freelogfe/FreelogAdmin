@@ -21,41 +21,22 @@ interface IApplication {
   searchedText: string;
   changeSearchText: (value: string) => void;
   filterUser: (filterUser: string) => void;
+
+  selectedRowKeys: string[];
+  changeSelectedRowKeys: (payload: string[]) => void;
 }
 
-function Application({ dataSource, pageSize, current, total, getDataSource, changePage, status, changeStatus, searchedText, changeSearchText, filterUser }: IApplication) {
+function Application({ dataSource, pageSize, current, total, getDataSource, changePage, status, changeStatus, searchedText, changeSearchText, filterUser, selectedRowKeys, changeSelectedRowKeys }: IApplication) {
 
-  // const [isMount, setIsMount] = React.useState<boolean>(true);
-  // const [dataSource, setDataSource] = React.useState<any[] | null>(null);
-  // const [pageSize, setPageSize] = React.useState<number>(10);
-  // const [current, setCurrent] = React.useState<number>(1);
-  // const [total, setTotal] = React.useState<number>(0);
-  // const [status, setStatus] = React.useState<number>(-1);
   // const [selectedRowKeys, setSelectedRowKeys] = React.useState<string[]>([]);
   // const [handledRecordIds, setHandledRecordIds] = React.useState<string[]>([]);
   // const [auditValue, setAuditValue] = React.useState<number>(1);
   // const [otherReasonValue, setOtherReasonValue] = React.useState<string>('');
-  // // 0 不用限用户 -1 用户不存在 other 用户 id
-  // const [searchedUserID, setSearchedUserID] = React.useState<number>(0);
 
   React.useEffect(() => {
     getDataSource({ pageSize, current });
   }, []);
 
-  // React.useEffect(() => {
-  //   setIsMount(false);
-  // }, []);
-
-  // React.useEffect(() => {
-  //   handleData();
-  // }, [current, pageSize, status, searchedUserID]);
-
-  // React.useEffect(() => {
-  //   if (!isMount) {
-  //     console.log(searchUserValue, 'searchUserValue');
-  //     // searchUserID();
-  //   }
-  // }, [searchUserValue]);
 
   // const handleData = async () => {
   //   if (searchedUserID === -1) {
@@ -97,25 +78,6 @@ function Application({ dataSource, pageSize, current, total, getDataSource, chan
   //   //   userInfo: response1.data.find((j: any) => j.userId === i.userId),
   //   // })));
   //
-  // };
-
-  // const searchUserID = async (keyword: string) => {
-  //   if (!keyword) {
-  //     return setSearchedUserID(0);
-  //   }
-  //   // setSearchUserValue(keyword);
-  //   const response = await searchUser({
-  //     keywords: keyword,
-  //   });
-  //   if (response.errcode !== 0 || response.ret !== 0) {
-  //     return message.error(response.msg);
-  //   }
-  //
-  //   if (response.data) {
-  //     setSearchedUserID(response.data.userId);
-  //   } else {
-  //     setSearchedUserID(-1);
-  //   }
   // };
 
   const columns = [
@@ -219,7 +181,8 @@ function Application({ dataSource, pageSize, current, total, getDataSource, chan
 
   const rowSelection = {
     fixed: true,
-    // selectedRowKeys: selectedRowKeys,
+    selectedRowKeys,
+    onChange: changeSelectedRowKeys,
     // onChange: (selectedRowKeys: any, selectedRows: any) => {
     // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
     // setSelectedRowKeys(selectedRowKeys);
@@ -282,12 +245,12 @@ function Application({ dataSource, pageSize, current, total, getDataSource, chan
     <div className={styles.normal}>
       <div style={{ padding: '8px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          {/*<span>已选中 {selectedRowKeys.length} 条</span>*/}
-          {/*<Button*/}
-          {/*  type="link"*/}
-          {/*  disabled={selectedRowKeys.length === 0}*/}
-          {/*  onClick={() => setHandledRecordIds(selectedRowKeys)}*/}
-          {/*>批量审核</Button>*/}
+          <span>已选中 {selectedRowKeys.length} 条</span>
+          <Button
+            type="link"
+            disabled={selectedRowKeys.length === 0}
+            // onClick={() => setHandledRecordIds(selectedRowKeys)}
+          >批量审核</Button>
         </div>
         <Input.Search
           value={searchedText}
@@ -370,6 +333,7 @@ export default connect(
     total: application.total,
     status: application.status,
     searchedText: application.searchedText,
+    selectedRowKeys: application.selectedRowKeys,
   }),
   {
     getDataSource: (params: any) => ({
@@ -391,6 +355,11 @@ export default connect(
     }),
     filterUser: (payload: any) => ({
       type: 'application/filterUser',
+      payload,
+    }),
+
+    changeSelectedRowKeys: (payload: string[]) => ({
+      type: 'application/changeSelectedRowKeysStatus',
       payload,
     }),
   },

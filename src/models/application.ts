@@ -20,6 +20,8 @@ export interface StateType {
 
   searchedText: string;
   searchedUserID: number;
+
+  selectedRowKeys: string[];
 }
 
 export interface ApplicationModelType {
@@ -49,6 +51,8 @@ const Model: ApplicationModelType = {
 
     searchedText: '',
     searchedUserID: 0,
+
+    selectedRowKeys: [],
   },
 
   effects: {
@@ -156,6 +160,13 @@ const Model: ApplicationModelType = {
         ...state,
         searchedUserID: payload,
         current: 1,
+      };
+    },
+
+    changeSelectedRowKeysStatus(state: StateType, { payload }: any): StateType {
+      return {
+        ...state,
+        selectedRowKeys: payload,
       };
     },
   },
