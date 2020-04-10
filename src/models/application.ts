@@ -92,6 +92,19 @@ const Model: ApplicationModelType = {
         dataSource: response.data.dataList,
         total: response.data.totalItem,
       });
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { selectedRowKeys, dataSource } = yield select(({ application }: any) => ({
+        selectedRowKeys: application.selectedRowKeys,
+        dataSource: application.dataSource,
+      }));
+      const dataSourceIDs: string[] = dataSource.map((i: { recordId: string; }) => i.recordId);
+      // console.log(dataSourceIDs, 'dataSourceIDs');
+      yield put({
+        type: 'changeSelectedRowKeysStatus',
+        payload: selectedRowKeys.filter((i: string) => dataSourceIDs.includes(i)),
+        // payload: [],
+      });
     },
     * changePage({ payload }, { put }: EffectsCommandMap): Generator<any, void, any> {
       // console.log(payload, 'type, payloadtype, payload');
@@ -132,7 +145,7 @@ const Model: ApplicationModelType = {
 
       let status: 1 | 2 = 1;
       let auditMsg: string = '';
-      const {auditValue, otherReasonValue, handledRecordIds} = yield select(({ application }: any) => ({
+      const { auditValue, otherReasonValue, handledRecordIds } = yield select(({ application }: any) => ({
         auditValue: application.auditValue,
         otherReasonValue: application.otherReasonValue,
         handledRecordIds: application.handledRecordIds,
@@ -167,7 +180,7 @@ const Model: ApplicationModelType = {
       if (response.errcode !== 0 || response.ret !== 0) {
         message.error(response.msg);
       } else {
-        yield put({type: 'changeHandledRecordIdsStatus', payload: []});
+        yield put({ type: 'changeHandledRecordIdsStatus', payload: [] });
         yield put({ type: 'getDataSource' });
         message.success('修改状态成功');
       }
