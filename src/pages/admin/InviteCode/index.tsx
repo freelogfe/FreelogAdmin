@@ -2,10 +2,10 @@ import React from 'react';
 import { Button, Table, Modal, InputNumber, message, Pagination, Select, Dropdown, Menu } from 'antd';
 import moment from 'moment';
 
-import { batchCreate, batchUpdate, selectBetaCodes } from '@/services/admin';
+import { batchCreate, batchUpdate } from '@/services/admin';
 
 import styles from './index.less';
-import { userinfos } from '@/services/user';
+// import { userinfos } from '@/services/user';
 import { connect } from 'dva';
 import { ConnectState } from '@/models/connect';
 
@@ -13,14 +13,17 @@ interface InviteCodeProps {
   dataSource: any[] | null;
   total: number;
   handleDataSource: () => void;
+  pageSize: number;
+  current: number;
+  changePage: (payload: { pageSize?: number; current?: number; }) => void;
 }
 
-function InviteCode({dataSource, total, handleDataSource}: InviteCodeProps) {
+function InviteCode({ dataSource, total, handleDataSource, pageSize, current, changePage }: InviteCodeProps) {
 
   // const [dataSource, setDataSource] = React.useState<any[] | null>(null);
   const [visible, setVisible] = React.useState<boolean>(false);
-  const [pageSize, setPageSize] = React.useState<number>(10);
-  const [current, setCurrent] = React.useState<number>(1);
+  // const [pageSize, setPageSize] = React.useState<number>(10);
+  // const [current, setCurrent] = React.useState<number>(1);
   // const [total, setTotal] = React.useState<number>(0);
   const [status, setStatus] = React.useState<number>(-1);
   const [selectedRowKeys, setsSelectedRowKeys] = React.useState<string[]>([]);
@@ -29,49 +32,6 @@ function InviteCode({dataSource, total, handleDataSource}: InviteCodeProps) {
   React.useEffect(() => {
     handleDataSource();
   }, []);
-
-  const handleData = async () => {
-    const response = await selectBetaCodes({
-      page: current,
-      pageSize: pageSize,
-      status: status,
-    });
-    if (response.ret !== 0 || response.errcode !== 0) {
-      return message.error(response.msg);
-    }
-    const data = response.data;
-    setsSelectedRowKeys([]);
-    // setCurrent(data.page);
-    // setPageSize(data.pageSize);
-    setTotal(data.totalItem);
-    setDataSource(data.dataList);
-
-    if (data.totalItem === 0) {
-      return;
-    }
-
-    const userIds = data.dataList
-      .filter((j: any) => j.usedUsers.length > 0)
-      .map((i: any) => i.usedUsers[0]);
-
-    // console.log('#######');
-    if (userIds.length === 0) {
-      return;
-    }
-    // return;
-    // console.log(data.dataList, ' data.dataList');
-    const response1 = await userinfos({
-      userIds: userIds.join(','),
-    });
-
-    if (response1.errcode !== 0 || response1.ret !== 0) {
-      return message.error(response1.msg);
-    }
-    setDataSource(data.dataList.map((i: any) => ({
-      ...i,
-      userInfo: response1.data.find((j: any) => j.userId === i.usedUsers[0]),
-    })));
-  };
 
   const columns = [
     {
@@ -93,7 +53,7 @@ function InviteCode({dataSource, total, handleDataSource}: InviteCodeProps) {
           value={status}
           style={{ width: 100 }}
           onChange={(value: number) => {
-            setCurrent(1);
+            // setCurrent(1);
             setStatus(value);
           }}
         >
@@ -250,9 +210,9 @@ function InviteCode({dataSource, total, handleDataSource}: InviteCodeProps) {
     message.success('生成成功');
     setVisible(false);
     if (current === 1) {
-      handleData();
+      handleDataSource();
     } else {
-      setCurrent(1);
+      // setCurrent(1);
     }
     // console.log(response, '#######');
   };
@@ -274,7 +234,7 @@ function InviteCode({dataSource, total, handleDataSource}: InviteCodeProps) {
       return message.error(response.msg);
     }
     message.success('修改状态成功');
-    handleData();
+    handleDataSource();
   };
 
   const menu = (
@@ -326,16 +286,16 @@ function InviteCode({dataSource, total, handleDataSource}: InviteCodeProps) {
         total !== 0 ?
           (<div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 16 }}>
             <Pagination
-              showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+              showTotal={(total1, range) => `${range[0]}-${range[1]} of ${total1} items`}
               showSizeChanger
               current={current}
-              onChange={(current: number) => {
-                setCurrent(current);
+              onChange={(current1: number) => {
+                changePage({current: current1});
               }}
               pageSize={pageSize}
-              onShowSizeChange={(current: number, size: number) => {
-                setCurrent(1);
-                setPageSize(size);
+              onShowSizeChange={(_current: number, size: number) => {
+                // setCurrent(1);
+                changePage({pageSize: size});
               }}
               total={total}
               pageSizeOptions={['10', '20', '30', '40', '50']}
@@ -366,11 +326,16 @@ export default connect(
   ({ inviteCode }: ConnectState) => ({
     dataSource: inviteCode.dataSource,
     total: inviteCode.total,
+    pageSize: inviteCode.pageSize,
+    current: inviteCode.current,
   }),
   {
     handleDataSource: () => ({
       type: 'inviteCode/handleDataSource',
     }),
-
-  }
+    changePage: (payload: { pageSize?: number; current?: number; }) => ({
+      type: 'inviteCode/changePage',
+      payload,
+    }),
+  },
 )(InviteCode);
