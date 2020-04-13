@@ -22,12 +22,7 @@ interface InviteCodeProps {
 
 function InviteCode({ dataSource, total, handleDataSource, pageSize, current, changePage, status, changeStatus }: InviteCodeProps) {
 
-  // const [dataSource, setDataSource] = React.useState<any[] | null>(null);
   const [visible, setVisible] = React.useState<boolean>(false);
-  // const [pageSize, setPageSize] = React.useState<number>(10);
-  // const [current, setCurrent] = React.useState<number>(1);
-  // const [total, setTotal] = React.useState<number>(0);
-  // const [status, setStatus] = React.useState<number>(-1);
   const [selectedRowKeys, setsSelectedRowKeys] = React.useState<string[]>([]);
   const [createQuantity, setCreateQuantity] = React.useState<number>(10);
 
@@ -40,9 +35,7 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
       title: '生成时间',
       dataIndex: 'createDate',
       key: 'createDate',
-      render: (text: string) => {
-        return moment(text).format('YYYY-MM-DD');
-      },
+      render: (text: string) => moment(text).format('YYYY-MM-DD'),
     },
     {
       title: '邀请码',
@@ -50,21 +43,19 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
       key: 'code',
     },
     {
-      title: () => {
-        return (<Select
-          value={status}
-          style={{ width: 100 }}
-          onChange={(value: number) => {
-            // setCurrent(1);
-            changeStatus(value);
-          }}
-        >
-          <Select.Option value={-1}>全部状态</Select.Option>
-          <Select.Option value={0}>未使用</Select.Option>
-          <Select.Option value={1}>已分发</Select.Option>
-          <Select.Option value={2}>已核销</Select.Option>
-        </Select>);
-      },
+      title: () => (<Select
+        value={status}
+        style={{ width: 100 }}
+        onChange={(value: number) => {
+          // setCurrent(1);
+          changeStatus(value);
+        }}
+      >
+        <Select.Option value={-1}>全部状态</Select.Option>
+        <Select.Option value={0}>未使用</Select.Option>
+        <Select.Option value={1}>已分发</Select.Option>
+        <Select.Option value={2}>已核销</Select.Option>
+      </Select>),
       dataIndex: 'status',
       key: 'status',
       render: ((text: number) => {
@@ -105,43 +96,35 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
       title: '分发时间',
       dataIndex: 'distributeDate',
       key: 'distributeDate',
-      render: (text: string) => {
-        return text ? moment(text).format('YYYY-MM-DD') : '---';
-      },
+      render: (text: string) => text ? moment(text).format('YYYY-MM-DD') : '---',
     },
     {
       title: '核销时间',
       dataIndex: 'destroyDate',
       key: 'destroyDate',
-      render: (text: string) => {
-        return text ? moment(text).format('YYYY-MM-DD') : '---';
-      },
+      render: (text: string) => text ? moment(text).format('YYYY-MM-DD') : '---',
     },
     {
       title: '核销用户',
       dataIndex: 'username',
       key: 'username',
-      render: (text: any, record: any) => {
+      render: (text: any, record: any) =>
         // console.log(record, 'recordrecord');
-        return record.userInfo ? record.userInfo.username : '';
-      },
+        record.userInfo ? record.userInfo.username : ''
+      ,
     },
     {
       title: '手机号',
       dataIndex: 'phone',
       key: 'phone',
-      render: (text: any, record: any) => {
-        // console.log(record, 'recordrecord');
-        return record.userInfo ? record.userInfo.mobile : '';
-      },
+      render: (text: any, record: any) => record.userInfo ? record.userInfo.mobile : ''
+      ,
     },
     {
       title: '邮箱',
       dataIndex: 'email',
       key: 'email',
-      render: (text: any, record: any) => {
-        return record.userInfo ? record.userInfo.email : '';
-      },
+      render: (text: any, record: any) => record.userInfo ? record.userInfo.email : '',
     },
     // {
     //   title: '最后登录',
@@ -154,47 +137,45 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
       key: 'action',
       width: 90,
       fixed: 'right',
-      render: (text: any, record: any) => {
-        return (<Dropdown
-          disabled={record.status === 2}
-          overlay={<Menu>
-            {
-              record.status === 0
-                ? (<Menu.Item>
-                  <a onClick={() => updateStatus([record.code], 1)}>
-                    已分发
-                  </a>
-                </Menu.Item>)
-                : null
-            }
+      render: (text: any, record: any) => (<Dropdown
+        disabled={record.status === 2}
+        overlay={<Menu>
+          {
+            record.status === 0
+              ? (<Menu.Item>
+                <a onClick={() => updateStatus([record.code], 1)}>
+                  已分发
+                </a>
+              </Menu.Item>)
+              : null
+          }
 
-            {
-              record.status === 1
-                ? (<Menu.Item>
-                  <a onClick={() => updateStatus([record.code], 0)}>
-                    未分发
-                  </a>
-                </Menu.Item>)
-                : null
-            }
-          </Menu>}>
-          <Button
-            style={{ padding: 0 }}
-            type="link"
-            disabled={record.status === 2}
-          >更改状态</Button>
-        </Dropdown>);
-      },
+          {
+            record.status === 1
+              ? (<Menu.Item>
+                <a onClick={() => updateStatus([record.code], 0)}>
+                  未分发
+                </a>
+              </Menu.Item>)
+              : null
+          }
+        </Menu>}>
+        <Button
+          style={{ padding: 0 }}
+          type="link"
+          disabled={record.status === 2}
+        >更改状态</Button>
+      </Dropdown>),
     },
   ];
 
   const rowSelection = {
     fixed: true,
-    selectedRowKeys: selectedRowKeys,
-    onChange: (selectedRowKeys: any, selectedRows: any) => {
+    selectedRowKeys,
+    onChange: (selectedRowKeys1: string[]) => {
       // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
       // console.log(selectedRowKeys, 'selectedRowKeys');
-      setsSelectedRowKeys(selectedRowKeys);
+      setsSelectedRowKeys(selectedRowKeys1);
     },
     getCheckboxProps: (record: any) => ({
       disabled: record.status === 2, // Column configuration not to be checked
@@ -207,7 +188,8 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
       quantity: createQuantity,
     });
     if (response.ret !== 0 || response.errcode !== 0) {
-      return message.error(response.msg);
+      message.error(response.msg);
+      return;
     }
     message.success('生成成功');
     setVisible(false);
@@ -227,13 +209,14 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
     setCreateQuantity(value || 10);
   };
 
-  const updateStatus = async (codes: string[], status: number) => {
+  const updateStatus = async (codes: string[], status1: number) => {
     const response = await batchUpdate({
       codes,
-      status,
+      status: status1,
     });
     if (response.ret !== 0 || response.errcode !== 0) {
-      return message.error(response.msg);
+      message.error(response.msg);
+      return;
     }
     message.success('修改状态成功');
     handleDataSource();
@@ -279,7 +262,7 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
         dataSource={dataSource || []}
         // @ts-ignore
         columns={columns}
-        rowKey={'code'}
+        rowKey="code"
         pagination={false}
         scroll={{ x: true }}
       />
