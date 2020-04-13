@@ -98,7 +98,9 @@ const Model: ApplicationModelType = {
         selectedRowKeys: application.selectedRowKeys,
         dataSource: application.dataSource,
       }));
-      const dataSourceIDs: string[] = dataSource.map((i: { recordId: string; }) => i.recordId);
+      const dataSourceIDs: string[] = dataSource
+        .filter((j: { status: number }) => j.status === 0)
+        .map((i: { recordId: string; }) => i.recordId);
       // console.log(dataSourceIDs, 'dataSourceIDs');
       yield put({
         type: 'changeSelectedRowKeysStatus',

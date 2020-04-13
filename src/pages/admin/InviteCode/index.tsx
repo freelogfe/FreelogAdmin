@@ -2,13 +2,13 @@ import React from 'react';
 import { Button, Table, Modal, InputNumber, message, Pagination, Select, Dropdown, Menu } from 'antd';
 import moment from 'moment';
 
-import { batchCreate, batchUpdate } from '@/services/admin';
+import { batchCreate } from '@/services/admin';
 
-import styles from './index.less';
 // import { userinfos } from '@/services/user';
 import { connect } from 'dva';
 import { ConnectState } from '@/models/connect';
 import { TableRowSelection } from 'antd/lib/table/interface';
+import styles from './index.less';
 
 interface InviteCodeProps {
   dataSource: any[] | null;
@@ -19,12 +19,14 @@ interface InviteCodeProps {
   changePage: (payload: { pageSize?: number; current?: number; }) => void;
   status: number;
   changeStatus: (paylaod: number) => void;
+  selectedRowKeys: string[];
+  changeSelectedRowKeys: (payload: string[]) => void;
+  updateStatus: (codes: string[], status: number) => void;
 }
 
-function InviteCode({ dataSource, total, handleDataSource, pageSize, current, changePage, status, changeStatus }: InviteCodeProps) {
+function InviteCode({ dataSource, total, handleDataSource, pageSize, current, changePage, status, changeStatus, selectedRowKeys, changeSelectedRowKeys, updateStatus }: InviteCodeProps) {
 
   const [visible, setVisible] = React.useState<boolean>(false);
-  const [selectedRowKeys, setsSelectedRowKeys] = React.useState<string[]>([]);
   const [createQuantity, setCreateQuantity] = React.useState<number>(10);
 
   React.useEffect(() => {
@@ -174,7 +176,7 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
     fixed: true,
     selectedRowKeys,
     onChange: (selectedRowKeys1: string[] | number[]) => {
-      setsSelectedRowKeys(selectedRowKeys1 as string[]);
+      changeSelectedRowKeys(selectedRowKeys1 as string[]);
     },
     getCheckboxProps: (record: any) => ({
       disabled: record.status === 2, // Column configuration not to be checked
@@ -208,19 +210,6 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
     setCreateQuantity(value || 10);
   };
 
-  const updateStatus = async (codes: string[], status1: number) => {
-    const response = await batchUpdate({
-      codes,
-      status: status1,
-    });
-    if (response.ret !== 0 || response.errcode !== 0) {
-      message.error(response.msg);
-      return;
-    }
-    message.success('修改状态成功');
-    handleDataSource();
-  };
-
   const menu = (
     <Menu>
       <Menu.Item>
@@ -249,7 +238,7 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
       <div style={{ padding: '8px 0' }}>
         <span>已选中 {selectedRowKeys.length} 条</span>
         <Dropdown
-          overlay={menu}>
+          overlay={selectedRowKeys.length === 0 ? <></> : menu}>
           <Button
             type="link"
             disabled={selectedRowKeys.length === 0}
@@ -313,6 +302,7 @@ export default connect(
     pageSize: inviteCode.pageSize,
     current: inviteCode.current,
     status: inviteCode.status,
+    selectedRowKeys: inviteCode.selectedRowKeys,
   }),
   {
     handleDataSource: () => ({
@@ -326,5 +316,15 @@ export default connect(
       type: 'inviteCode/changeStatus',
       payload,
     }),
+    changeSelectedRowKeys: (payload: string[]) => ({
+      type: 'inviteCode/changeSelectedRowKeysStatus',
+      payload,
+    }),
+    updateStatus: (codes: string[], status: number) => ({
+      type: 'inviteCode/updateStatus',
+      status,
+      codes,
+    }),
   },
-)(InviteCode);
+)
+(InviteCode);

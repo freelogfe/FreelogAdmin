@@ -1,6 +1,6 @@
 import { Effect, EffectsCommandMap } from 'dva';
 import { AnyAction, Reducer } from 'redux';
-import { selectBetaCodes } from '@/services/admin';
+import { batchUpdate, selectBetaCodes } from '@/services/admin';
 import { message } from 'antd';
 import { userinfos } from '@/services/user';
 
@@ -10,6 +10,7 @@ export interface InviteCodeModelState {
   pageSize: number;
   current: number;
   status: number;
+  selectedRowKeys: string[];
 }
 
 export interface InviteCodeModelType {
@@ -19,12 +20,15 @@ export interface InviteCodeModelType {
     handleDataSource: Effect;
     changePage: Effect;
     changeStatus: Effect;
+    updateStatus: Effect;
+    // changeSelectedRowKeys: Effect;
     // fresh: Effect;
   };
   reducers: {
     changeDataSourceStatus: Reducer<InviteCodeModelState>;
     changePageStatus: Reducer<InviteCodeModelState>;
     changeStatusStatus: Reducer<InviteCodeModelState>;
+    changeSelectedRowKeysStatus: Reducer<InviteCodeModelState>;
   };
   // subscriptions: any;
 }
@@ -35,6 +39,7 @@ const defaultState: InviteCodeModelState = {
   pageSize: 10,
   current: 1,
   status: -1,
+  selectedRowKeys: [],
 };
 
 const Model: InviteCodeModelType = {
@@ -62,6 +67,21 @@ const Model: InviteCodeModelType = {
         type: 'changeDataSourceStatus',
         dataSource: response.data.dataList,
         total: response.data.totalItem,
+      });
+
+      const { selectedRowKeys, dataSource } = yield select(({ inviteCode }: any) => ({
+        selectedRowKeys: inviteCode.selectedRowKeys,
+        dataSource: inviteCode.dataSource,
+      }));
+      const dataSourceIDs: string[] = dataSource
+        .filter((j: {status:number}) => j.status !== 2)
+        .map((i: { code: string; }) => i.code);
+      // console.log(dataSourceIDs, 'dataSourceIDs');
+      // console.log(selectedRowKeys, 'selectedRowKeys');
+      yield put({
+        type: 'changeSelectedRowKeysStatus',
+        payload: selectedRowKeys.filter((i: string) => dataSourceIDs.includes(i)),
+        // payload: [],
       });
 
       if (response.data.totalItem === 0) {
@@ -106,6 +126,19 @@ const Model: InviteCodeModelType = {
       yield put({ type: 'handleDataSource' });
     },
 
+    * updateStatus({ codes, status }: any, { put, call }: EffectsCommandMap): Generator<any, void, any> {
+      const response = yield call(batchUpdate, {
+        codes,
+        status,
+      });
+      if (response.ret !== 0 || response.errcode !== 0) {
+        message.error(response.msg);
+        return;
+      }
+      message.success('修改状态成功');
+      yield put({ type: 'handleDataSource' });
+    },
+
     // * fresh(_: any, { take, put }: EffectsCommandMap): Generator<any, void, any> {
     //   console.log('inviteCodeinviteCode');
     //   while (yield take('changePage')) {
@@ -134,6 +167,13 @@ const Model: InviteCodeModelType = {
         ...state,
         current: 1,
         status: payload,
+      };
+    },
+    changeSelectedRowKeysStatus(state: InviteCodeModelState = defaultState, { payload }: AnyAction) {
+      // console.log(payload, 'PPPPPPP');
+      return {
+        ...state,
+        selectedRowKeys: payload,
       };
     },
   },
