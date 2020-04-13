@@ -16,16 +16,18 @@ interface InviteCodeProps {
   pageSize: number;
   current: number;
   changePage: (payload: { pageSize?: number; current?: number; }) => void;
+  status: number;
+  changeStatus: (paylaod: number) => void;
 }
 
-function InviteCode({ dataSource, total, handleDataSource, pageSize, current, changePage }: InviteCodeProps) {
+function InviteCode({ dataSource, total, handleDataSource, pageSize, current, changePage, status, changeStatus }: InviteCodeProps) {
 
   // const [dataSource, setDataSource] = React.useState<any[] | null>(null);
   const [visible, setVisible] = React.useState<boolean>(false);
   // const [pageSize, setPageSize] = React.useState<number>(10);
   // const [current, setCurrent] = React.useState<number>(1);
   // const [total, setTotal] = React.useState<number>(0);
-  const [status, setStatus] = React.useState<number>(-1);
+  // const [status, setStatus] = React.useState<number>(-1);
   const [selectedRowKeys, setsSelectedRowKeys] = React.useState<string[]>([]);
   const [createQuantity, setCreateQuantity] = React.useState<number>(10);
 
@@ -54,7 +56,7 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
           style={{ width: 100 }}
           onChange={(value: number) => {
             // setCurrent(1);
-            setStatus(value);
+            changeStatus(value);
           }}
         >
           <Select.Option value={-1}>全部状态</Select.Option>
@@ -290,12 +292,12 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
               showSizeChanger
               current={current}
               onChange={(current1: number) => {
-                changePage({current: current1});
+                changePage({ current: current1 });
               }}
               pageSize={pageSize}
               onShowSizeChange={(_current: number, size: number) => {
                 // setCurrent(1);
-                changePage({pageSize: size});
+                changePage({ pageSize: size });
               }}
               total={total}
               pageSizeOptions={['10', '20', '30', '40', '50']}
@@ -328,6 +330,7 @@ export default connect(
     total: inviteCode.total,
     pageSize: inviteCode.pageSize,
     current: inviteCode.current,
+    status: inviteCode.status,
   }),
   {
     handleDataSource: () => ({
@@ -335,6 +338,10 @@ export default connect(
     }),
     changePage: (payload: { pageSize?: number; current?: number; }) => ({
       type: 'inviteCode/changePage',
+      payload,
+    }),
+    changeStatus: (payload: number) => ({
+      type: 'inviteCode/changeStatus',
       payload,
     }),
   },

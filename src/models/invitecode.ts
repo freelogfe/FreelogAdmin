@@ -9,6 +9,7 @@ export interface InviteCodeModelState {
   total: number;
   pageSize: number;
   current: number;
+  status: number;
 }
 
 export interface InviteCodeModelType {
@@ -17,11 +18,15 @@ export interface InviteCodeModelType {
   effects: {
     handleDataSource: Effect;
     changePage: Effect;
+    changeStatus: Effect;
+    // fresh: Effect;
   };
   reducers: {
     changeDataSourceStatus: Reducer<InviteCodeModelState>;
     changePageStatus: Reducer<InviteCodeModelState>;
+    changeStatusStatus: Reducer<InviteCodeModelState>;
   };
+  // subscriptions: any;
 }
 
 const defaultState: InviteCodeModelState = {
@@ -29,6 +34,7 @@ const defaultState: InviteCodeModelState = {
   total: -1,
   pageSize: 10,
   current: 1,
+  status: -1,
 };
 
 const Model: InviteCodeModelType = {
@@ -43,12 +49,9 @@ const Model: InviteCodeModelType = {
       const params = yield select(({ inviteCode }: any) => ({
         pageSize: inviteCode.pageSize,
         page: inviteCode.current,
-        // status: application.status,
+        status: inviteCode.status,
       }));
-      const response = yield call(selectBetaCodes, {
-        ...params,
-        status: -1,
-      });
+      const response = yield call(selectBetaCodes, params);
       // console.log(response, 'response');
       if (response.ret !== 0 || response.errcode !== 0) {
         message.error(response.msg);
@@ -94,15 +97,21 @@ const Model: InviteCodeModelType = {
     },
 
     * changePage({ payload }: any, { put }: EffectsCommandMap): Generator<any, void, any> {
-      // console.log(payload, 'payloadpayload');
-      yield put({
-        type: 'changePageStatus',
-        payload,
-      });
-      yield put({
-        type: 'handleDataSource',
-      });
+      yield put({ type: 'changePageStatus', payload });
+      yield put({ type: 'handleDataSource' });
     },
+
+    * changeStatus({ payload }: any, { put }: EffectsCommandMap): Generator<any, void, any> {
+      yield put({ type: 'changeStatusStatus', payload });
+      yield put({ type: 'handleDataSource' });
+    },
+
+    // * fresh(_: any, { take, put }: EffectsCommandMap): Generator<any, void, any> {
+    //   console.log('inviteCodeinviteCode');
+    //   while (yield take('changePage')) {
+    //     put({ type: 'handleDataSource' });
+    //   }
+    // },
   },
 
   reducers: {
@@ -120,7 +129,20 @@ const Model: InviteCodeModelType = {
         ...payload,
       };
     },
+    changeStatusStatus(state: InviteCodeModelState = defaultState, { payload }: AnyAction) {
+      return {
+        ...state,
+        current: 1,
+        status: payload,
+      };
+    },
   },
+
+  // subscriptions: {
+  //   fresh1({ dispatch }: SubscriptionAPI) {
+  //     dispatch({type: 'fresh'});
+  //   },
+  // },
 };
 
 export default Model;
