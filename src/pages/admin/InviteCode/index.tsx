@@ -1,10 +1,7 @@
 import React from 'react';
-import { Button, Table, Modal, InputNumber, message, Pagination, Select, Dropdown, Menu } from 'antd';
+import { Button, Table, Modal, InputNumber, Pagination, Select, Dropdown, Menu } from 'antd';
 import moment from 'moment';
 
-import { batchCreate } from '@/services/admin';
-
-// import { userinfos } from '@/services/user';
 import { connect } from 'dva';
 import { ConnectState } from '@/models/connect';
 import { TableRowSelection } from 'antd/lib/table/interface';
@@ -22,12 +19,17 @@ interface InviteCodeProps {
   selectedRowKeys: string[];
   changeSelectedRowKeys: (payload: string[]) => void;
   updateStatus: (codes: string[], status: number) => void;
+  modalVisible: boolean;
+  changeModalVisible: (visble: boolean) => void;
+  createQuantity: number;
+  changeCreateQuantity: (payload: number) => void;
+  batchCreate: () => void;
 }
 
-function InviteCode({ dataSource, total, handleDataSource, pageSize, current, changePage, status, changeStatus, selectedRowKeys, changeSelectedRowKeys, updateStatus }: InviteCodeProps) {
+function InviteCode({ dataSource, total, handleDataSource, pageSize, current, changePage, status, changeStatus, selectedRowKeys, changeSelectedRowKeys, updateStatus, modalVisible, changeModalVisible, createQuantity, changeCreateQuantity, batchCreate }: InviteCodeProps) {
 
-  const [visible, setVisible] = React.useState<boolean>(false);
-  const [createQuantity, setCreateQuantity] = React.useState<number>(10);
+  // const [visible, setVisible] = React.useState<boolean>(false);
+  // const [createQuantity, setCreateQuantity] = React.useState<number>(10);
 
   React.useEffect(() => {
     handleDataSource();
@@ -184,30 +186,8 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
     }),
   };
 
-  const handleOk = async () => {
-    const response = await batchCreate({
-      quantity: createQuantity,
-    });
-    if (response.ret !== 0 || response.errcode !== 0) {
-      message.error(response.msg);
-      return;
-    }
-    message.success('生成成功');
-    setVisible(false);
-    if (current === 1) {
-      handleDataSource();
-    } else {
-      // setCurrent(1);
-    }
-    // console.log(response, '#######');
-  };
-
-  const handleCancel = () => {
-    setVisible(false);
-  };
-
   const onChange = (value: number | undefined) => {
-    setCreateQuantity(value || 10);
+    changeCreateQuantity(value || 10);
   };
 
   const menu = (
@@ -232,7 +212,7 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
         <Button
           type="primary"
           icon="plus"
-          onClick={() => setVisible(true)}
+          onClick={() => changeModalVisible(true)}
         >批量生成邀请码</Button>
       </div>
       <div style={{ padding: '8px 0' }}>
@@ -279,9 +259,9 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
 
       <Modal
         title="批量生成邀请码"
-        visible={visible}
-        onOk={handleOk}
-        onCancel={handleCancel}
+        visible={modalVisible}
+        onOk={batchCreate}
+        onCancel={() => changeModalVisible(false)}
         okText="生成"
       >
         <InputNumber
@@ -303,6 +283,8 @@ export default connect(
     current: inviteCode.current,
     status: inviteCode.status,
     selectedRowKeys: inviteCode.selectedRowKeys,
+    modalVisible: inviteCode.modalVisible,
+    createQuantity: inviteCode.createQuantity,
   }),
   {
     handleDataSource: () => ({
@@ -325,6 +307,16 @@ export default connect(
       status,
       codes,
     }),
+    changeModalVisible: (payload: boolean) => ({
+      type: 'inviteCode/changeModalVisibleStatus',
+      payload,
+    }),
+    changeCreateQuantity: (payload: number) => ({
+      type: 'inviteCode/changeCreateQuantityStatus',
+      payload,
+    }),
+    batchCreate: () => ({
+      type: 'inviteCode/batchCreate',
+    }),
   },
-)
-(InviteCode);
+)(InviteCode);

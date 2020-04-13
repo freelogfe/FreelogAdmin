@@ -1,6 +1,6 @@
 import { Effect, EffectsCommandMap } from 'dva';
 import { AnyAction, Reducer } from 'redux';
-import { batchUpdate, selectBetaCodes } from '@/services/admin';
+import { batchCreate, batchUpdate, selectBetaCodes } from '@/services/admin';
 import { message } from 'antd';
 import { userinfos } from '@/services/user';
 
@@ -11,6 +11,8 @@ export interface InviteCodeModelState {
   current: number;
   status: number;
   selectedRowKeys: string[];
+  modalVisible: boolean;
+  createQuantity: number;
 }
 
 export interface InviteCodeModelType {
@@ -21,6 +23,7 @@ export interface InviteCodeModelType {
     changePage: Effect;
     changeStatus: Effect;
     updateStatus: Effect;
+    batchCreate: Effect;
     // changeSelectedRowKeys: Effect;
     // fresh: Effect;
   };
@@ -29,6 +32,8 @@ export interface InviteCodeModelType {
     changePageStatus: Reducer<InviteCodeModelState>;
     changeStatusStatus: Reducer<InviteCodeModelState>;
     changeSelectedRowKeysStatus: Reducer<InviteCodeModelState>;
+    changeModalVisibleStatus: Reducer<InviteCodeModelState>;
+    changeCreateQuantityStatus: Reducer<InviteCodeModelState>;
   };
   // subscriptions: any;
 }
@@ -40,6 +45,8 @@ const defaultState: InviteCodeModelState = {
   current: 1,
   status: -1,
   selectedRowKeys: [],
+  modalVisible: false,
+  createQuantity: 10,
 };
 
 const Model: InviteCodeModelType = {
@@ -74,7 +81,7 @@ const Model: InviteCodeModelType = {
         dataSource: inviteCode.dataSource,
       }));
       const dataSourceIDs: string[] = dataSource
-        .filter((j: {status:number}) => j.status !== 2)
+        .filter((j: { status: number }) => j.status !== 2)
         .map((i: { code: string; }) => i.code);
       // console.log(dataSourceIDs, 'dataSourceIDs');
       // console.log(selectedRowKeys, 'selectedRowKeys');
@@ -139,6 +146,25 @@ const Model: InviteCodeModelType = {
       yield put({ type: 'handleDataSource' });
     },
 
+    * batchCreate(_: any, { put, call, select }: EffectsCommandMap): Generator<any, void, any> {
+      const { createQuantity } = yield select(({ inviteCode }: any) => ({
+        createQuantity: inviteCode.createQuantity,
+      }));
+      const response = yield call(batchCreate, {
+        quantity: createQuantity,
+      });
+      if (response.ret !== 0 || response.errcode !== 0) {
+        message.error(response.msg);
+        return;
+      }
+      message.success('生成成功');
+      // console.log('######');
+      yield put({ type: 'changeModalVisibleStatus', payload: false });
+      // console.log('@@@@@@');
+      yield put({ type: 'changePageStatus', payload: { current: 1 } });
+      yield put({ type: 'handleDataSource' });
+    },
+
     // * fresh(_: any, { take, put }: EffectsCommandMap): Generator<any, void, any> {
     //   console.log('inviteCodeinviteCode');
     //   while (yield take('changePage')) {
@@ -174,6 +200,20 @@ const Model: InviteCodeModelType = {
       return {
         ...state,
         selectedRowKeys: payload,
+      };
+    },
+    changeModalVisibleStatus(state: InviteCodeModelState = defaultState, { payload }: AnyAction) {
+      // console.log(payload, 'PPPPPPP');
+      return {
+        ...state,
+        modalVisible: payload,
+      };
+    },
+    changeCreateQuantityStatus(state: InviteCodeModelState = defaultState, { payload }: AnyAction) {
+      // console.log(payload, 'PPPPPPP');
+      return {
+        ...state,
+        createQuantity: payload,
       };
     },
   },
