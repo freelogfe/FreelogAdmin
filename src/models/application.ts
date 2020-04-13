@@ -12,7 +12,7 @@ import { message } from 'antd';
 // import {setAuthority} from '@/utils/authority';
 // import {getPageQuery} from '@/utils/utils';
 
-export interface StateType {
+export interface ApplicationModelState {
   dataSource: any[];
   pageSize: number;
   current: number;
@@ -30,7 +30,7 @@ export interface StateType {
 
 export interface ApplicationModelType {
   namespace: string;
-  state: StateType;
+  state: ApplicationModelState;
   effects: {
     getDataSource: Effect,
     changePage: Effect,
@@ -39,20 +39,20 @@ export interface ApplicationModelType {
     approvals: Effect,
   };
   reducers: {
-    changeDataSourceStatus: Reducer<StateType>;
-    changePageSizeStatus: Reducer<StateType>;
-    changeTotalStatus: Reducer<StateType>;
-    changeStatusStatus: Reducer<StateType>;
-    changeSearchedTextStatus: Reducer<StateType>;
-    changeSearchedUserIDStatus: Reducer<StateType>;
-    changeSelectedRowKeysStatus: Reducer<StateType>;
-    changeHandledRecordIdsStatus: Reducer<StateType>;
-    changeAuditValueStatus: Reducer<StateType>;
-    changeOtherReasonValueStatus: Reducer<StateType>;
+    changeDataSourceStatus: Reducer<ApplicationModelState>;
+    changePageSizeStatus: Reducer<ApplicationModelState>;
+    changeTotalStatus: Reducer<ApplicationModelState>;
+    changeStatusStatus: Reducer<ApplicationModelState>;
+    changeSearchedTextStatus: Reducer<ApplicationModelState>;
+    changeSearchedUserIDStatus: Reducer<ApplicationModelState>;
+    changeSelectedRowKeysStatus: Reducer<ApplicationModelState>;
+    changeHandledRecordIdsStatus: Reducer<ApplicationModelState>;
+    changeAuditValueStatus: Reducer<ApplicationModelState>;
+    changeOtherReasonValueStatus: Reducer<ApplicationModelState>;
   };
 }
 
-const defaultState: StateType = {
+const defaultState: ApplicationModelState = {
   dataSource: [],
   pageSize: 10,
   current: 1,
@@ -189,7 +189,7 @@ const Model: ApplicationModelType = {
   },
 
   reducers: {
-    changeDataSourceStatus(state: StateType = defaultState, { dataSource, total }: AnyAction): StateType {
+    changeDataSourceStatus(state: ApplicationModelState = defaultState, { dataSource, total }: AnyAction): ApplicationModelState {
       // console.log(applyRecords, 'applyRecords');
       // console.log(state, 'state');
       return {
@@ -200,7 +200,7 @@ const Model: ApplicationModelType = {
 
     },
     // @ts-ignore
-    changePageStatus(state: StateType, { type2, pageSize, current }: AnyAction): StateType {
+    changePageStatus(state: ApplicationModelState, { type2, pageSize, current }: AnyAction): ApplicationModelState {
       switch (type2) {
         case 'CURRENT':
           return {
@@ -218,45 +218,45 @@ const Model: ApplicationModelType = {
       }
     },
 
-    changeStatusStatus(state: StateType = defaultState, { status }: AnyAction): StateType {
+    changeStatusStatus(state: ApplicationModelState = defaultState, { status }: AnyAction): ApplicationModelState {
       return {
         ...state,
         status,
         current: 1,
       };
     },
-    changeSearchedTextStatus(state: StateType = defaultState, { payload }: AnyAction): StateType {
+    changeSearchedTextStatus(state: ApplicationModelState = defaultState, { payload }: AnyAction): ApplicationModelState {
       return {
         ...state,
         searchedText: payload,
       };
     },
-    changeSearchedUserIDStatus(state: StateType = defaultState, { payload }: AnyAction): StateType {
+    changeSearchedUserIDStatus(state: ApplicationModelState = defaultState, { payload }: AnyAction): ApplicationModelState {
       return {
         ...state,
         searchedUserID: payload,
         current: 1,
       };
     },
-    changeSelectedRowKeysStatus(state: StateType = defaultState, { payload }: AnyAction): StateType {
+    changeSelectedRowKeysStatus(state: ApplicationModelState = defaultState, { payload }: AnyAction): ApplicationModelState {
       return {
         ...state,
         selectedRowKeys: payload,
       };
     },
-    changeHandledRecordIdsStatus(state: StateType = defaultState, { payload }: AnyAction): StateType {
+    changeHandledRecordIdsStatus(state: ApplicationModelState = defaultState, { payload }: AnyAction): ApplicationModelState {
       return {
         ...state,
         handledRecordIds: payload,
       };
     },
-    changeAuditValueStatus(state: StateType = defaultState, { payload }: AnyAction): StateType {
+    changeAuditValueStatus(state: ApplicationModelState = defaultState, { payload }: AnyAction): ApplicationModelState {
       return {
         ...state,
         auditValue: payload,
       };
     },
-    changeOtherReasonValueStatus(state: StateType = defaultState, { payload }: AnyAction): StateType {
+    changeOtherReasonValueStatus(state: ApplicationModelState = defaultState, { payload }: AnyAction): ApplicationModelState {
       return {
         ...state,
         otherReasonValue: payload,

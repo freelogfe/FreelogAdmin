@@ -1,26 +1,34 @@
 import React from 'react';
-import {Button, Table, Modal, InputNumber, message, Pagination, Select, Dropdown, Menu} from 'antd';
+import { Button, Table, Modal, InputNumber, message, Pagination, Select, Dropdown, Menu } from 'antd';
 import moment from 'moment';
 
-import {batchCreate, batchUpdate, selectBetaCodes} from '@/services/admin';
+import { batchCreate, batchUpdate, selectBetaCodes } from '@/services/admin';
 
 import styles from './index.less';
-import {userinfos} from "@/services/user";
+import { userinfos } from '@/services/user';
+import { connect } from 'dva';
+import { ConnectState } from '@/models/connect';
 
-export default function () {
+interface InviteCodeProps {
+  dataSource: any[] | null;
+  total: number;
+  handleDataSource: () => void;
+}
 
-  const [dataSource, setDataSource] = React.useState<any[] | null>(null);
+function InviteCode({dataSource, total, handleDataSource}: InviteCodeProps) {
+
+  // const [dataSource, setDataSource] = React.useState<any[] | null>(null);
   const [visible, setVisible] = React.useState<boolean>(false);
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [current, setCurrent] = React.useState<number>(1);
-  const [total, setTotal] = React.useState<number>(0);
+  // const [total, setTotal] = React.useState<number>(0);
   const [status, setStatus] = React.useState<number>(-1);
   const [selectedRowKeys, setsSelectedRowKeys] = React.useState<string[]>([]);
   const [createQuantity, setCreateQuantity] = React.useState<number>(10);
 
   React.useEffect(() => {
-    handleData();
-  }, [current, pageSize, status]);
+    handleDataSource();
+  }, []);
 
   const handleData = async () => {
     const response = await selectBetaCodes({
@@ -72,7 +80,7 @@ export default function () {
       key: 'createDate',
       render: (text: string) => {
         return moment(text).format('YYYY-MM-DD');
-      }
+      },
     },
     {
       title: '邀请码',
@@ -83,7 +91,7 @@ export default function () {
       title: () => {
         return (<Select
           value={status}
-          style={{width: 100}}
+          style={{ width: 100 }}
           onChange={(value: number) => {
             setCurrent(1);
             setStatus(value);
@@ -137,7 +145,7 @@ export default function () {
       key: 'distributeDate',
       render: (text: string) => {
         return text ? moment(text).format('YYYY-MM-DD') : '---';
-      }
+      },
     },
     {
       title: '核销时间',
@@ -145,7 +153,7 @@ export default function () {
       key: 'destroyDate',
       render: (text: string) => {
         return text ? moment(text).format('YYYY-MM-DD') : '---';
-      }
+      },
     },
     {
       title: '核销用户',
@@ -154,7 +162,7 @@ export default function () {
       render: (text: any, record: any) => {
         // console.log(record, 'recordrecord');
         return record.userInfo ? record.userInfo.username : '';
-      }
+      },
     },
     {
       title: '手机号',
@@ -163,7 +171,7 @@ export default function () {
       render: (text: any, record: any) => {
         // console.log(record, 'recordrecord');
         return record.userInfo ? record.userInfo.mobile : '';
-      }
+      },
     },
     {
       title: '邮箱',
@@ -171,7 +179,7 @@ export default function () {
       key: 'email',
       render: (text: any, record: any) => {
         return record.userInfo ? record.userInfo.email : '';
-      }
+      },
     },
     // {
     //   title: '最后登录',
@@ -209,12 +217,12 @@ export default function () {
             }
           </Menu>}>
           <Button
-            style={{padding: 0}}
+            style={{ padding: 0 }}
             type="link"
             disabled={record.status === 2}
           >更改状态</Button>
-        </Dropdown>)
-      }
+        </Dropdown>);
+      },
     },
   ];
 
@@ -287,14 +295,14 @@ export default function () {
 
   return (
     <div className={styles.normal}>
-      <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button
           type="primary"
           icon="plus"
           onClick={() => setVisible(true)}
         >批量生成邀请码</Button>
       </div>
-      <div style={{padding: '8px 0'}}>
+      <div style={{ padding: '8px 0' }}>
         <span>已选中 {selectedRowKeys.length} 条</span>
         <Dropdown
           overlay={menu}>
@@ -311,12 +319,12 @@ export default function () {
         columns={columns}
         rowKey={'code'}
         pagination={false}
-        scroll={{x: true}}
+        scroll={{ x: true }}
       />
 
       {
         total !== 0 ?
-          (<div style={{display: 'flex', justifyContent: 'flex-end', paddingTop: 16}}>
+          (<div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 16 }}>
             <Pagination
               showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
               showSizeChanger
@@ -353,3 +361,16 @@ export default function () {
     </div>
   );
 }
+
+export default connect(
+  ({ inviteCode }: ConnectState) => ({
+    dataSource: inviteCode.dataSource,
+    total: inviteCode.total,
+  }),
+  {
+    handleDataSource: () => ({
+      type: 'inviteCode/handleDataSource',
+    }),
+
+  }
+)(InviteCode);
