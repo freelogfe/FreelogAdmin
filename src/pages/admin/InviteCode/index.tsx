@@ -8,6 +8,7 @@ import styles from './index.less';
 // import { userinfos } from '@/services/user';
 import { connect } from 'dva';
 import { ConnectState } from '@/models/connect';
+import { TableRowSelection } from 'antd/lib/table/interface';
 
 interface InviteCodeProps {
   dataSource: any[] | null;
@@ -169,13 +170,11 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
     },
   ];
 
-  const rowSelection = {
+  const rowSelection: TableRowSelection<any> = {
     fixed: true,
     selectedRowKeys,
-    onChange: (selectedRowKeys1: string[]) => {
-      // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-      // console.log(selectedRowKeys, 'selectedRowKeys');
-      setsSelectedRowKeys(selectedRowKeys1);
+    onChange: (selectedRowKeys1: string[] | number[]) => {
+      setsSelectedRowKeys(selectedRowKeys1 as string[]);
     },
     getCheckboxProps: (record: any) => ({
       disabled: record.status === 2, // Column configuration not to be checked
