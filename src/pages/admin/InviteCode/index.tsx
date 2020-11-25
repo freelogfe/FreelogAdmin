@@ -34,7 +34,16 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
   React.useEffect(() => {
     handleDataSource();
   }, []);
-
+  // code: "Y2IxZTcyNmMtMzVjNS00N2M2LTk0Mz" 邀请码
+  // createDate: "2020-11-24T06:57:02.123Z" 创建时间
+  // destroyDate: null  
+  // distributeDate: null  
+  // limitCount: 1  总次数  
+  // status: 0      
+  // type: "beta"
+  // updateDate: "2020-11-24T06:57:02.123Z"
+  // usedCount: 0   使用次数
+  // usedUsers: []  
   const columns = [
     {
       title: '生成时间',
@@ -207,6 +216,7 @@ function InviteCode({ dataSource, total, handleDataSource, pageSize, current, ch
   );
 
   return (
+    // 
     <div className={styles.normal}>
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button
