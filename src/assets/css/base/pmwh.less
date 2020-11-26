@@ -1,0 +1,86 @@
+
+.loopStyle(@counter) when (@counter > 0) {
+  .p-@{counter} {
+    padding: (1px * @counter) !important;
+  }
+
+  .px-@{counter} {
+    padding-left: (1px * @counter) !important;
+    padding-right: (1px * @counter) !important;
+  }
+
+  .py-@{counter} {
+    padding-top: (1px * @counter) !important;
+    padding-bottom: (1px * @counter) !important;
+  }
+  
+  .pt-@{counter} {
+    padding-top: (1px * @counter) !important;
+  }
+
+  .pr-@{counter} {
+    padding-right: (1px * @counter) !important;
+  }
+
+  .pb-@{counter} {
+    padding-bottom: (1px * @counter) !important;
+  }
+
+  .pl-@{counter} {
+    padding-left: (1px * @counter) !important;
+  }
+
+  .m-@{counter} {
+    margin: (1px * @counter) !important;
+  }
+
+  .mx-@{counter} {
+    margin-left: (1px * @counter) !important;
+    margin-right: (1px * @counter) !important;
+  }
+
+  .my-@{counter} {
+    margin-top: (1px * @counter) !important;
+    margin-bottom: (1px * @counter) !important;
+  }
+
+  .mt-@{counter} {
+    margin-top: (1px * @counter) !important;
+  }
+
+  .mr-@{counter} {
+    margin-right: (1px * @counter) !important;
+  }
+
+  .mb-@{counter} {
+    margin-bottom: (1px * @counter) !important;
+  }
+
+  .ml-@{counter} {
+    margin-left: (1px * @counter) !important;
+  } 
+  .w-@{counter} {
+    width: (1px * @counter) !important;
+  }
+
+  .h-@{counter} {
+    height: (1px * @counter) !important;
+  }
+  .loopStyle((@counter - 1)); // 递归调用自身
+}
+
+.loopStyle(100);
+
+
+.loopStyle2(@counter) when (@counter > 100) {
+  .w-@{counter} {
+    width: (1px * @counter) !important;
+  }
+
+  .h-@{counter} {
+    height: (1px * @counter) !important;
+  }
+  .loopStyle2((@counter - 1)); // 递归调用自身
+}
+
+.loopStyle2(1000);

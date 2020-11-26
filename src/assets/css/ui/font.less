@@ -1,0 +1,23 @@
+
+.loopfs(@counter) when (@counter > 0) {
+
+    .fs-@{counter} {
+      font-size: (1px * @counter) !important;
+    }
+  
+    .loopfs((@counter - 1)); // 递归调用自身
+  }
+  
+.loopfs(100);
+  
+.fs-regular{
+    font-weight: 400;
+}
+
+.fs-medium{
+    font-weight: 500;
+}
+
+.fs-bold{
+    font-weight: 600;
+}

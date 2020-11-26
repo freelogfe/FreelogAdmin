@@ -5,29 +5,67 @@
  * props: tags                          
  */
 import React from 'react';
-import { Row, Typography, Col } from 'antd';
-const { Title } = Typography;
+import { Select, Tag, DatePicker, Input } from 'antd';
+import { Moment } from 'moment';
+const { Option } = Select;
+const { CheckableTag } = Tag;
+const { RangePicker } = DatePicker;
+const { Search } = Input;
 
 interface filterProps {
-  tags: Array<any>;
-  sortData: Array<any>;
-  sortSelected: any;
-  onSelectChange: Function
+  tags: Array<string>;
+  sortData: Array<{id: number, value: string}>;
+  sortSelected: number;
+  selectedTags: Array<string>;
+  onTagChange(tag: string, checked: boolean): void;
+  onSelectChange(value:number):void;
+  onSearch(value:string): void;
+  onDateChange(date: Moment, dateString: [string, string]): void
 }
 
 const Filter: React.FC<filterProps> = (props) => {
-  const { tags, onSelectChange, sortData, sortSelected } = props;
+  const { tags, onSelectChange, sortData, sortSelected, selectedTags, onTagChange, onSearch, onDateChange } = props;
+ 
 //   const [count, setCount] = useState(0);
   return (
     // top and bottom
-    <div>
+    <div className="px-10 pb-20">
         {/* top.title sort: left right */}
-        <div className="flex-row space-between px-20">
+        <div className="flex-row space-between pb-20">
           {/* left.title */}
-          <div>用户管理</div>
-          <div className="flex-row ">
-            <span >排序：</span>
-            
+          <div className="fs-20 fs-bold">用户管理</div>
+          {/* right.sort */}
+          <div className="flex-row align-center">
+            <span className="fs-16" >排序：</span>
+            <Select defaultValue={sortSelected} style={{ width: 220 }} onSelect={onSelectChange}>
+              {
+                sortData.map((item, index) => {
+                    return <Option key={item.id} value={item.id}>{item.value}</Option>
+                })
+              }  
+            </Select> 
+          </div>
+        </div>
+        {/* bottom:left  right */}
+        <div className="flex-row align-center space-between">
+          {/* left.tag date */}
+          <div className="flex-row align-center">
+            <span className="pr-8">标签:</span>
+            {tags.map(tag => (
+              <CheckableTag
+                className="br-samll b-1 d-inline  px-8 py-4"
+                key={tag}
+                checked={selectedTags.indexOf(tag) > -1}
+                onChange={checked => onTagChange(tag, checked)}
+              >
+                {tag}
+              </CheckableTag>
+            ))}
+            <div><RangePicker onChange={onDateChange}/></div>
+          </div>
+          {/* right */}
+          <div className="pr-46">
+           <Search placeholder="input search text" className="w-300" onSearch={onSearch} enterButton  allowClear/>
           </div>
         </div>
     </div>
