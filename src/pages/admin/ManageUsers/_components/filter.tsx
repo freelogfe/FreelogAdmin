@@ -65,7 +65,7 @@ const Filter: React.FC<filterProps> = (props) => {
           </div>
           {/* right */}
           <div className="pr-46">
-           <Search placeholder="input search text" className="w-300" onSearch={onSearch} enterButton  allowClear/>
+           <Search placeholder="用户名/邮箱/手机号" className="w-300" onSearch={onSearch} enterButton  allowClear/>
           </div>
         </div>
     </div>

@@ -1,11 +1,11 @@
-import { Reducer } from 'redux';
-import { Effect } from 'dva';
 import { stringify } from 'querystring';
-import router from 'umi/router';
+import { history, Reducer, Effect } from 'umi';
 
-import { fakeAccountLogin, getFakeCaptcha } from '@/services/login';
-// import {setAuthority} from '@/utils/authority';
-import { getPageQuery, isDevelopmentEnv } from '@/utils/utils';
+import { fakeAccountLogin } from '@/services/login';
+import { setAuthority } from '@/utils/authority';
+import { getPageQuery } from '@/utils/utils';
+import { message } from 'antd';
+import { isDevelopmentEnv } from '@/utils/utils';
 
 export interface StateType {
   status?: 'ok' | 'error';
@@ -18,7 +18,6 @@ export interface LoginModelType {
   state: StateType;
   effects: {
     login: Effect;
-    getCaptcha: Effect;
     logout: Effect;
   };
   reducers: {
@@ -34,15 +33,22 @@ const Model: LoginModelType = {
   },
 
   effects: {
-    * login({ payload }, { call, put }) {
-      const { response, data } = yield call(fakeAccountLogin, payload);
+    *login({ payload }, { call, put }) {
+      const  datas = yield call(fakeAccountLogin, payload);
+      const {response, data} = datas
+      console.log(datas)
+      yield put({
+        type: 'changeLoginStatus',
+        payload: response,
+      });
+      // Login successfully
       if (response === undefined || (data.errcode === 0 && data.ret === 0)) {
         if (isDevelopmentEnv()) {
           window.document.cookie = `authInfo=${response.headers.get('authorization').replace('Bearer ', '')}; path=/`;
         }
-
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
+        message.success('🎉 🎉 🎉  登录成功！');
         let { redirect } = params as { redirect: string };
         if (redirect) {
           const redirectUrlParams = new URL(redirect);
@@ -56,19 +62,15 @@ const Model: LoginModelType = {
             return;
           }
         }
-        router.replace(redirect || '/');
+        history.replace(redirect || '/');
       }
-    },
-
-    * getCaptcha({ payload }, { call }) {
-      yield call(getFakeCaptcha, payload);
     },
 
     logout() {
       const { redirect } = getPageQuery();
       // Note: There may be security issues, please note
       if (window.location.pathname !== '/user/login' && !redirect) {
-        router.replace({
+        history.replace({
           pathname: '/user/login',
           search: stringify({
             redirect: window.location.href,
@@ -80,8 +82,7 @@ const Model: LoginModelType = {
 
   reducers: {
     changeLoginStatus(state, { payload }) {
-      // setAuthority(payload.currentAuthority);
-      // setAuthority(payload.headers.get('authorization'));
+      setAuthority(payload.currentAuthority);
       return {
         ...state,
         status: payload.status,

@@ -1,5 +1,4 @@
-import { Effect } from 'dva';
-import { Reducer } from 'redux';
+import { Effect, Reducer } from 'umi';
 
 import { queryCurrent, query as queryUsers } from '@/services/user';
 
@@ -16,7 +15,7 @@ export interface CurrentUser {
 }
 
 export interface UserModelState {
-  currentUser: CurrentUser | null;
+  currentUser?: CurrentUser | object;
 }
 
 export interface UserModelType {
@@ -28,7 +27,7 @@ export interface UserModelType {
   };
   reducers: {
     saveCurrentUser: Reducer<UserModelState>;
-    // changeNotifyCount: Reducer<UserModelState>;
+    changeNotifyCount: Reducer<UserModelState>;
   };
 }
 
@@ -36,20 +35,19 @@ const UserModel: UserModelType = {
   namespace: 'user',
 
   state: {
-    currentUser: null,
+    currentUser: {},
   },
 
   effects: {
-    * fetch(_, { call, put }) {
+    *fetch(_, { call, put }) {
       const response = yield call(queryUsers);
       yield put({
         type: 'save',
         payload: response,
       });
     },
-    * fetchCurrent(_, { call, put }) {
+    *fetchCurrent(_, { call, put }) {
       const response = yield call(queryCurrent);
-      // console.log(response, 'responseresponseresponse');
       yield put({
         type: 'saveCurrentUser',
         payload: response.data,
@@ -59,26 +57,27 @@ const UserModel: UserModelType = {
 
   reducers: {
     saveCurrentUser(state, action) {
+      console.log(action)
       return {
         ...state,
-        currentUser: action.payload || null,
+        currentUser: action.payload || {},
       };
     },
-    // changeNotifyCount(
-    //   state = {
-    //     currentUser: {},
-    //   },
-    //   action,
-    // ) {
-    //   return {
-    //     ...state,
-    //     currentUser: {
-    //       ...state.currentUser,
-    //       notifyCount: action.payload.totalCount,
-    //       unreadCount: action.payload.unreadCount,
-    //     },
-    //   };
-    // },
+    changeNotifyCount(
+      state = {
+        currentUser: {},
+      },
+      action,
+    ) {
+      return {
+        ...state,
+        currentUser: {
+          ...state.currentUser,
+          notifyCount: action.payload.totalCount,
+          unreadCount: action.payload.unreadCount,
+        },
+      };
+    },
   },
 };
 

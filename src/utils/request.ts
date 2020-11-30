@@ -4,7 +4,6 @@
  */
 import { extend } from 'umi-request';
 import { notification } from 'antd';
-import { isDevelopmentEnv } from '@/utils/utils';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -46,14 +45,12 @@ const errorHandler = (error: { response: Response }): Response => {
   return response;
 };
 
-
 /**
  * 配置request请求时的默认参数
  */
 const request = extend({
   errorHandler, // 默认错误处理
   credentials: 'include', // 默认请求是否带上cookie
-  prefix: isDevelopmentEnv() ? '' : window.location.origin.replace('admin', 'qi'),
 });
 
 export default request;

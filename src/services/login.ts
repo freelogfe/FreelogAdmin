@@ -1,6 +1,5 @@
 import request from '@/utils/request';
 import { isDevelopmentEnv } from '@/utils/utils';
-// import axios from 'axios';
 
 export interface LoginParamsType {
   userName: string;

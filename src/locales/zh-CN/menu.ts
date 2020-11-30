@@ -3,6 +3,7 @@ export default {
   'menu.more-blocks': '更多区块',
   'menu.home': '首页',
   'menu.admin': '管理页',
+  'menu.admin.sub-page': '二级管理页',
   'menu.login': '登录',
   'menu.register': '注册',
   'menu.register.result': '注册结果',
@@ -48,13 +49,4 @@ export default {
   'menu.editor.flow': '流程编辑器',
   'menu.editor.mind': '脑图编辑器',
   'menu.editor.koni': '拓扑编辑器',
-
-
-  'menu.user': '用户',
-  'menu.user.management': '用户管理',
-  'menu.user.beta-application': '内测申请审核',
-  'menu.user.invite-code-management': '邀请码管理',
-  'menu.node': '节点',
-  'menu.node.management': '节点管理',
-  'menu.node.audited': '节点审核',
 };

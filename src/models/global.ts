@@ -1,5 +1,4 @@
-import { Reducer } from 'redux';
-import { Subscription, Effect } from 'dva';
+import { Reducer, Effect } from 'umi';
 
 import { NoticeIconData } from '@/components/NoticeIcon';
 import { queryNotices } from '@/services/user';
@@ -29,7 +28,6 @@ export interface GlobalModelType {
     saveNotices: Reducer<GlobalModelState>;
     saveClearedNotices: Reducer<GlobalModelState>;
   };
-  subscriptions: { setup: Subscription };
 }
 
 const GlobalModel: GlobalModelType = {
@@ -48,7 +46,7 @@ const GlobalModel: GlobalModelType = {
         payload: data,
       });
       const unreadCount: number = yield select(
-        (state: ConnectState) => state.global.notices.filter(item => !item.read).length,
+        (state: ConnectState) => state.global.notices.filter((item) => !item.read).length,
       );
       yield put({
         type: 'user/changeNotifyCount',
@@ -65,7 +63,7 @@ const GlobalModel: GlobalModelType = {
       });
       const count: number = yield select((state: ConnectState) => state.global.notices.length);
       const unreadCount: number = yield select(
-        (state: ConnectState) => state.global.notices.filter(item => !item.read).length,
+        (state: ConnectState) => state.global.notices.filter((item) => !item.read).length,
       );
       yield put({
         type: 'user/changeNotifyCount',
@@ -77,7 +75,7 @@ const GlobalModel: GlobalModelType = {
     },
     *changeNoticeReadState({ payload }, { put, select }) {
       const notices: NoticeItem[] = yield select((state: ConnectState) =>
-        state.global.notices.map(item => {
+        state.global.notices.map((item) => {
           const notice = { ...item };
           if (notice.id === payload) {
             notice.read = true;
@@ -95,7 +93,7 @@ const GlobalModel: GlobalModelType = {
         type: 'user/changeNotifyCount',
         payload: {
           totalCount: notices.length,
-          unreadCount: notices.filter(item => !item.read).length,
+          unreadCount: notices.filter((item) => !item.read).length,
         },
       });
     },
@@ -117,21 +115,10 @@ const GlobalModel: GlobalModelType = {
     },
     saveClearedNotices(state = { notices: [], collapsed: true }, { payload }): GlobalModelState {
       return {
-        collapsed: false,
         ...state,
+        collapsed: false,
         notices: state.notices.filter((item): boolean => item.type !== payload),
       };
-    },
-  },
-
-  subscriptions: {
-    setup({ history }): void {
-      // Subscribe history(url) change, trigger `load` action if pathname is `/`
-      history.listen(({ pathname, search }): void => {
-        if (typeof window.ga !== 'undefined') {
-          window.ga('send', 'pageview', pathname + search);
-        }
-      });
     },
   },
 };

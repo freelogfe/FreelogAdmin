@@ -1,4 +1,4 @@
-import {reloadAuthorized} from './Authorized';
+import { reloadAuthorized } from './Authorized';
 
 // use localStorage to store the authority info, which might be sent from server in actual project.
 export function getAuthority(str?: string): string | string[] {
@@ -24,10 +24,9 @@ export function getAuthority(str?: string): string | string[] {
   return authority;
 }
 
-export function setAuthority(authorization: string): void {
-  // const proAuthority = typeof authority === 'string' ? [authority] : authority;
-  // localStorage.setItem('authorization', JSON.stringify(proAuthority));
-  localStorage.setItem('authorization', authorization);
+export function setAuthority(authority: string | string[]): void {
+  const proAuthority = typeof authority === 'string' ? [authority] : authority;
+  localStorage.setItem('antd-pro-authority', JSON.stringify(proAuthority));
   // auto reload
   reloadAuthorized();
 }
