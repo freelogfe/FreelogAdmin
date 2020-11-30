@@ -6,12 +6,7 @@
  * https://pro.ant.design/docs/deploy
  */
 export default {
-  dev: {
-    '/api/': {
-      target: 'https://preview.pro.ant.design',
-      changeOrigin: true,
-      pathRewrite: { '^': '' },
-    },
+  dev: { 
     '/v1': {
       target: 'http://qi.testfreelog.com',
       changeOrigin: true, // pathRewrite: { '^/server': '' },
