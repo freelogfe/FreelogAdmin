@@ -57,7 +57,6 @@ const UserModel: UserModelType = {
 
   reducers: {
     saveCurrentUser(state, action) {
-      console.log(action)
       return {
         ...state,
         currentUser: action.payload || {},
