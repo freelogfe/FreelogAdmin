@@ -10,21 +10,21 @@ import { InviteCodeModelState } from '@/models/invitecode';
 
 export { GlobalModelState, SettingModelState, UserModelState, ApplicationModelState };
 
-export interface Loading {
-  global: boolean;
-  effects: { [key: string]: boolean | undefined };
-  models: {
-    global?: boolean;
-    menu?: boolean;
-    setting?: boolean;
-    user?: boolean;
-    login?: boolean;
-  };
-}
+// export interface Loading {
+//   global: boolean;
+//   effects: { [key: string]: boolean | undefined };
+//   models: {
+//     global?: boolean;
+//     menu?: boolean;
+//     setting?: boolean;
+//     user?: boolean;
+//     login?: boolean;
+//   };
+// }
 
 export interface ConnectState {
   global: GlobalModelState;
-  loading: Loading;
+  // loading: Loading;
   settings: SettingModelState;
   user: UserModelState;
   login: StateType;
