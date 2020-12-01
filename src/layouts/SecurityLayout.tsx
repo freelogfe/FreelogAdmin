@@ -23,12 +23,12 @@ class SecurityLayout extends React.Component<SecurityLayoutProps, SecurityLayout
   async componentDidMount() {
     const { loginStatus, dispatch }  = this.props;
     if(loginStatus !== 'ok'){
-      await frequest('user.queryCurrent', [], '')
-      // console.log(res)
-      // dispatch &&  dispatch({
-      //   type: 'login/changeLoginStatus',
-      //   payload: res.errcode === 30 ? 'ok' : 'error'
-      // });
+      let res  = await frequest('user.queryCurrent', [], '')
+      console.log(res)
+      dispatch &&  dispatch({
+        type: 'login/changeLoginStatus',
+        payload: res.errcode === 30 ? 'ok' : 'error'
+      });
     }
     this.setState({
       isReady: true
@@ -36,21 +36,11 @@ class SecurityLayout extends React.Component<SecurityLayoutProps, SecurityLayout
   }
 
   render() {
-    const { isReady } = this.state;
-    const { children, loading, loginStatus
-      //  currentUser 
-      }  = this.props; 
-    const queryString = stringify({
-      redirect: window.location.href,
-    });
-
-    if ((!loginStatus && loading) || !isReady) {
+    if (!this.state.isReady) {
       return <PageLoading/>;
     }
-    if (loginStatus !== 'ok' ) {
-      return <Redirect to={`/user/login?${queryString}`}/>;
-    }  
-    return children;
+    console.log(this.props.loginStatus)
+    return this.props.children;
   }
 }
 

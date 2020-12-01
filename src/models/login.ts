@@ -35,11 +35,11 @@ const Model: LoginModelType = {
     *login({ payload }, { call, put }) {
       const  datas = yield call(frequest, 'user.login', [], payload); 
       const {response, data} = datas
-      console.log(response)
+      console.log(datas)
       yield put({
         type: 'changeLoginStatus',
         payload: response,
-      });
+      }); 
       // Login successfully
       if (response === undefined || (data.errcode === 0 && data.ret === 0)) {
         if (isDevelopmentEnv()) {
@@ -47,7 +47,7 @@ const Model: LoginModelType = {
         }
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
-        message.success('🎉 🎉 🎉  登录成功！');
+        // message.success('🎉 🎉 🎉  登录成功！');
         let { redirect } = params as { redirect: string };
         if (redirect) {
           const redirectUrlParams = new URL(redirect);
