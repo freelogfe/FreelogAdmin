@@ -52,5 +52,32 @@ const request = extend({
   errorHandler, // 默认错误处理
   credentials: 'include', // 默认请求是否带上cookie
 });
+// 判断是否登录
+request.interceptors.response.use(async response => {
+  const data = await response.clone().json();
+  // 需要提取公共方法
+  if (data && data.NOT_LOGIN) {
+    location.href = '/user/login';
+  }
+  return response;
+});
+
+
+export function createClient() {
+  const req = extend({
+    errorHandler, // 默认错误处理
+    credentials: 'include', // 默认请求是否带上cookie
+  })
+  
+  req.interceptors.response.use(async response => {
+    const data = await response.clone().json();
+    // 需要提取公共方法
+    if (data && data.NOT_LOGIN) {
+      location.href = '/user/login';
+    }
+    return response;
+  });
+  return req;
+};
 
 export default request;

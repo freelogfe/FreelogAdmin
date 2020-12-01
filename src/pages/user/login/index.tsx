@@ -80,13 +80,13 @@ const Login: React.FC<LoginProps> = (props) => {
               defaultMessage: '账户密码登录',
             })}
           />
-          <Tabs.TabPane
+          {/* <Tabs.TabPane
             key="mobile"
             tab={intl.formatMessage({
               id: 'pages.login.phoneLogin.tab',
               defaultMessage: '手机号登录',
             })}
-          />
+          /> */}
         </Tabs>
 
         {status === 'error' && loginType === 'account' && !submitting && (
@@ -244,12 +244,7 @@ const Login: React.FC<LoginProps> = (props) => {
           </a>
         </div>
       </ProForm>
-      <Space className={styles.other}>
-        <FormattedMessage id="pages.login.loginWith" defaultMessage="其他登录方式" />
-        <AlipayCircleOutlined className={styles.icon} />
-        <TaobaoCircleOutlined className={styles.icon} />
-        <WeiboCircleOutlined className={styles.icon} />
-      </Space>
+     
     </div>
   );
 };

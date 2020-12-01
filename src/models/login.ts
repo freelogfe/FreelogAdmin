@@ -1,7 +1,6 @@
 import { stringify } from 'querystring';
 import { history, Reducer, Effect } from 'umi';
-
-import { fakeAccountLogin } from '@/services/login';
+import frequest from '@/services/handler'
 import { setAuthority } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 import { message } from 'antd';
@@ -34,7 +33,7 @@ const Model: LoginModelType = {
 
   effects: {
     *login({ payload }, { call, put }) {
-      const  datas = yield call(fakeAccountLogin, payload);
+      const  datas = yield call(frequest, 'user.login', [], payload);
       const {response, data} = datas
       console.log(datas)
       yield put({
