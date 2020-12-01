@@ -24,10 +24,16 @@ class SecurityLayout extends React.Component<SecurityLayoutProps, SecurityLayout
     const { loginStatus, dispatch }  = this.props;
     if(loginStatus !== 'ok'){
       let res  = await frequest('user.queryCurrent', [], '')
-      dispatch &&  dispatch({
-        type: 'login/changeLoginStatus',
-        payload: res.errcode === 30 ? 'error' : 'ok'
-      });
+      if(dispatch){
+        dispatch({
+          type: 'login/changeLoginStatus',
+          payload: res.errcode === 30 ? 'error' : 'ok'
+        });
+        dispatch({
+          type: 'user/saveCurrentUser',
+          payload: res.data,
+        });
+      }
     }
     this.setState({
       isReady: true
