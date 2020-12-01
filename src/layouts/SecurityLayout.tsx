@@ -24,10 +24,9 @@ class SecurityLayout extends React.Component<SecurityLayoutProps, SecurityLayout
     const { loginStatus, dispatch }  = this.props;
     if(loginStatus !== 'ok'){
       let res  = await frequest('user.queryCurrent', [], '')
-      console.log(res)
       dispatch &&  dispatch({
         type: 'login/changeLoginStatus',
-        payload: res.errcode === 30 ? 'ok' : 'error'
+        payload: res.errcode === 30 ? 'error' : 'ok'
       });
     }
     this.setState({
@@ -39,7 +38,6 @@ class SecurityLayout extends React.Component<SecurityLayoutProps, SecurityLayout
     if (!this.state.isReady) {
       return <PageLoading/>;
     }
-    console.log(this.props.loginStatus)
     return this.props.children;
   }
 }

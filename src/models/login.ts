@@ -38,7 +38,7 @@ const Model: LoginModelType = {
       console.log(datas)
       yield put({
         type: 'changeLoginStatus',
-        payload: response,
+        payload: response.status === 200 ? 'ok' : 'error',
       }); 
       // Login successfully
       if (response === undefined || (data.errcode === 0 && data.ret === 0)) {
@@ -84,7 +84,7 @@ const Model: LoginModelType = {
       // setAuthority(payload.currentAuthority);
       return {
         ...state,
-        status: payload.status === 200 ? 'ok' : 'error',
+        status: payload,
         type: payload.type,
       };
     },
