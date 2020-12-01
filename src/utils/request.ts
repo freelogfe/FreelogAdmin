@@ -4,6 +4,7 @@
  */
 import { extend } from 'umi-request';
 import { notification } from 'antd';
+import { stringify } from 'querystring';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -52,12 +53,18 @@ const request = extend({
   errorHandler, // 默认错误处理
   credentials: 'include', // 默认请求是否带上cookie
 });
+
+function toLogin() {
+  const queryString = stringify({
+    redirect: window.location.href,
+  });
+  location.href = `/user/login?${queryString}`;
+}
 // 判断是否登录
 request.interceptors.response.use(async response => {
   const data = await response.clone().json();
-  // 需要提取公共方法
-  if (data && data.NOT_LOGIN) {
-    location.href = '/user/login';
+  if (data && data.errcode === 30) {
+    toLogin()
   }
   return response;
 });
@@ -68,12 +75,11 @@ export function createClient() {
     errorHandler, // 默认错误处理
     credentials: 'include', // 默认请求是否带上cookie
   })
-  
+
   req.interceptors.response.use(async response => {
     const data = await response.clone().json();
-    // 需要提取公共方法
-    if (data && data.NOT_LOGIN) {
-      location.href = '/user/login';
+    if (data && data.errcode === 30) {
+      toLogin()
     }
     return response;
   });

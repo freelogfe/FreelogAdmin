@@ -12,7 +12,6 @@ import React, { useState } from 'react';
 import ProForm, { ProFormCaptcha, ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
 import { connect, Dispatch, useIntl, FormattedMessage } from 'umi';
 import { StateType } from '@/models/login';
-import { getFakeCaptcha, LoginParamsType } from '@/services/login';
 import { ConnectState } from '@/models/connect';
 import { isDevelopmentEnv } from '@/utils/utils';
 import styles from './index.less';
@@ -35,7 +34,12 @@ const LoginMessage: React.FC<{
     showIcon
   />
 );
-
+ interface LoginParamsType {
+  userName: string;
+  password: string;
+  mobile: string;
+  captcha: string;
+}
 const Login: React.FC<LoginProps> = (props) => {
   const { userLogin = {}, submitting } = props;
   const { status, type: loginType } = userLogin;
@@ -218,11 +222,11 @@ const Login: React.FC<LoginProps> = (props) => {
                 },
               ]}
               onGetCaptcha={async (mobile) => {
-                const result = await getFakeCaptcha(mobile);
-                if (result === false) {
-                  return;
-                }
-                message.success('获取验证码成功！验证码为：1234');
+                // // const result = await getFakeCaptcha(mobile);
+                // if (result === false) {
+                //   return;
+                // }
+                // message.success('获取验证码成功！验证码为：1234');
               }}
             />
           </>

@@ -33,9 +33,9 @@ const Model: LoginModelType = {
 
   effects: {
     *login({ payload }, { call, put }) {
-      const  datas = yield call(frequest, 'user.login', [], payload);
+      const  datas = yield call(frequest, 'user.login', [], payload); 
       const {response, data} = datas
-      console.log(datas)
+      console.log(response)
       yield put({
         type: 'changeLoginStatus',
         payload: response,
@@ -81,10 +81,10 @@ const Model: LoginModelType = {
 
   reducers: {
     changeLoginStatus(state, { payload }) {
-      setAuthority(payload.currentAuthority);
+      // setAuthority(payload.currentAuthority);
       return {
         ...state,
-        status: payload.status,
+        status: payload.status === 200 ? 'ok' : 'error',
         type: payload.type,
       };
     },

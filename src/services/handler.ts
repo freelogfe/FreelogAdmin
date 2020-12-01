@@ -6,17 +6,16 @@ import apis from './api'
 
 
 export default function frequest(action: string, urlData: Array<string | number>, data: string | object | Array<any> | null | JSON): any {
-    if (action.indexOf('.') < -1) {
+    if (action.indexOf('.') === -1) {
         console.error('action is not exists: ' + action)
         return
     }
-    console.log(action, urlData, data)
     let arr = action.split('.')
-    if (!apis[arr[0].toLowerCase()] || !apis[arr[0].toLowerCase()][arr[1].toLowerCase()]) {
+    if (!apis[arr[0].toLowerCase()] || !apis[arr[0].toLowerCase()][arr[1]]) {
         console.error('action is not exists: ' + action)
         return
     }
-    let api: Api = Object.assign({},apis[arr[0].toLowerCase()][arr[1].toLowerCase()])
+    let api: Api = Object.assign({},apis[arr[0].toLowerCase()][arr[1]])
     // type Api2 = Exclude<Api, 'url' | 'before' | 'after'>
     let url = api.url
     if (url.indexOf(placeHolder) > -1) {
@@ -29,8 +28,11 @@ export default function frequest(action: string, urlData: Array<string | number>
         })
     }
     // pre method
-    api.before && api.before(data)
+    if(api.before){
+        data = api.before(data) || data
+    } 
     let req = request
+    // after method: create a new request
     if(api.after){
         req = createClient()
         request.interceptors.response.use((response, options) => {
@@ -43,7 +45,6 @@ export default function frequest(action: string, urlData: Array<string | number>
     }else{
         api.data = data
     }
-    // after method: create a new request
     ;['url', 'before', 'after'].forEach((item) => {
         delete api[item]
     })

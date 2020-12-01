@@ -41,6 +41,7 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
       currentUser = {
         headImage: '',
         username: '',
+        avatheadImagear: ''
       },
       menu,
     } = this.props;

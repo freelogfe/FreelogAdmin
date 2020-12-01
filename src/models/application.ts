@@ -1,16 +1,9 @@
 import { AnyAction, Reducer } from 'redux';
 import { Effect, EffectsCommandMap } from 'dva';
-// import { query as queryUsers } from '../services/user';
 import { applyRecords as applyRecordsAPI, betaAudit } from '@/services/admin';
-import { searchUser } from '@/services/user';
+import frequest from '@/services/handler'
 import { message } from 'antd';
-
-// import {stringify} from 'querystring';
-// import router from 'umi/router';
-
-// import {fakeAccountLogin, getFakeCaptcha} from '@/services/login';
-// import {setAuthority} from '@/utils/authority';
-// import {getPageQuery} from '@/utils/utils';
+ 
 
 export interface ApplicationModelState {
   dataSource: any[];
@@ -129,7 +122,7 @@ const Model: ApplicationModelType = {
       if (!payload) {
         yield put({ type: 'changeSearchedUserIDStatus', payload: 0 });
       } else {
-        const response = yield call(searchUser, { keywords: payload });
+        const response = yield call(frequest, 'user.searchUser', [], { keywords: payload });
         // if (response.errcode !== 0 || response.ret !== 0) {
         //   return message.error(response.msg);
         // }

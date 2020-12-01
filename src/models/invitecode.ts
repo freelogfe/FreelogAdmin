@@ -3,6 +3,7 @@ import { AnyAction, Reducer } from 'redux';
 import { batchCreate, batchUpdate, selectBetaCodes } from '@/services/admin';
 import { message } from 'antd';
 import { userinfos } from '@/services/user';
+import frequest from '@/services/handler'
 
 export interface InviteCodeModelState {
   dataSource: any[] | null;
@@ -104,7 +105,7 @@ const Model: InviteCodeModelType = {
         return;
       }
 
-      const response1 = yield call(userinfos, {
+      const response1 = yield call(frequest, 'user.getUserInfos', [], {
         userIds: userIds.join(','),
       });
 

@@ -7,7 +7,7 @@ interface User {
 // todo  需要给data或params定义类型 
 const user: User = {}
 
-user.getUserInfo = {
+user.getUserInfos = {
     url: '/v1/userinfos',
     method: 'GET',
 }

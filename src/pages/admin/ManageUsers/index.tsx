@@ -197,7 +197,6 @@ function ManageUsers({ applyRecords, init }: any) {
   const [sortSelected, setSortSelected] = React.useState(1);
   const [selectedTags, setSelectedTags] = React.useState(['cool']);
   let selectChange = (data: number) => {
-    console.log(data)
     setSortSelected(data)
   }
   let tagChange = (tag: string, checked: boolean) => {
@@ -211,7 +210,6 @@ function ManageUsers({ applyRecords, init }: any) {
         })
       }
     }
-    console.log(data)
     setSelectedTags(data)
   }
   let search = (value: string) => {

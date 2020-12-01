@@ -1,4 +1,6 @@
 import user from './modules/user'
+import admin from './modules/admin'
+
 // todo 上传文件进度等需要配置
 export interface Api {
   url: string;
@@ -7,11 +9,11 @@ export interface Api {
   getResponse?: boolean;
   params?: any;
   data?: any;
-  before?: (data: any)=>void;
-  after?: (res: any)=>void;
+  before?: (data: any) => any;
+  after?: (res: any) => void;
 }
 export const placeHolder: string = 'urlPlaceHolder'
 
-const apis = {user}
+const apis = { user, admin }
 
 export default apis
