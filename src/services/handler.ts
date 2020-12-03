@@ -4,7 +4,12 @@ import {createClient} from '@/utils/request';
 import { Api, placeHolder } from './api'
 import apis from './api'
 
-
+/**
+ * 
+ * @param action api namespace.apiName
+ * @param urlData array, use item for replace url's placeholder 
+ * @param data  body data or query data
+ */
 export default function frequest(action: string, urlData: Array<string | number>, data: string | object | Array<any> | null | JSON): any {
     if (action.indexOf('.') === -1) {
         console.error('action is not exists: ' + action)
