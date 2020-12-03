@@ -5,7 +5,7 @@ import { setAuthority } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 import { message } from 'antd';
 import { isDevelopmentEnv } from '@/utils/utils';
-
+import { delCookie, getCookie } from '@/utils/cookie'
 export interface StateType {
   status?: 'ok' | 'error';
   type?: string;
@@ -33,13 +33,12 @@ const Model: LoginModelType = {
 
   effects: {
     *login({ payload }, { call, put }) {
-      const  datas = yield call(frequest, 'user.login', [], payload); 
-      const {response, data} = datas
-      console.log(datas)
+      const datas = yield call(frequest, 'user.login', [], payload);
+      const { response, data } = datas
       yield put({
         type: 'changeLoginStatus',
         payload: response.status === 200 ? 'ok' : 'error',
-      }); 
+      });
       // Login successfully
       if (response === undefined || (data.errcode === 0 && data.ret === 0)) {
         if (isDevelopmentEnv()) {
@@ -65,9 +64,13 @@ const Model: LoginModelType = {
       }
     },
 
-    logout() {
+    *logout({ payload }, { call, put }) {
       const { redirect } = getPageQuery();
-      // Note: There may be security issues, please note
+      yield call(frequest, 'user.loginOut', [redirect], {returnUrl: window.location.href});
+      yield put({
+        type: 'changeLoginStatus',
+        payload: '',
+      });
       if (window.location.pathname !== '/user/login' && !redirect) {
         history.replace({
           pathname: '/user/login',

@@ -1,4 +1,4 @@
-import { Api } from '../index'
+import { Api, placeHolder } from '../index'
 import { isDevelopmentEnv } from '@/utils/utils';
 
 interface User {
@@ -35,4 +35,9 @@ user.login = {
     getResponse: isDevelopmentEnv(),
 }
 
+user.loginOut = {
+    url: `/v1/passport/logout`,
+    method: 'get',
+    getResponse: isDevelopmentEnv(),
+}
 export default user;

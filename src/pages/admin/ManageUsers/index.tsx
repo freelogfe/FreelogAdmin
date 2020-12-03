@@ -2,12 +2,12 @@ import React from 'react';
 
 import styles from './index.less';
 import { connect } from 'dva';
-import { ConnectState } from '@/models/connect';
 import { Table, Tag } from 'antd';
 import Filter from './_components/filter'
 import { Moment } from 'moment';
+import { PageContainer } from '@ant-design/pro-layout';
 
-function ManageUsers({ applyRecords, init }: any) {
+function ManageUsers({ init }: any) {
 
   const columns = [
     {
@@ -193,7 +193,6 @@ function ManageUsers({ applyRecords, init }: any) {
       tags: ['cool', 'teacher'],
     }
   ];
-  // console.log(applyRecords, 'applyRecords');
   const [sortSelected, setSortSelected] = React.useState(1);
   const [selectedTags, setSelectedTags] = React.useState(['cool']);
   let selectChange = (data: number) => {
@@ -215,34 +214,21 @@ function ManageUsers({ applyRecords, init }: any) {
   let search = (value: string) => {
     console.log(value)
   }
-  let dateChange = (date: Moment, dateString: [string, string]) => {
+  let dateChange = (date: [Moment,Moment ], dateString: [string, string]) => {
     console.log(date)
-  }
-  React.useEffect(() => {
-    init()
-  }, []);
+  } 
   let tags = ['cool', 'teacher', 'loser', 'nice', 'developer']
   let sortData = [{ id: 1, value: '最近注册' }, { id: 2, value: '资源发布最多' }, { id: 3, value: '展品发布最多' }, { id: 4, value: '消费合约最多' }]
   return (
-    <div className={styles.normal}>
+    <PageContainer className={styles.normal}>
       <Filter  {...{ tags, sortData, sortSelected, selectedTags }}
         onSearch={search} onSelectChange={selectChange}
         onTagChange={tagChange} onDateChange={dateChange}></Filter>
       <Table columns={columns} dataSource={data} />
-      <pre>{JSON.stringify(applyRecords)}</pre>
-    </div>
+    </PageContainer>
   );
 }
 
-export default connect(
-  ({ application }: ConnectState) => ({
-    applyRecords: application.applyRecords,
-  }),
-  {
-    init: () => ({
-      type: 'application/getApplyRecords',
-    }),
-  },
-)(ManageUsers);
+export default connect()(ManageUsers);
 
 

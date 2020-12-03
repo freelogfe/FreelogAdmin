@@ -1,15 +1,11 @@
 import React from 'react';
 import { PageLoading } from '@ant-design/pro-layout';
-import { Redirect, connect, ConnectProps } from 'umi';
-import { stringify } from 'querystring';
+import { connect, ConnectProps } from 'umi';
 import { ConnectState } from '@/models/connect';
-import { CurrentUser } from '@/models/user';
 import frequest from '@/services/handler'
 
 interface SecurityLayoutProps extends ConnectProps {
-  loading?: boolean;
-  currentUser?: CurrentUser;
-  loginStatus: 'ok' | 'error';
+  loginStatus?: 'ok' | 'error';
 }
 
 interface SecurityLayoutState {
@@ -30,7 +26,7 @@ class SecurityLayout extends React.Component<SecurityLayoutProps, SecurityLayout
       });
       dispatch({
         type: 'user/saveCurrentUser',
-        payload: res.data,
+        payload: res.data
       });
     }
     this.setState({
@@ -46,8 +42,6 @@ class SecurityLayout extends React.Component<SecurityLayoutProps, SecurityLayout
   }
 }
 
-export default connect(({ user, loading, login }: ConnectState) => ({
-  currentUser: user.currentUser,
-  loading: loading.models.user,
+export default connect(({ user, login }: ConnectState) => ({
   loginStatus: login.status
 }))(SecurityLayout);

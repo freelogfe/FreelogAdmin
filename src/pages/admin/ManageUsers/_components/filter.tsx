@@ -6,7 +6,6 @@
  */
 import React from 'react';
 import { Select, Tag, DatePicker, Input } from 'antd';
-import { Moment } from 'moment';
 const { Option } = Select;
 const { CheckableTag } = Tag;
 const { RangePicker } = DatePicker;
@@ -20,20 +19,18 @@ interface filterProps {
   onTagChange(tag: string, checked: boolean): void;
   onSelectChange(value:number):void;
   onSearch(value:string): void;
-  onDateChange(date: Moment, dateString: [string, string]): void
+  onDateChange(dates: any, dateString: [string, string]): void;
 }
 
 const Filter: React.FC<filterProps> = (props) => {
   const { tags, onSelectChange, sortData, sortSelected, selectedTags, onTagChange, onSearch, onDateChange } = props;
- 
-//   const [count, setCount] = useState(0);
   return (
     // top and bottom
     <div className="px-10 pb-20">
         {/* top.title sort: left right */}
         <div className="flex-row space-between pb-20">
           {/* left.title */}
-          <div className="fs-20 fs-bold">用户管理</div>
+          <div className="fs-20 fw-bold"></div>
           {/* right.sort */}
           <div className="flex-row align-center">
             <span className="fs-16" >排序：</span>
@@ -50,7 +47,7 @@ const Filter: React.FC<filterProps> = (props) => {
         <div className="flex-row align-center space-between">
           {/* left.tag date */}
           <div className="flex-row align-center">
-            <span className="pr-8">标签:</span>
+            <span className="pr-8 shrink-0">标签:</span>
             {tags.map(tag => (
               <CheckableTag
                 className="br-samll b-1 d-inline  px-8 py-4"
@@ -64,7 +61,7 @@ const Filter: React.FC<filterProps> = (props) => {
             <div><RangePicker onChange={onDateChange}/></div>
           </div>
           {/* right */}
-          <div className="pr-46">
+          <div >
            <Search placeholder="用户名/邮箱/手机号" className="w-300" onSearch={onSearch} enterButton  allowClear/>
           </div>
         </div>

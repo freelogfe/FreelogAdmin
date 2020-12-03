@@ -6,18 +6,17 @@
 import ProLayout, {
   MenuDataItem,
   BasicLayoutProps as ProLayoutProps,
-  Settings,
   DefaultFooter,
 } from '@ant-design/pro-layout';
-import React, { useEffect, useMemo, useRef } from 'react';
+import { DefaultSettings } from '../../config/defaultSettings';
+
+import React, { useMemo, useRef } from 'react';
 import { Link, useIntl, connect, Dispatch, history } from 'umi';
-import { GithubOutlined } from '@ant-design/icons';
 import { Result, Button } from 'antd';
 import Authorized from '@/utils/Authorized';
 import RightContent from '@/components/GlobalHeader/RightContent';
 import { ConnectState } from '@/models/connect';
 import { getMatchMenu } from '@umijs/route-utils';
-import { getAuthorityFromRouter } from '@/utils/utils';
 
 import logo from '../assets/logo.svg';
 
@@ -40,7 +39,7 @@ export interface BasicLayoutProps extends ProLayoutProps {
   route: ProLayoutProps['route'] & {
     authority: string[];
   };
-  settings: Settings;
+  settings: DefaultSettings;
   dispatch: Dispatch;
 }
 export type BasicLayoutContext = { [K in 'location']: BasicLayoutProps[K] } & {
@@ -64,25 +63,7 @@ const menuDataRender = (menuList: MenuDataItem[]): MenuDataItem[] =>
 const defaultFooterDom = (
   <DefaultFooter
     copyright={`${new Date().getFullYear()} 飞致网络出品`}
-    links={[
-      // {
-      //   key: 'freelog admin',
-      //   title: 'freelog admin',
-      //   href: 'https://pro.ant.design',
-      //   blankTarget: true,
-      // },
-      // {
-      //   key: 'github',
-      //   title: <GithubOutlined />,
-      //   href: 'https://github.com/ant-design/ant-design-pro',
-      //   blankTarget: true,
-      // },
-      // {
-      //   key: 'Ant Design',
-      //   title: 'Ant Design',
-      //   href: 'https://ant.design',
-      //   blankTarget: true,
-      // },
+    links={[ 
     ]}
   />
 );
@@ -98,18 +79,9 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   } = props;
 
   const menuDataRef = useRef<MenuDataItem[]>([]);
-
-  useEffect(() => {
-    // if (dispatch) {
-    //   dispatch({
-    //     type: 'user/fetchCurrent',
-    //   });
-    // }
-  }, []);
   /**
    * init variables
    */
-
   const handleMenuCollapse = (payload: boolean): void => {
     if (dispatch) {
       dispatch({
@@ -143,13 +115,14 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
         }
         return <Link to={menuItemProps.path}>{defaultDom}</Link>;
       }}
-      breadcrumbRender={(routers = []) => [
+      breadcrumbRender={(routers = []) => {
+        return [
         {
           path: '/',
           breadcrumbName: formatMessage({ id: 'menu.home' }),
         },
         ...routers,
-      ]}
+      ]}}
       itemRender={(route, params, routes, paths) => {
         const first = routes.indexOf(route) === 0;
         return first ? (
