@@ -8,21 +8,23 @@ interface User {
 const user: User = {}
 
 user.getUserInfos = {
-    url: '/v1/userinfos',
+    url: '/api/userinfos',
     method: 'GET',
 }
 
 user.searchUser = {
-    url: '/v1/userinfos/detail',
+    url: '/api/userinfos/detail',
     method: 'GET',
 }
 
 user.queryCurrent = {
-    url: '/v1/userinfos/current',
+    url: '/api/users/current',
     method: 'GET',
 }
 
-
+// TODO 定义类型的意义只是为了写代码时检查一下而已
+// 情况1： 字段不多，不需要费那么多事，可以不定义类型
+// 情况2： 字段很多，定义起来很费事，得不偿失
 export interface LoginParamsType {
     userName: string;
     password: string;
@@ -33,6 +35,13 @@ user.login = {
     url: '/v1/passport/login',
     method: 'POST',
     getResponse: isDevelopmentEnv(),
+    dataModel: {
+      loginName: 'string',
+      password: 'string',
+      mobile: 'string',
+      jwtType: 'string',
+      captcha: 'string',
+    }
 }
 
 user.loginOut = {
@@ -40,4 +49,5 @@ user.loginOut = {
     method: 'get',
     getResponse: isDevelopmentEnv(),
 }
+ 
 export default user;

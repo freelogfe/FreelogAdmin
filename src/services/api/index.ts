@@ -11,6 +11,8 @@ export interface Api {
   data?: any;
   before?: (data: any) => any;
   after?: (res: any) => void;
+  dataModel?: object | Array<any>;
+  isDiff?: boolean
 }
 export const placeHolder: string = 'urlPlaceHolder'
 

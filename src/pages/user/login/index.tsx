@@ -53,6 +53,7 @@ const Login: React.FC<LoginProps> = (props) => {
       payload: { 
         loginName: values.userName,
         password: values.password,
+        task: 2134,
         jwtType: isDevelopmentEnv() ? 'header' : undefined, },
     });
   };
