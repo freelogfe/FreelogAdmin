@@ -8,7 +8,8 @@
 export default {
   dev: { 
     '/api': {
-      target: 'http://qi.testfreelog.com',
+      // target: 'http://127.0.0.1:7001/',
+      target: 'http://qi.testfreelog.com/',
       changeOrigin: true, // pathRewrite: { '^/server': '' },
       pathRewrite: { '^/api': '/v2' },
     },
