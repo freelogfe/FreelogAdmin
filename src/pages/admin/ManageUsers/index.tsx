@@ -6,25 +6,62 @@ import { Table, Tag } from 'antd';
 import Filter from './_components/filter'
 import { Moment } from 'moment';
 import { PageContainer } from '@ant-design/pro-layout';
-
-function ManageUsers({ init }: any) {
-
+import { UsersModelState, PagingData } from './model'
+interface manageUsersPropsType {
+  users: Array<object>;
+  getUsers: (data: PagingData) => void;
+  deleteTag: () => void;
+  addTag: () => void;
+  freeze: () => void;
+  unfreeze: () => void;
+  pagingData: PagingData;
+} 
+function ManageUsers({ users,pagingData, getUsers, deleteTag, addTag, freeze, unfreeze }: manageUsersPropsType) {
+  // createDate: "2020-11-09T08:44:58.008Z"
+  // email: ""
+  // headImage: "https://image.freelog.com/headImage/50050"
+  // mobile: "13027930519"
+  // status: 0
+  // tags: []
+  // userId: 50050
+  // userRole: 1
+  // userType: 0
+  // username: "snnaenu"
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-      render: (text: String) => <a>{text}</a>,
-    },
+      title: '用户',
+      dataIndex: 'username',
+      key: 'username',
+      render: (text: String) => <span>{text}</span>,
+    }, 
     {
-      title: 'Age',
-      dataIndex: 'age',
-      key: 'age',
-    },
+      title: '发布资源数',
+      dataIndex: 'resources',
+      key: 'resources',
+      render: (text: String) => <span>{text}</span>,
+    }, 
     {
-      title: 'Address',
-      dataIndex: 'address',
-      key: 'address',
+      title: '运营节点数',
+      dataIndex: 'nodes',
+      key: 'nodes',
+      render: (text: String) => <span>{text}</span>,
+    }, 
+    {
+      title: '消费合约数',
+      dataIndex: 'contracts',
+      key: 'contracts',
+      render: (text: String) => <span>{text}</span>,
+    }, 
+    {
+      title: '注册手机号/邮箱',
+      dataIndex: '_me',
+      key: '_me',
+      render: (_me: Array<any>) => (
+        <>
+          <p>{_me[0]}</p>
+          <p>{_me[1]}</p>
+        </>
+      ),
     },
     {
       title: 'Tags',
@@ -47,152 +84,29 @@ function ManageUsers({ init }: any) {
       ),
     },
     {
-      title: 'Action',
-      key: 'action',
+      title: '账号状态',
+      key: 'status',
+      dataIndex: 'status',
+      // 0 Normal, 1 Freeze, 2 BetaTestToBeAudit, 3 BetaTestApplyNotPass 
       render: (text: string, record: any) => (
         <>
+          <span className="pr-10">{['正常','冻结','测试资格待审核','测试资格审核未通过'][text]}</span>
           <a>Invite {record.name}</a>
           <a>Delete</a>
         </>
       ),
     },
   ];
-
-  const data = [
-    {
-      key: '1',
-      name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '2',
-      name: 'Jim Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      tags: ['loser'],
-    },
-    {
-      key: '3',
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '4',
-      name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '5',
-      name: 'Jim Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      tags: ['loser'],
-    },
-    {
-      key: '6',
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '7',
-      name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '8',
-      name: 'Jim Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      tags: ['loser'],
-    },
-    {
-      key: '9',
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '10',
-      name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '11',
-      name: 'Jim Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      tags: ['loser'],
-    },
-    {
-      key: '12',
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '13',
-      name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '14',
-      name: 'Jim Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      tags: ['loser'],
-    },
-    {
-      key: '15',
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '16',
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '17',
-      name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '18',
-      name: 'Jim Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      tags: ['loser'],
-    },
-    {
-      key: '19',
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher'],
-    }
-  ];
+  React.useEffect(() => {
+    getUsers({
+      skip: 0,
+      limit: 50,
+      keywords: '',
+      tagIds: '',
+      startRegisteredDate: null,
+      endRegisteredDate: null
+    });
+  }, []);
   const [sortSelected, setSortSelected] = React.useState(1);
   const [selectedTags, setSelectedTags] = React.useState(['cool']);
   let selectChange = (data: number) => {
@@ -214,21 +128,43 @@ function ManageUsers({ init }: any) {
   let search = (value: string) => {
     console.log(value)
   }
-  let dateChange = (date: [Moment,Moment ], dateString: [string, string]) => {
+  let dateChange = (date: [Moment, Moment], dateString: [string, string]) => {
     console.log(date)
-  } 
+  }
   let tags = ['cool', 'teacher', 'loser', 'nice', 'developer']
-  let sortData = [{ id: 1, value: '最近注册' }, { id: 2, value: '资源发布最多' }, { id: 3, value: '展品发布最多' }, { id: 4, value: '消费合约最多' }]
+  let sortData = [{ id: 1, value: '最近注册' }, { id: 2, value: '资源发布最多' }, { id: 3, value: '展品发布最多' }, { id: 4, value: '消费合约最多' }];
   return (
     <PageContainer className={styles.normal}>
       <Filter  {...{ tags, sortData, sortSelected, selectedTags }}
         onSearch={search} onSelectChange={selectChange}
         onTagChange={tagChange} onDateChange={dateChange}></Filter>
-      <Table columns={columns} dataSource={data} />
+      <Table columns={columns} dataSource={users} />
     </PageContainer>
   );
 }
 
-export default connect()(ManageUsers);
+
+export default connect(({ users }) => {
+  return ({
+  users: users.users,
+  pagingData: users.pagingData
+})}, {
+  getUsers: (data: PagingData) => ({
+    type: 'users/getUsers',
+    payload: data
+  }),
+  deleteTag: () => ({
+    type: 'users/deleteTag',
+  }),
+  addTag: () => ({
+    type: 'users/addTag',
+  }),
+  freeze: () => ({
+    type: 'users/freeze',
+  }),
+  unfreeze: () => ({
+    type: 'users/unfreeze',
+  })
+})(ManageUsers);
 
 

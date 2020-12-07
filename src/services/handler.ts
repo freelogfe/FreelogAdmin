@@ -36,7 +36,6 @@ export default function frequest(action: string, urlData: Array<string | number>
     // filter data if there are dataModel
     if(api.dataModel){
         compareObjects(api.dataModel, data, !!api.isDiff)  
-        console.log(data)
     }
     // pre method
     if(api.before){

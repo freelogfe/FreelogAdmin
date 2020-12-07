@@ -1,4 +1,4 @@
-import { Effect, Reducer } from 'umi';
+import { Effect, Reducer, history } from 'umi';
 
 import frequest from '@/services/handler'
 
@@ -38,11 +38,16 @@ const UserModel: UserModelType = {
   },
 
   effects: {
-    *fetchCurrent(_, { call, put }) {
+    *fetchCurrent(state, action) {
+      let { call, put } = action
       const response = yield call(frequest, 'user.queryCurrent', [], '');
       yield put({
+        type: 'login/changeLoginStatus',
+        payload: 'ok'
+      });
+      yield put({
         type: 'saveCurrentUser',
-        payload: response.data,
+        payload: response.data
       });
     },
   },

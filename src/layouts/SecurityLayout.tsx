@@ -1,6 +1,6 @@
 import React from 'react';
 import { PageLoading } from '@ant-design/pro-layout';
-import { connect, ConnectProps } from 'umi';
+import { connect, ConnectProps, history } from 'umi';
 import { ConnectState } from '@/models/connect';
 import frequest from '@/services/handler'
 
@@ -16,17 +16,12 @@ class SecurityLayout extends React.Component<SecurityLayoutProps, SecurityLayout
   state: SecurityLayoutState = {
     isReady: false
   };
-  async componentDidMount() {
-    const { loginStatus, dispatch } = this.props;
-    let res = await frequest('user.queryCurrent', [], '')
-    if (dispatch) {
-      loginStatus !== 'ok' && dispatch({
-        type: 'login/changeLoginStatus',
-        payload: res.errcode === 30 ? 'error' : 'ok'
-      });
-      dispatch({
-        type: 'user/saveCurrentUser',
-        payload: res.data
+  componentDidMount() {
+    const { dispatch, loginStatus } = this.props;
+    if (dispatch && loginStatus !== 'ok') {
+      dispatch && dispatch({
+        type: 'user/fetchCurrent',
+        payload: ''
       });
     }
     this.setState({

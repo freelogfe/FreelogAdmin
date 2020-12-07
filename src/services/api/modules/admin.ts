@@ -1,14 +1,14 @@
 
 import { Api } from '../index'
 import { isDevelopmentEnv } from '@/utils/utils';
-
+// TODO 使用namespace来做
 interface Admin {
-    [propName: string]: Api
+  [propName: string]: Api
 }
 
 // todo  需要给data或params定义类型 
 const admin: Admin = {}
- 
+
 
 interface IApplyRecordsType {
   page?: number;
@@ -28,7 +28,7 @@ interface IBatchCreateType {
 
 admin.batchCreate = {
   // console.log(params, 'paramsparams');
-  url: '/v1/testQualifications/beta/codes/batchCreate', 
+  url: '/v1/testQualifications/beta/codes/batchCreate',
   method: 'POST'
 }
 
@@ -41,7 +41,7 @@ interface ISelectBetaCodesType {
 }
 
 admin.selectBetaCodes = {
-  url: '/v1/testQualifications/beta/codes', 
+  url: '/v1/testQualifications/beta/codes',
   method: 'GET',
 }
 
@@ -54,7 +54,7 @@ interface IBetaAuditType {
 }
 
 admin.betaAudit = {
-  url: '/v1/testQualifications/beta/audit', 
+  url: '/v1/testQualifications/beta/audit',
   method: 'PUT'
 }
 
@@ -65,10 +65,23 @@ interface IBatchUpdateType {
   status: number;
 }
 
-admin.batchUpdate = { 
-    url: '/v1/testQualifications/beta/codes/batchUpdate',
-    method: 'PUT'
+admin.batchUpdate = {
+  url: '/v1/testQualifications/beta/codes/batchUpdate',
+  method: 'PUT'
 }
- 
 
+
+// 用户管理
+admin.getUsers = {
+  url: '/api/users',
+  method: 'GET',
+  params: {
+    skip: 'int',
+    limit: 'int',
+    keywords: 'string',
+    tagIds: 'string',
+    startRegisteredDate: 'date',
+    endRegisteredDate: 'date'
+  }
+}
 export default admin;

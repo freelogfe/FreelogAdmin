@@ -26,7 +26,6 @@ export interface LoginModelType {
 
 const Model: LoginModelType = {
   namespace: 'login',
-
   state: {
     status: undefined,
   },
@@ -37,10 +36,14 @@ const Model: LoginModelType = {
       const { response, data } = datas
       yield put({
         type: 'changeLoginStatus',
-        payload: response.status === 200 ? 'ok' : 'error',
+        payload: data && data.ret === 0 ? 'ok' : 'error',
+      });
+      yield put({
+        type: 'user/saveCurrentUser',
+        payload: data && data.ret === 0 ? data.data:{},
       });
       // Login successfully
-      if (response === undefined || (data.errcode === 0 && data.ret === 0)) {
+      if (data && data.ret === 0) {
         if (isDevelopmentEnv()) {
           window.document.cookie = `authInfo=${response.headers.get('authorization').replace('Bearer ', '')}; path=/`;
         }

@@ -1,19 +1,19 @@
 ﻿export default [
   {
-    path: '/user',
-    component: '../layouts/UserLayout',
-    routes: [
-      {
-        name: 'login',
-        path: '/user/login',
-        component: './user/login',
-      },
-    ],
-  },
-  {
     path: '/',
     component: '../layouts/SecurityLayout',
     routes: [
+      {
+        path: '/user',
+        component: '../layouts/UserLayout',
+        routes: [
+          {
+            name: 'login',
+            path: '/user/login',
+            component: './user/login',
+          },
+        ],
+      },
       {
         path: '/',
         component: '../layouts/BasicLayout',

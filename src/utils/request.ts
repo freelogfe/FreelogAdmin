@@ -54,18 +54,16 @@ const request = extend({
   credentials: 'include', // 默认请求是否带上cookie
 });
 
-function toLogin() {
+function toLogin(data: any) {
   const queryString = stringify({
     redirect: window.location.href,
   });
-  location.href = `/user/login?${queryString}`;
+  data && data.errcode === 3 && (location.href = `/user/login?${queryString}`);
 }
 // 判断是否登录
 request.interceptors.response.use(async response => {
   const data = await response.clone().json();
-  if (data && data.errcode === 30) {
-    toLogin()
-  }
+  toLogin(data)
   return response;
 });
 
@@ -78,9 +76,7 @@ export function createClient() {
 
   req.interceptors.response.use(async response => {
     const data = await response.clone().json();
-    if (data && data.errcode === 30) {
-      toLogin()
-    }
+    toLogin(data)
     return response;
   });
   return req;

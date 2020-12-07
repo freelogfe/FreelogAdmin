@@ -1,7 +1,12 @@
 import user from './modules/user'
 import admin from './modules/admin'
+import contract from './modules/contract'
+import node from './modules/node'
+import resource from './modules/resource'
 
-// todo 上传文件进度等需要配置
+// TODO 上传文件进度等需要配置
+// TODO  需要给data或params定义类型, 1.在model当中定义
+
 export interface Api {
   url: string;
   method: string;
@@ -16,6 +21,6 @@ export interface Api {
 }
 export const placeHolder: string = 'urlPlaceHolder'
 
-const apis = { user, admin }
+const apis = { user, admin, contract, node, resource }
 
 export default apis

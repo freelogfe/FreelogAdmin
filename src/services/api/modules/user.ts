@@ -4,7 +4,6 @@ import { isDevelopmentEnv } from '@/utils/utils';
 interface User {
     [propName: string]: Api
 }
-// todo  需要给data或params定义类型 
 const user: User = {}
 
 user.getUserInfos = {
@@ -21,6 +20,7 @@ user.queryCurrent = {
     url: '/api/users/current',
     method: 'GET',
 }
+// TODO 使用namespace来做
 
 // TODO 定义类型的意义只是为了写代码时检查一下而已
 // 情况1： 字段不多，不需要费那么多事，可以不定义类型
@@ -45,7 +45,7 @@ user.login = {
 }
 
 user.loginOut = {
-    url: `/v1/passport/logout`,
+    url: `/v2/passport/logout`,
     method: 'get',
     getResponse: isDevelopmentEnv(),
 }
