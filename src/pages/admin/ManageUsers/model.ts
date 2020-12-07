@@ -1,10 +1,6 @@
 import { Effect, Reducer, history } from 'umi';
 
 import frequest from '@/services/handler'
-import user from '@/services/api/modules/user';
-import resource from '../../../../.history/src/services/api/modules/resource_20201207111558';
-import { FunctionOutlined } from '@ant-design/icons';
-import { default } from '../../../../.history/mock/user_20201130104502';
 
 export interface PagingData {
   skip: number;
@@ -17,7 +13,7 @@ export interface PagingData {
 
 export interface UsersModelState {
   users: Array<object>;
-  pagingData: PagingData | null;
+  pagingData: PagingData;
   currentUserIds: string;
 }
 
