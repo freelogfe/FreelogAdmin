@@ -77,7 +77,6 @@ export const getLocalStorageUserInfo = (): object | null => {
  * delete the data's keys while they are (not) exist in origin
  */
 export function compareObjects(origin: object, data: object, diff: boolean = false) {
-  console.log(origin, data, diff)
   let otype = Object.prototype.toString.call(origin)  
   let dtype = Object.prototype.toString.call(data) 
   if(dtype === otype && otype === '[object Array]'){

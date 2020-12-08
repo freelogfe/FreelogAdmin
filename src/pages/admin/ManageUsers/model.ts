@@ -1,20 +1,23 @@
-import { Effect, Reducer, history } from 'umi';
+import { Effect, Reducer } from 'umi';
+import { AnyAction } from 'redux';
 
 import frequest from '@/services/handler'
 
-export interface PagingData {
+export interface QueryData {
   skip: number;
   limit: number;
-  keywords: string;
+  keywords?: string;
   tagIds: string;
-  startRegisteredDate: Date | null;
-  endRegisteredDate: Date | null;
+  startRegisteredDate?: Date | null;
+  endRegisteredDate?: Date | null;
 }
 
 export interface UsersModelState {
   users: Array<object>;
-  pagingData: PagingData;
+  queryData: QueryData;
   currentUserIds: string;
+  total: number;
+  tags: Array<object>;
 }
 
 export interface UsersModelType {
@@ -26,34 +29,58 @@ export interface UsersModelType {
     addTag: Effect;
     freeze: Effect;
     unfreeze: Effect;
+    getTags: Effect;
   };
   reducers: {
     saveUsers: Reducer<UsersModelState>;
+    saveTags: Reducer<UsersModelState>;
+    saveTotal: Reducer<UsersModelState>;
   };
 }
-
+const defaultState: UsersModelState = {
+  users: [],
+  queryData: {
+    skip: 0,
+    limit: 100,
+    keywords: '',
+    tagIds: '',
+    startRegisteredDate: null,
+    endRegisteredDate: null
+  },
+  total: 0,
+  currentUserIds: '',
+  tags: []
+}
 const UsersModel: UsersModelType = {
   namespace: 'users',
   state: {
-    users: [],
-    pagingData: {
-      skip: 0,
-      limit: 30,
-      keywords: '',
-      tagIds: '',
-      startRegisteredDate: null,
-      endRegisteredDate: null
-    },
-    currentUserIds: ''
+    ...defaultState
   },
   effects: {
-    *getUsers(state, action) {
-      let { call, put, all } = action
-      const users = yield call(frequest, 'admin.getUsers', [], action.payload);
+    *getTags(action, saga) {
+      let { call, put } = saga
+      const tagsRes = yield call(frequest, 'admin.getTags', []);
+      yield put({
+        type: 'saveTags',
+        payload: tagsRes.data
+      });
+    },
+    *getUsers(action, saga) {
+      let { call, put, all, fork, select } = saga
       // TODO 错误情况
       let currentUserIds = ''
+      const tags = yield select(({ users }: any) => users.tags);
+      if (!tags.length) {
+        yield fork(function* () {
+          yield put({
+            type: 'getTags',
+            payload: ''
+          });
+        })
+      }
+      const users = yield call(frequest, 'admin.getUsers', [], action.payload);
       users.data.dataList = users.data.dataList.map((item: any) => {
-        let _me = [item.mobile, item.email || 'chsignup5@mailinator.com']
+        let _me = [item.mobile, item.email]
         currentUserIds ? currentUserIds += ',' + item.userId : currentUserIds = item.userId
         return { ...item, key: item.userId, _me }
       })
@@ -66,24 +93,28 @@ const UsersModel: UsersModelType = {
         obj[key] = origin
         arr.some((item: any) => {
           if (item.userId === obj.userId) {
-            obj[key] = item.createdResourceCount || origin
+            obj[key] = item[key] || origin
             return true
           }
           return false
         });
       }
       users.data.dataList = users.data.dataList.map((user: any) => {
-        getValue(fresources.data || [], user, 'resources', 0)
-        getValue(fnodes.data || [], user, 'nodes', 0)
-        getValue(fcontracts.data || [], user, 'contracts', 0)
+        getValue(fresources.data || [], user, 'createdResourceCount', 0)
+        getValue(fnodes.data || [], user, 'createdNodeCount', 0)
+        getValue(fcontracts.data || [], user, 'signedContractCount', 0)
         return user
-      })
+      }) 
       yield put({
         type: 'saveUsers',
-        payload: [users.data.dataList, currentUserIds]
+        payload: [users.data.dataList || [], currentUserIds]
+      });
+      yield put({
+        type: 'saveTotal',
+        payload: users.data.totalItem + 100
       });
     },
-    *deleteTag(state, action) {
+    *deleteTag(action, saga) {
       let { call, put } = action
       const response = yield call(frequest, 'user.queryCurrent', [], '');
       yield put({
@@ -91,7 +122,7 @@ const UsersModel: UsersModelType = {
         payload: response.data
       });
     },
-    *addTag(state, action) {
+    *addTag(action, saga) {
       let { call, put } = action
       const response = yield call(frequest, 'user.queryCurrent', [], '');
       yield put({
@@ -99,7 +130,7 @@ const UsersModel: UsersModelType = {
         payload: response.data
       });
     },
-    *freeze(state, action) {
+    *freeze(action, saga) {
       let { call, put } = action
       const response = yield call(frequest, 'user.queryCurrent', [], '');
       yield put({
@@ -107,7 +138,7 @@ const UsersModel: UsersModelType = {
         payload: response.data
       });
     },
-    *unfreeze(state, action) {
+    *unfreeze(action, saga) {
       let { call, put } = action
       const response = yield call(frequest, 'user.queryCurrent', [], '');
       yield put({
@@ -117,11 +148,23 @@ const UsersModel: UsersModelType = {
     },
   },
   reducers: {
-    saveUsers(state, action) {
+    saveUsers(state: UsersModelState = defaultState, action: AnyAction) {
       return {
         ...state,
-        users: action.payload[0] || {},
+        users: action.payload[0] || [],
         currentUserIds: action.payload[1]
+      };
+    },
+    saveTags(state: UsersModelState = defaultState, action: AnyAction) {
+      return {
+        ...state,
+        tags: action.payload
+      };
+    },
+    saveTotal(state: UsersModelState = defaultState, action: AnyAction) {
+      return {
+        ...state,
+        total: action.payload
       };
     }
   }

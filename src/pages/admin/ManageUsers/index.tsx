@@ -6,29 +6,47 @@ import { Table, Tag } from 'antd';
 import Filter from './_components/filter'
 import { Moment } from 'moment';
 import { PageContainer } from '@ant-design/pro-layout';
-import { UsersModelState, PagingData } from './model';
 import moment from 'moment';
 interface manageUsersPropsType {
   users: Array<object>;
-  getUsers: (data: PagingData) => void;
+  getUsers: (data: any) => void;
   deleteTag: () => void;
   addTag: () => void;
   freeze: () => void;
   unfreeze: () => void;
-  pagingData: PagingData;
+  total: 0;
 } 
-function ManageUsers({ users,pagingData, getUsers, deleteTag, addTag, freeze, unfreeze }: manageUsersPropsType) {
-  // createDate: "2020-11-09T08:44:58.008Z"
-  // email: ""
-  // latestLoginDate: ''
-  // headImage: "https://image.freelog.com/headImage/50050"
-  // mobile: "13027930519"
-  // status: 0
-  // tags: []
-  // userId: 50050
-  // userRole: 1
-  // userType: 0
-  // username: "snnaenu"
+function ManageUsers({ users,total, getUsers, deleteTag, addTag, freeze, unfreeze }: manageUsersPropsType) {
+  // filter开始
+  const [sortSelected, setSortSelected] = React.useState(1);
+  const [selectedTags, setSelectedTags] = React.useState(['cool']);
+  let selectChange = (data: number) => {
+    setSortSelected(data)
+  }
+  let tagChange = (tag: string, checked: boolean) => {
+    let data = [...selectedTags]
+    if (!selectedTags.includes(tag)) {
+      checked && data.push(tag)
+    } else {
+      if (!checked) {
+        data = selectedTags.filter((item) => {
+          return item !== tag
+        })
+      }
+    }
+    setSelectedTags(data)
+  }
+  let search = (value: string) => {
+    console.log(value)
+  }
+  let dateChange = (date: [Moment, Moment], dateString: [string, string]) => {
+    console.log(date, dateString)
+  }
+  let tags = ['cool', 'teacher', 'loser', 'nice', 'developer']
+  let sortData = [{ id: 1, value: '最近注册' }, { id: 2, value: '资源发布最多' }, { id: 3, value: '展品发布最多' }, { id: 4, value: '消费合约最多' }];
+  // filter结束
+
+  // 表格开始
   const columns = [
     {
       title: '用户',
@@ -44,20 +62,20 @@ function ManageUsers({ users,pagingData, getUsers, deleteTag, addTag, freeze, un
     }, 
     {
       title: '发布资源数',
-      dataIndex: 'resources',
-      key: 'resources',
+      dataIndex: 'createdResourceCount',
+      key: 'createdResourceCount',
       render: (text: String) => <span>{text}</span>,
     }, 
     {
       title: '运营节点数',
-      dataIndex: 'nodes',
-      key: 'nodes',
+      dataIndex: 'createdNodeCount',
+      key: 'createdNodeCount',
       render: (text: String) => <span>{text}</span>,
     }, 
     {
       title: '消费合约数',
-      dataIndex: 'contracts',
-      key: 'contracts',
+      dataIndex: 'signedContractCount',
+      key: 'signedContractCount',
       render: (text: String) => <span>{text}</span>,
     }, 
     {
@@ -111,59 +129,41 @@ function ManageUsers({ users,pagingData, getUsers, deleteTag, addTag, freeze, un
       ),
     },
   ];
+  const [pageData, setPageData] = React.useState({
+    current: 1,
+    pageSize: 10
+  });
+
+  function showTotal() {
+    return `Total ${total} items`;
+  }
+  let pageChange = (current: number, pageSize: any) =>  {
+     setPageData({current, pageSize})
+     getUsers({current, pageSize})
+  }
+  // 表格结束
   React.useEffect(() => {
-    getUsers({
-      skip: 0,
-      limit: 50,
-      keywords: '',
-      tagIds: '',
-      startRegisteredDate: null,
-      endRegisteredDate: null
-    });
+    getUsers({});
   }, []);
-  const [sortSelected, setSortSelected] = React.useState(1);
-  const [selectedTags, setSelectedTags] = React.useState(['cool']);
-  let selectChange = (data: number) => {
-    setSortSelected(data)
-  }
-  let tagChange = (tag: string, checked: boolean) => {
-    let data = [...selectedTags]
-    if (!selectedTags.includes(tag)) {
-      checked && data.push(tag)
-    } else {
-      if (!checked) {
-        data = selectedTags.filter((item) => {
-          return item !== tag
-        })
-      }
-    }
-    setSelectedTags(data)
-  }
-  let search = (value: string) => {
-    console.log(value)
-  }
-  let dateChange = (date: [Moment, Moment], dateString: [string, string]) => {
-    console.log(date)
-  }
-  let tags = ['cool', 'teacher', 'loser', 'nice', 'developer']
-  let sortData = [{ id: 1, value: '最近注册' }, { id: 2, value: '资源发布最多' }, { id: 3, value: '展品发布最多' }, { id: 4, value: '消费合约最多' }];
   return (
     <PageContainer className={styles.normal}>
       <Filter  {...{ tags, sortData, sortSelected, selectedTags }}
         onSearch={search} onSelectChange={selectChange}
         onTagChange={tagChange} onDateChange={dateChange}></Filter>
-      <Table columns={columns} dataSource={users} pagination={{ showQuickJumper: true, defaultCurrent: 2, total: 500 }}  />
+      <Table columns={columns} dataSource={users} loading={!users.length} 
+             pagination={{ showQuickJumper: true, current: pageData.current, pageSize: pageData.pageSize, total: total, showTotal: showTotal,onChange: pageChange }}  />
     </PageContainer>
   );
 }
 
 
-export default connect(({ users }) => {
+export default connect(({ users }: any) => {
   return ({
   users: users.users,
-  pagingData: users.pagingData
+  queryData: users.pagingData,
+  total: users.total
 })}, {
-  getUsers: (data: PagingData) => ({
+  getUsers: (data: any) => ({
     type: 'users/getUsers',
     payload: data
   }),

@@ -5,8 +5,8 @@ import node from './modules/node'
 import resource from './modules/resource'
 
 // TODO 上传文件进度等需要配置
-// TODO  需要给data或params定义类型, 1.在model当中定义
-
+// TODO  需要给data或params定义类型 
+// dataModel限定运行时的提交数据
 export interface Api {
   url: string;
   method: string;

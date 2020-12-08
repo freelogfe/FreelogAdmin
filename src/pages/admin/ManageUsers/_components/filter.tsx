@@ -28,7 +28,7 @@ const Filter: React.FC<filterProps> = (props) => {
     // top and bottom
     <div className="px-10 pb-20">
         {/* top.title sort: left right */}
-        <div className="flex-row space-between pb-20">
+        <div className="flex-row space-between pb-20 d-none">
           {/* left.title */}
           <div className="fs-20 fw-bold"></div>
           {/* right.sort */}

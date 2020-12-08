@@ -71,11 +71,11 @@ admin.batchUpdate = {
 }
 
 
-// 用户管理
+// 获取用户列表
 admin.getUsers = {
   url: '/api/users',
   method: 'GET',
-  params: {
+  dataModel: {
     skip: 'int',
     limit: 'int',
     keywords: 'string',
@@ -83,5 +83,10 @@ admin.getUsers = {
     startRegisteredDate: 'date',
     endRegisteredDate: 'date'
   }
+}
+// 获取标签列表
+admin.getTags = {
+  url: '/api/users/tags',
+  method: 'GET',
 }
 export default admin;

@@ -33,7 +33,7 @@ export default function frequest(action: string, urlData: Array<string | number>
             url = url.replace(placeHolder, item + '')
         })
     }
-    // filter data if there are dataModel
+    // filter data if there is dataModel
     if(api.dataModel){
         compareObjects(api.dataModel, data, !!api.isDiff)  
     }
