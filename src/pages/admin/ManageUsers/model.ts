@@ -38,7 +38,7 @@ const UsersModel: UsersModelType = {
     users: [],
     pagingData: {
       skip: 0,
-      limit: 50,
+      limit: 30,
       keywords: '',
       tagIds: '',
       startRegisteredDate: null,

@@ -152,7 +152,7 @@ function ManageUsers({ users,pagingData, getUsers, deleteTag, addTag, freeze, un
       <Filter  {...{ tags, sortData, sortSelected, selectedTags }}
         onSearch={search} onSelectChange={selectChange}
         onTagChange={tagChange} onDateChange={dateChange}></Filter>
-      <Table columns={columns} dataSource={users} />
+      <Table columns={columns} dataSource={users} pagination={{ showQuickJumper: true, defaultCurrent: 2, total: 500 }}  />
     </PageContainer>
   );
 }
