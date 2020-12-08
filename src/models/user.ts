@@ -41,14 +41,16 @@ const UserModel: UserModelType = {
     *fetchCurrent(state, action) {
       let { call, put } = action
       const response = yield call(frequest, 'user.queryCurrent', [], '');
-      yield put({
-        type: 'login/changeLoginStatus',
-        payload: 'ok'
-      });
-      yield put({
-        type: 'saveCurrentUser',
-        payload: response.data
-      });
+      if (response) {
+        yield put({
+          type: 'login/changeLoginStatus',
+          payload: 'ok'
+        });
+        yield put({
+          type: 'saveCurrentUser',
+          payload: response.data
+        });
+      }
     },
   },
 

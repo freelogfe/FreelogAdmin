@@ -78,7 +78,6 @@ const UsersModel: UsersModelType = {
         getValue(fcontracts.data || [], user, 'contracts', 0)
         return user
       })
-      console.log(users.data.dataList)
       yield put({
         type: 'saveUsers',
         payload: [users.data.dataList, currentUserIds]

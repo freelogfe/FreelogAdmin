@@ -5,7 +5,6 @@ import { setAuthority } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 import { message } from 'antd';
 import { isDevelopmentEnv } from '@/utils/utils';
-import { delCookie, getCookie } from '@/utils/cookie'
 export interface StateType {
   status?: 'ok' | 'error';
   type?: string;

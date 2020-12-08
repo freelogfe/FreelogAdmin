@@ -6,7 +6,8 @@ import { Table, Tag } from 'antd';
 import Filter from './_components/filter'
 import { Moment } from 'moment';
 import { PageContainer } from '@ant-design/pro-layout';
-import { UsersModelState, PagingData } from './model'
+import { UsersModelState, PagingData } from './model';
+import moment from 'moment';
 interface manageUsersPropsType {
   users: Array<object>;
   getUsers: (data: PagingData) => void;
@@ -19,6 +20,7 @@ interface manageUsersPropsType {
 function ManageUsers({ users,pagingData, getUsers, deleteTag, addTag, freeze, unfreeze }: manageUsersPropsType) {
   // createDate: "2020-11-09T08:44:58.008Z"
   // email: ""
+  // latestLoginDate: ''
   // headImage: "https://image.freelog.com/headImage/50050"
   // mobile: "13027930519"
   // status: 0
@@ -33,6 +35,12 @@ function ManageUsers({ users,pagingData, getUsers, deleteTag, addTag, freeze, un
       dataIndex: 'username',
       key: 'username',
       render: (text: String) => <span>{text}</span>,
+    }, 
+    {
+      title: '最近登录',
+      dataIndex: 'latestLoginDate',
+      key: 'latestLoginDate',
+      render: (text: any) => <span>{!text? moment('2020-11-09T08:44:58.008Z').format("YYYY-MM-DD") : ''}</span>,
     }, 
     {
       title: '发布资源数',
@@ -83,6 +91,12 @@ function ManageUsers({ users,pagingData, getUsers, deleteTag, addTag, freeze, un
         </>
       ),
     },
+    {
+      title: '注册时间',
+      dataIndex: 'createDate',
+      key: 'createDate',
+      render: (text: any) => <span>{text? moment(text).format("YYYY-MM-DD") : ''}</span>,
+    }, 
     {
       title: '账号状态',
       key: 'status',
