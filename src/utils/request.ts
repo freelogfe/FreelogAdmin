@@ -27,7 +27,8 @@ const codeMessage = {
 };
 
 /**
- * 异常处理程序
+ * 异常处理程序 
+ * TODO 异常跳转页面未完善
  */
 const errorHandler = (error: { response: Response }): Response => {
   const { response } = error;

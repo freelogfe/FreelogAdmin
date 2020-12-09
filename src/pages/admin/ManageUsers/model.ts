@@ -3,20 +3,14 @@ import { AnyAction } from 'redux';
 
 import frequest from '@/services/handler'
 
-export interface QueryData {
-  skip: number;
-  limit: number;
-  keywords?: string;
-  tagIds: string;
-  startRegisteredDate?: Date | null;
-  endRegisteredDate?: Date | null;
-}
+
 
 export interface UsersModelState {
   users: Array<object>;
   currentUserIds: string;
   total: number;
   tags: Array<object>;
+  loading: boolean;
 }
 
 export interface UsersModelType {
@@ -34,13 +28,15 @@ export interface UsersModelType {
     saveUsers: Reducer<UsersModelState>;
     saveTags: Reducer<UsersModelState>;
     saveTotal: Reducer<UsersModelState>;
+    toggleLoading: Reducer<UsersModelState>;
   };
 }
 const defaultState: UsersModelState = {
   users: [],
   total: 0,
   currentUserIds: '',
-  tags: []
+  tags: [],
+  loading: false
 }
 const UsersModel: UsersModelType = {
   namespace: 'users',
@@ -58,6 +54,10 @@ const UsersModel: UsersModelType = {
     },
     *getUsers(action, saga) {
       let { call, put, all, fork, select } = saga
+      yield put({
+        type: 'toggleLoading',
+        payload: true
+      });
       // TODO 错误情况
       let currentUserIds = ''
       const tags = yield select(({ users }: any) => users.tags);
@@ -95,14 +95,18 @@ const UsersModel: UsersModelType = {
         getValue(fnodes.data || [], user, 'createdNodeCount', 0)
         getValue(fcontracts.data || [], user, 'signedContractCount', 0)
         return user
-      }) 
+      })
       yield put({
         type: 'saveUsers',
         payload: [users.data.dataList || [], currentUserIds]
       });
       yield put({
         type: 'saveTotal',
-        payload: users.data.totalItem 
+        payload: users.data.totalItem
+      });
+      yield put({
+        type: 'toggleLoading',
+        payload: false
       });
     },
     *deleteTag(action, saga) {
@@ -157,7 +161,13 @@ const UsersModel: UsersModelType = {
         ...state,
         total: action.payload
       };
-    }
+    },
+    toggleLoading(state: UsersModelState = defaultState, action: AnyAction) {
+      return {
+        ...state,
+        loading: action.payload
+      };
+    },
   }
 };
 

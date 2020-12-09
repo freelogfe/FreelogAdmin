@@ -2,7 +2,7 @@ import React from 'react';
 
 import styles from './index.less';
 import { connect } from 'dva';
-import { Table, Tag } from 'antd';
+import { Table, Tag, Pagination  } from 'antd';
 import Filter from './_components/filter'
 import { Moment } from 'moment';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -16,11 +16,12 @@ interface manageUsersPropsType {
   unfreeze: () => void;
   total: 0;
   tags: Array<object>;
+  loading: false
 }
-function ManageUsers({ users, tags, total, getUsers, deleteTag, addTag, freeze, unfreeze }: manageUsersPropsType) {
+function ManageUsers({ users, tags, total,loading, getUsers, deleteTag, addTag, freeze, unfreeze }: manageUsersPropsType) {
   const [filterData, setFilterData] = React.useState({
     skip: 0,
-    limit: 20,
+    limit: 10,
     keywords: '',
     tagIds: '',
     startRegisteredDate: null,
@@ -153,7 +154,6 @@ function ManageUsers({ users, tags, total, getUsers, deleteTag, addTag, freeze, 
     pageSize: filterData.limit
   }
   let pageChange = (current: number, pageSize: any) => {
-    
     let data = Object.assign({}, filterData, {
       skip: (current - 1) * pageSize,
       limit: pageSize
@@ -169,8 +169,8 @@ function ManageUsers({ users, tags, total, getUsers, deleteTag, addTag, freeze, 
       <Filter  {...{ tags, sortData, sortSelected: filterData.sort, selectedTags: filterData.tagIds.split(',') }}
         onSearch={search} onSelectChange={selectChange}
         onTagChange={tagChange} onDateChange={dateChange}></Filter>
-      <Table columns={columns} dataSource={users} loading={!users.length}
-        pagination={{ showQuickJumper: true, current: pageData.current, pageSize: pageData.pageSize, total: total, showTotal: showTotal, onChange: pageChange }} />
+      <Table columns={columns} dataSource={users} loading={!!loading}
+        pagination={{ showQuickJumper: true,showSizeChanger: true, current: pageData.current,  total: total, showTotal: showTotal, onChange: pageChange }} />
     </PageContainer>
   );
 }
@@ -181,7 +181,8 @@ export default connect(({ users }: any) => {
     users: users.users,
     queryData: users.pagingData,
     total: users.total,
-    tags: users.tags
+    tags: users.tags,
+    loading: users.loading
   })
 }, {
   getUsers: (data: any) => ({
