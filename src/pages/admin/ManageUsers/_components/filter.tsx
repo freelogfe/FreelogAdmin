@@ -6,6 +6,9 @@
  */
 import React from 'react';
 import { Select, Tag, DatePicker, Input } from 'antd';
+import {
+  SettingOutlined
+} from '@ant-design/icons';
 const { Option } = Select;
 const { CheckableTag } = Tag;
 const { RangePicker } = DatePicker;
@@ -20,10 +23,12 @@ interface filterProps {
   onSelectChange(value:number):void;
   onSearch(value:string): void;
   onDateChange(dates: any, dateString: [string, string]): void;
+  showTagMagnge(flag:boolean): void;
 }
 
 const Filter: React.FC<filterProps> = (props) => {
-  const { tags, onSelectChange, sortData, sortSelected, selectedTags, onTagChange, onSearch, onDateChange } = props;
+  const { tags, onSelectChange, sortData, sortSelected, selectedTags, onTagChange, onSearch, onDateChange, showTagMagnge } = props;
+
   return (
     // top and bottom
     <div className="px-10 pb-20">
@@ -58,12 +63,15 @@ const Filter: React.FC<filterProps> = (props) => {
                 {tag.tag}
               </CheckableTag>
             ))}
+            <div className="flex-row align-center px-20 cursor-pointer"
+                 onClick={()=> showTagMagnge(true)}>
+              <SettingOutlined />
+              <div className="fc-blue fs-14 px-5" >管理标签</div>
+            </div>          
             <div><RangePicker onChange={onDateChange}/></div>
           </div>
           {/* right */}
-          <div >
-           <Search placeholder="用户名/邮箱/手机号" className="w-300" onSearch={onSearch} enterButton  allowClear/>
-          </div>
+          <Search placeholder="用户名/邮箱/手机号" className="w-300" onSearch={onSearch} enterButton  allowClear/>
         </div>
     </div>
   );

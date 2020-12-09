@@ -1,4 +1,3 @@
-
 .loopStyle(@counter) when (@counter > 0) {
   .p-@{counter} {
     padding: (1px * @counter) !important;
@@ -13,7 +12,7 @@
     padding-top: (1px * @counter) !important;
     padding-bottom: (1px * @counter) !important;
   }
-  
+
   .pt-@{counter} {
     padding-top: (1px * @counter) !important;
   }
@@ -58,7 +57,8 @@
 
   .ml-@{counter} {
     margin-left: (1px * @counter) !important;
-  } 
+  }
+
   .w-@{counter} {
     width: (1px * @counter) !important;
   }
@@ -66,6 +66,7 @@
   .h-@{counter} {
     height: (1px * @counter) !important;
   }
+
   .loopStyle((@counter - 1)); // 递归调用自身
 }
 
@@ -80,7 +81,16 @@
   .h-@{counter} {
     height: (1px * @counter) !important;
   }
+
   .loopStyle2((@counter - 1)); // 递归调用自身
 }
 
-.loopStyle2(500);
+.loopStyle2(550);
+
+.w-100x {
+  width: 100%;
+}
+
+.h-100x {
+  height: 100%;
+}

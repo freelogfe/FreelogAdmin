@@ -2,8 +2,9 @@ import React from 'react';
 
 import styles from './index.less';
 import { connect } from 'dva';
-import { Table, Tag, Pagination  } from 'antd';
-import Filter from './_components/filter'
+import { Table, Tag } from 'antd';
+import Filter from './_components/Filter';
+import TagManage from './_components/TagManage';
 import { Moment } from 'moment';
 import { PageContainer } from '@ant-design/pro-layout';
 import moment from 'moment';
@@ -29,13 +30,15 @@ function ManageUsers({ users, tags, total,loading, getUsers, deleteTag, addTag, 
     sort: 1
   });
   // filter开始
+  const [visible, setVisible] = React.useState(false);
+  let showTagMagnge = (flag: boolean) =>{
+    setVisible(flag)
+  }
   let selectChange = (sort: number) => {
-    
     let data = Object.assign({}, filterData, { sort })
     setFilterData(data)
   }
   let tagChange = (tag: string, checked: boolean) => {
-    
     let tagIds = filterData.tagIds.split(',')
     if (!tagIds.includes(tag)) {
       checked && tagIds.push(tag)
@@ -50,12 +53,10 @@ function ManageUsers({ users, tags, total,loading, getUsers, deleteTag, addTag, 
     setFilterData(data)
   }
   let search = (keywords: string) => {
-    
     let data = Object.assign({}, filterData, { keywords })
     setFilterData(data)
   }
   let dateChange = (date: [Moment, Moment], dateString: [string, string]) => {
-    
     let data = Object.assign({}, filterData, { startRegisteredDate: dateString[0], endRegisteredDate: dateString[1] })
     setFilterData(data)
   }
@@ -168,7 +169,9 @@ function ManageUsers({ users, tags, total,loading, getUsers, deleteTag, addTag, 
     <PageContainer className={styles.normal}>
       <Filter  {...{ tags, sortData, sortSelected: filterData.sort, selectedTags: filterData.tagIds.split(',') }}
         onSearch={search} onSelectChange={selectChange}
+        showTagMagnge={showTagMagnge}
         onTagChange={tagChange} onDateChange={dateChange}></Filter>
+      <TagManage {...{tags, visible}} showTagMagnge={showTagMagnge}/>
       <Table columns={columns} dataSource={users} loading={!!loading}
         pagination={{ showQuickJumper: true,showSizeChanger: true, current: pageData.current,  total: total, showTotal: showTotal, onChange: pageChange }} />
     </PageContainer>

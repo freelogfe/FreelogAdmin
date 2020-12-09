@@ -35,6 +35,8 @@ export default function frequest(action: string, urlData: Array<string | number>
     }
     // filter data if there is dataModel
     if(api.dataModel){
+        // TODO 需要用deepclone
+        data = Object.assign({}, data)
         compareObjects(api.dataModel, data, !!api.isDiff)  
     }
     // pre method

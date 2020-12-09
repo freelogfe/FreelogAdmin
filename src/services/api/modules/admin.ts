@@ -89,4 +89,13 @@ admin.getTags = {
   url: '/api/users/tags',
   method: 'GET',
 }
+// 获取标签列表
+admin.postTag = {
+  url: '/api/users/tags',
+  method: 'POST',
+  dataModel:{
+    tag: 'string',
+    type: 'int' // 1 手动  2 自动
+  }
+}
 export default admin;
