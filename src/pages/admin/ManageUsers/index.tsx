@@ -15,34 +15,50 @@ interface manageUsersPropsType {
   freeze: () => void;
   unfreeze: () => void;
   total: 0;
-} 
-function ManageUsers({ users,total, getUsers, deleteTag, addTag, freeze, unfreeze }: manageUsersPropsType) {
+  tags: Array<object>;
+}
+function ManageUsers({ users, tags, total, getUsers, deleteTag, addTag, freeze, unfreeze }: manageUsersPropsType) {
+  const [filterData, setFilterData] = React.useState({
+    skip: 0,
+    limit: 20,
+    keywords: '',
+    tagIds: '',
+    startRegisteredDate: null,
+    endRegisteredDate: null,
+    sort: 1
+  });
   // filter开始
-  const [sortSelected, setSortSelected] = React.useState(1);
-  const [selectedTags, setSelectedTags] = React.useState(['cool']);
-  let selectChange = (data: number) => {
-    setSortSelected(data)
+  let selectChange = (sort: number) => {
+    
+    let data = Object.assign({}, filterData, { sort })
+    setFilterData(data)
   }
   let tagChange = (tag: string, checked: boolean) => {
-    let data = [...selectedTags]
-    if (!selectedTags.includes(tag)) {
-      checked && data.push(tag)
+    
+    let tagIds = filterData.tagIds.split(',')
+    if (!tagIds.includes(tag)) {
+      checked && tagIds.push(tag)
     } else {
       if (!checked) {
-        data = selectedTags.filter((item) => {
+        tagIds = tagIds.filter((item) => {
           return item !== tag
         })
       }
     }
-    setSelectedTags(data)
+    let data = Object.assign({}, filterData, { tagIds: tagIds.join(',') })
+    setFilterData(data)
   }
-  let search = (value: string) => {
-    console.log(value)
+  let search = (keywords: string) => {
+    
+    let data = Object.assign({}, filterData, { keywords })
+    setFilterData(data)
   }
   let dateChange = (date: [Moment, Moment], dateString: [string, string]) => {
-    console.log(date, dateString)
+    
+    let data = Object.assign({}, filterData, { startRegisteredDate: dateString[0], endRegisteredDate: dateString[1] })
+    setFilterData(data)
   }
-  let tags = ['cool', 'teacher', 'loser', 'nice', 'developer']
+  // let tags = ['cool', 'teacher', 'loser', 'nice', 'developer']
   let sortData = [{ id: 1, value: '最近注册' }, { id: 2, value: '资源发布最多' }, { id: 3, value: '展品发布最多' }, { id: 4, value: '消费合约最多' }];
   // filter结束
 
@@ -53,44 +69,9 @@ function ManageUsers({ users,total, getUsers, deleteTag, addTag, freeze, unfreez
       dataIndex: 'username',
       key: 'username',
       render: (text: String) => <span>{text}</span>,
-    }, 
-    {
-      title: '最近登录',
-      dataIndex: 'latestLoginDate',
-      key: 'latestLoginDate',
-      render: (text: any) => <span>{!text? moment('2020-11-09T08:44:58.008Z').format("YYYY-MM-DD") : ''}</span>,
-    }, 
-    {
-      title: '发布资源数',
-      dataIndex: 'createdResourceCount',
-      key: 'createdResourceCount',
-      render: (text: String) => <span>{text}</span>,
-    }, 
-    {
-      title: '运营节点数',
-      dataIndex: 'createdNodeCount',
-      key: 'createdNodeCount',
-      render: (text: String) => <span>{text}</span>,
-    }, 
-    {
-      title: '消费合约数',
-      dataIndex: 'signedContractCount',
-      key: 'signedContractCount',
-      render: (text: String) => <span>{text}</span>,
-    }, 
-    {
-      title: '注册手机号/邮箱',
-      dataIndex: '_me',
-      key: '_me',
-      render: (_me: Array<any>) => (
-        <>
-          <p>{_me[0]}</p>
-          <p>{_me[1]}</p>
-        </>
-      ),
     },
     {
-      title: 'Tags',
+      title: '',
       key: 'tags',
       dataIndex: 'tags',
       render: (tags: Array<any>) => (
@@ -110,11 +91,46 @@ function ManageUsers({ users,total, getUsers, deleteTag, addTag, freeze, unfreez
       ),
     },
     {
+      title: '最近登录',
+      dataIndex: 'latestLoginDate',
+      key: 'latestLoginDate',
+      render: (text: any) => <span>{!text ? moment('2020-11-09T08:44:58.008Z').format("YYYY-MM-DD") : ''}</span>,
+    },
+    {
+      title: '发布资源数',
+      dataIndex: 'createdResourceCount',
+      key: 'createdResourceCount',
+      render: (text: String) => <span>{text}</span>,
+    },
+    {
+      title: '运营节点数',
+      dataIndex: 'createdNodeCount',
+      key: 'createdNodeCount',
+      render: (text: String) => <span>{text}</span>,
+    },
+    {
+      title: '消费合约数',
+      dataIndex: 'signedContractCount',
+      key: 'signedContractCount',
+      render: (text: String) => <span>{text}</span>,
+    },
+    {
+      title: '注册手机号/邮箱',
+      dataIndex: '_me',
+      key: '_me',
+      render: (_me: Array<any>) => (
+        <>
+          <p>{_me[0]}</p>
+          <p>{_me[1]}</p>
+        </>
+      ),
+    },
+    {
       title: '注册时间',
       dataIndex: 'createDate',
       key: 'createDate',
-      render: (text: any) => <span>{text? moment(text).format("YYYY-MM-DD") : ''}</span>,
-    }, 
+      render: (text: any) => <span>{text ? moment(text).format("YYYY-MM-DD") : ''}</span>,
+    },
     {
       title: '账号状态',
       key: 'status',
@@ -122,36 +138,39 @@ function ManageUsers({ users,total, getUsers, deleteTag, addTag, freeze, unfreez
       // 0 Normal, 1 Freeze, 2 BetaTestToBeAudit, 3 BetaTestApplyNotPass 
       render: (text: string, record: any) => (
         <>
-          <span className="pr-10">{['正常','冻结','测试资格待审核','测试资格审核未通过'][text]}</span>
+          <span className="pr-10">{['正常', '冻结', '测试资格待审核', '测试资格审核未通过'][text]}</span>
           <a>Invite {record.name}</a>
           <a>Delete</a>
         </>
       ),
     },
   ];
-  const [pageData, setPageData] = React.useState({
-    current: 1,
-    pageSize: 10
-  });
-
   function showTotal() {
     return `Total ${total} items`;
   }
-  let pageChange = (current: number, pageSize: any) =>  {
-     setPageData({current, pageSize})
-     getUsers({current, pageSize})
+  let pageData = {
+    current: (filterData.skip/filterData.limit) + 1,
+    pageSize: filterData.limit
+  }
+  let pageChange = (current: number, pageSize: any) => {
+    
+    let data = Object.assign({}, filterData, {
+      skip: (current - 1) * pageSize,
+      limit: pageSize
+    })
+    setFilterData(data)
   }
   // 表格结束
   React.useEffect(() => {
-    getUsers({});
-  }, []);
+    getUsers({...filterData})
+  },[filterData]);
   return (
     <PageContainer className={styles.normal}>
-      <Filter  {...{ tags, sortData, sortSelected, selectedTags }}
+      <Filter  {...{ tags, sortData, sortSelected: filterData.sort, selectedTags: filterData.tagIds.split(',') }}
         onSearch={search} onSelectChange={selectChange}
         onTagChange={tagChange} onDateChange={dateChange}></Filter>
-      <Table columns={columns} dataSource={users} loading={!users.length} 
-             pagination={{ showQuickJumper: true, current: pageData.current, pageSize: pageData.pageSize, total: total, showTotal: showTotal,onChange: pageChange }}  />
+      <Table columns={columns} dataSource={users} loading={!users.length}
+        pagination={{ showQuickJumper: true, current: pageData.current, pageSize: pageData.pageSize, total: total, showTotal: showTotal, onChange: pageChange }} />
     </PageContainer>
   );
 }
@@ -159,10 +178,12 @@ function ManageUsers({ users,total, getUsers, deleteTag, addTag, freeze, unfreez
 
 export default connect(({ users }: any) => {
   return ({
-  users: users.users,
-  queryData: users.pagingData,
-  total: users.total
-})}, {
+    users: users.users,
+    queryData: users.pagingData,
+    total: users.total,
+    tags: users.tags
+  })
+}, {
   getUsers: (data: any) => ({
     type: 'users/getUsers',
     payload: data

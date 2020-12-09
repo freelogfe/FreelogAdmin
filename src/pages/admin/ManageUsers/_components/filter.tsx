@@ -12,7 +12,7 @@ const { RangePicker } = DatePicker;
 const { Search } = Input;
 
 interface filterProps {
-  tags: Array<string>;
+  tags: Array<any>;
   sortData: Array<{id: number, value: string}>;
   sortSelected: number;
   selectedTags: Array<string>;
@@ -48,14 +48,14 @@ const Filter: React.FC<filterProps> = (props) => {
           {/* left.tag date */}
           <div className="flex-row align-center">
             <span className="pr-8 shrink-0">标签:</span>
-            {tags.map(tag => (
+            {tags.map((tag: any) => (
               <CheckableTag
                 className="br-samll b-1 d-inline  px-8 py-4"
                 key={tag}
-                checked={selectedTags.indexOf(tag) > -1}
-                onChange={checked => onTagChange(tag, checked)}
+                checked={selectedTags.indexOf(tag.tagId) > -1}
+                onChange={checked => onTagChange(tag.tagId, checked)}
               >
-                {tag}
+                {tag.tag}
               </CheckableTag>
             ))}
             <div><RangePicker onChange={onDateChange}/></div>

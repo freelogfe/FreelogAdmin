@@ -14,7 +14,6 @@ export interface QueryData {
 
 export interface UsersModelState {
   users: Array<object>;
-  queryData: QueryData;
   currentUserIds: string;
   total: number;
   tags: Array<object>;
@@ -39,14 +38,6 @@ export interface UsersModelType {
 }
 const defaultState: UsersModelState = {
   users: [],
-  queryData: {
-    skip: 0,
-    limit: 100,
-    keywords: '',
-    tagIds: '',
-    startRegisteredDate: null,
-    endRegisteredDate: null
-  },
   total: 0,
   currentUserIds: '',
   tags: []
@@ -111,7 +102,7 @@ const UsersModel: UsersModelType = {
       });
       yield put({
         type: 'saveTotal',
-        payload: users.data.totalItem + 100
+        payload: users.data.totalItem 
       });
     },
     *deleteTag(action, saga) {
