@@ -2,6 +2,7 @@ import { Effect, Reducer } from 'umi';
 import { AnyAction } from 'redux';
 
 import frequest from '@/services/handler'
+import { ConsoleSqlOutlined } from '@ant-design/icons';
 
 
 
@@ -23,6 +24,7 @@ export interface UsersModelType {
     freeze: Effect;
     unfreeze: Effect;
     getTags: Effect;
+    postTag: Effect;
   };
   reducers: {
     saveUsers: Reducer<UsersModelState>;
@@ -44,6 +46,15 @@ const UsersModel: UsersModelType = {
     ...defaultState
   },
   effects: {
+    *postTag(action, saga) {
+      let { call, put } = saga
+      console.log(action)
+      yield call(frequest, 'admin.postTag', [],{type: 1,  tag: action.payload});
+      yield put({
+        type: 'getTags',
+        payload: ''
+      });
+    },
     *getTags(action, saga) {
       let { call, put } = saga
       const tagsRes = yield call(frequest, 'admin.getTags', []);

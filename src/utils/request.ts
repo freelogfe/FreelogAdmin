@@ -6,6 +6,7 @@ import { extend } from 'umi-request';
 import { notification } from 'antd';
 import { stringify } from 'querystring';
 import { getPageQuery } from '@/utils/utils';
+import { message } from 'antd';
 
 
 const codeMessage = {
@@ -90,6 +91,8 @@ function toLogin(data: any) {
   if (data) {
     if (data.errcode === 3) {
       location.href = `/user/login?${queryString}`;
+    } else if( data.errcode === 30){
+      message.warning('Authority Denied');
     }
   }
 }
