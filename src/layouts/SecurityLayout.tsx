@@ -1,8 +1,7 @@
 import React from 'react';
 import { PageLoading } from '@ant-design/pro-layout';
-import { connect, ConnectProps, history } from 'umi';
+import { connect, ConnectProps } from 'umi';
 import { ConnectState } from '@/models/connect';
-import frequest from '@/services/handler'
 
 interface SecurityLayoutProps extends ConnectProps {
   loginStatus?: 'ok' | 'error';
@@ -16,6 +15,7 @@ class SecurityLayout extends React.Component<SecurityLayoutProps, SecurityLayout
   state: SecurityLayoutState = {
     isReady: false
   };
+  
   componentDidMount() {
     const { dispatch, loginStatus } = this.props;
     if (dispatch && loginStatus !== 'ok') {

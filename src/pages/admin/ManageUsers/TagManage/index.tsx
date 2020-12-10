@@ -1,8 +1,9 @@
 import React from 'react';
 import { Button, Modal, Input, Table } from 'antd';
-import { connect } from 'dva';
+import { connect } from 'umi';
 import AddTag from '@/commons/AddTag';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+
 const { Search } = Input;
 const { confirm } = Modal;
 
@@ -17,20 +18,23 @@ const TagManage: React.FC<tagProps> = (props) => {
   const { tags, addTag, deleteTag, updateTag } = props;
   const [visible, setVisible] = React.useState(false);
   const [tag, setTag] = React.useState(null);
-  let search = (keywords: string) => {
-
+  const [tableData, setTableData] = React.useState([...tags]);
+  const search = (keywords: string) => {
+    setTableData( tags.filter((item)=>{
+      return item.tag.indexOf((keywords + '').toLocaleLowerCase()) > -1
+    }))
   }
-  let tagConfirm = (data: string, visible: boolean) => {
+  const tagConfirm = (data: string, visible: boolean) => {
     if (visible) {
       tag ? updateTag(tag.tagId, data) : addTag(data)
     }
     setVisible(false)
   }
-  let showModal = (tag?: any) => {
+  const showModal = (tag?: any) => {
     setTag(null)
     setVisible(true)
   }
-  let showConfirm = (tagContent: string) => {
+  const showConfirm = (tagContent: string) => {
     confirm({
       title: '确定删除这个标签?',
       icon: <ExclamationCircleOutlined />,
@@ -43,19 +47,21 @@ const TagManage: React.FC<tagProps> = (props) => {
       },
     });
   }
-  console.log(tags)
   const columns = [
     {
       title: '标签名',
       dataIndex: 'tag',
+      key: 'tag'
     },
     {
       title: 'Age',
       dataIndex: 'age',
+      key: 'age'
     },
     {
       title: 'Address',
       dataIndex: 'address',
+      key: 'address'
     },
     {
       title: '操作',
@@ -73,7 +79,7 @@ const TagManage: React.FC<tagProps> = (props) => {
   ];
 
   const data = [];
-  for (let i = 0; i < 46; i++) {
+  for (let i = 0; i < 46; i += 1) {
     data.push({
       key: i,
       name: `Edward King ${i}`,
@@ -100,7 +106,7 @@ const TagManage: React.FC<tagProps> = (props) => {
               {/* //icon={<PlusOutlined />} */}
           </Button>
         </div>
-        <Search placeholder="请输入标签名称进行搜索" className="w-300" onSearch={search} enterButton allowClear />
+        <Search placeholder="请输入标签名称进行搜索" className="w-300" onSearch={search} onPressEnter={(e)=> search(e.currentTarget.value)} enterButton allowClear />
       </div>
       <Table
         // rowSelection={{
@@ -108,7 +114,7 @@ const TagManage: React.FC<tagProps> = (props) => {
         //   ...rowSelection,
         // }}
         columns={columns}
-        dataSource={tags}
+        dataSource={tableData}
       />
       <AddTag tag={tag ? tag.tag : ''} commit={tagConfirm} visible={visible} />
     </div>

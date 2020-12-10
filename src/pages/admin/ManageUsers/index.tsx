@@ -1,16 +1,13 @@
 import React from 'react';
-
-import styles from './index.less';
-import { connect } from 'dva';
-import { Table, Tag } from 'antd';
-import Filter from './_components/Filter';
-import TagManage from './TagManage';
-import { history, Route } from 'umi';
+import moment, { Moment } from 'moment';
+import { history, Route, connect } from 'umi';
 import { useLocation } from 'react-router-dom';
-
-import { Moment } from 'moment';
+import { Table, Tag } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
-import moment from 'moment';
+import Filter from './_components/filter';
+import TagManage from './TagManage';
+import styles from './index.less';
+
 interface manageUsersPropsType {
   users: Array<object>;
   getUsers: (data: any) => void;
@@ -34,44 +31,38 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteTag, addTag,
     limit: 10,
     keywords: '',
     tagIds: '',
-    startRegisteredDate: null,
-    endRegisteredDate: null,
+    startRegisteredDate: '',
+    endRegisteredDate: '',
     sort: 1
   });
   // filter开始
-  let showTagMagnge = (flag: boolean) => {
+  const showTagMagnge = () => {
     history.push({
       pathname: '/admin/ManageUsers/TagManage'
     });
   }
-  let selectChange = (sort: number) => {
-    let data = Object.assign({}, filterData, { sort })
-    setFilterData(data)
+  const selectChange = (sort: number) => {
+    setFilterData({ ...filterData, sort })
   }
-  let tagChange = (tag: string, checked: boolean) => {
-    tag += ''
+  const tagChange = (_tag: string | number, checked: boolean) => {
+    const tag = _tag + ''
     let tagIds = filterData.tagIds ? filterData.tagIds.split(',') : [];
     if (!tagIds.includes(tag)) {
-      checked && tagIds.push(tag)
-    } else {
-      if (!checked) {
-        tagIds = tagIds.filter((item) => {
-          return item !== tag
-        })
-      }
+      if(checked) tagIds.push(tag)
+    } else if(!checked) {
+      tagIds = tagIds.filter((item) => {
+        return item !== tag
+      })
     }
-    let data = Object.assign({}, filterData, { tagIds: tagIds.join(',') })
-    setFilterData(data)
+    setFilterData({ ...filterData, tagIds: tagIds.join(',') })
   }
-  let search = (keywords: string) => {
-    let data = Object.assign({}, filterData, { keywords })
-    setFilterData(data)
+  const search = (keywords: string) => {
+    setFilterData({ ...filterData, keywords })
   }
-  let dateChange = (date: [Moment, Moment], dateString: [string, string]) => {
-    let data = Object.assign({}, filterData, { startRegisteredDate: dateString[0], endRegisteredDate: dateString[1] })
-    setFilterData(data)
+  const dateChange = (date: [Moment, Moment], dateString: [string, string]) => {
+    setFilterData({ ...filterData, startRegisteredDate: dateString[0], endRegisteredDate: dateString[1] })
   }
-  let sortData = [{ id: 1, value: '最近注册' }, { id: 2, value: '资源发布最多' }, { id: 3, value: '展品发布最多' }, { id: 4, value: '消费合约最多' }];
+  const sortData = [{ id: 1, value: '最近注册' }, { id: 2, value: '资源发布最多' }, { id: 3, value: '展品发布最多' }, { id: 4, value: '消费合约最多' }];
   // filter结束
 
   // 表格开始
@@ -86,9 +77,9 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteTag, addTag,
       title: '',
       key: 'tags',
       dataIndex: 'tags',
-      render: (tags: Array<any>) => (
+      render: (_tags: Array<any>) => (
         <>
-          {tags.map(tag => {
+          {_tags.map(tag => {
             let color = tag.length > 5 ? 'geekblue' : 'green';
             if (tag === 'loser') {
               color = 'volcano';
@@ -160,16 +151,16 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteTag, addTag,
   function showTotal() {
     return `Total ${total} items`;
   }
-  let pageData = {
+  const pageData = {
     current: (filterData.skip / filterData.limit) + 1,
     pageSize: filterData.limit
   }
-  let pageChange = (current: number, pageSize: any) => {
-    let data = Object.assign({}, filterData, {
+  const pageChange = (current: number, pageSize: any) => {
+    setFilterData({
+      ...filterData,
       skip: (current - 1) * pageSize,
       limit: pageSize
     })
-    setFilterData(data)
   }
   // 表格结束
   React.useEffect(() => {
@@ -182,9 +173,9 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteTag, addTag,
         <Filter  {...{ tags, sortData, sortSelected: filterData.sort, selectedTags: filterData.tagIds.split(',') }}
           onSearch={search} onSelectChange={selectChange}
           showTagMagnge={showTagMagnge}
-          onTagChange={tagChange} onDateChange={dateChange}></Filter>
+          onTagChange={tagChange} onDateChange={dateChange}/>
         <Table columns={columns} dataSource={users} loading={!!loading}
-          pagination={{ showQuickJumper: true, showSizeChanger: true, current: pageData.current, total: total, showTotal: showTotal, onChange: pageChange }} />
+          pagination={{ showQuickJumper: true, showSizeChanger: true, current: pageData.current, total, showTotal, onChange: pageChange }} />
       </div>
       {/* <TagManage {...{ tags, visible }} showTagMagnge={showTagMagnge} /> */}
       <Route exact path="/admin/ManageUsers/TagManage" component={TagManage} />
