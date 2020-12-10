@@ -117,9 +117,14 @@ admin.postTag = {
 // 删除标签
 admin.deleteTag = {
   url: '/api/users/tags',
-  method: 'POST',
+  method: 'DELETE',
   dataModel:{
     tagId: 'string',
   }
+}
+// 修改标签
+admin.updateTag = {
+  url: `/api/users/tags${placeHolder}`,
+  method: 'PUT'
 }
 export default admin;

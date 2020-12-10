@@ -1,80 +1,136 @@
-/**
- * component definition: 
- *   for user: provide selections of data filter 
- *   for caller: provide a object which includes all of data to filter    
- * props: tags                          
- */
 import React from 'react';
-import { Button, Modal, Input } from 'antd';
+import { Button, Modal, Input, Table } from 'antd';
 import { connect } from 'dva';
-import Draggable from 'react-draggable';
-import { PlusOutlined } from '@ant-design/icons';
+import AddTag from '@/commons/AddTag';
+import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 const { Search } = Input;
+const { confirm } = Modal;
 
 interface tagProps {
   tags: Array<any>;
-  visible: boolean;
-  createTag(data: string): void;
-  showTagMagnge(flag: boolean): void;
+  addTag(data: string): void;
+  deleteTag(tagId: number): void;
+  updateTag(tagId: number, tagContent: string): void;
 }
 
 const TagManage: React.FC<tagProps> = (props) => {
-  const { createTag, visible = true, showTagMagnge } = props;
-  const [disabled, setDisabled] = React.useState(false);
-  const [tagContent, setTagContent] = React.useState('');
-
-  let onChange = ({ target: { value } }:any) => {
-    setTagContent(value);
-  };
+  const { tags, addTag, deleteTag, updateTag } = props;
+  const [visible, setVisible] = React.useState(false);
+  const [tag, setTag] = React.useState(null);
   let search = (keywords: string) => {
-    
+
   }
+  let tagConfirm = (data: string, visible: boolean) => {
+    if (visible) {
+      tag ? updateTag(tag.tagId, data) : addTag(data)
+    }
+    setVisible(false)
+  }
+  let showModal = (tag?: any) => {
+    setTag(null)
+    setVisible(true)
+  }
+  let showConfirm = (tagContent: string) => {
+    confirm({
+      title: '确定删除这个标签?',
+      icon: <ExclamationCircleOutlined />,
+      content: tagContent,
+      onOk() {
+        console.log('OK');
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  }
+  console.log(tags)
+  const columns = [
+    {
+      title: '标签名',
+      dataIndex: 'tag',
+    },
+    {
+      title: 'Age',
+      dataIndex: 'age',
+    },
+    {
+      title: 'Address',
+      dataIndex: 'address',
+    },
+    {
+      title: '操作',
+      key: 'status',
+      dataIndex: 'operation',
+      // 0 Normal, 1 Freeze, 2 BetaTestToBeAudit, 3 BetaTestApplyNotPass 
+      render: (text: string, record: any) => (
+        <>
+          <span className="pr-10">{['正常', '冻结', '测试资格待审核', '测试资格审核未通过'][text]}</span>
+          <a>Invite {record.name}</a>
+          <a>Delete</a>
+        </>
+      ),
+    }
+  ];
+
+  const data = [];
+  for (let i = 0; i < 46; i++) {
+    data.push({
+      key: i,
+      name: `Edward King ${i}`,
+      age: 32,
+      address: `London, Park Lane no. ${i}`,
+    });
+  } 
+  // const rowSelection = {
+  //   onChange: (selectedRowKeys: any, selectedRows: any) => {
+  //     console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+  //   },
+  //   getCheckboxProps: (record: any) => ({
+  //     disabled: record.name === 'Disabled User', // Column configuration not to be checked
+  //     name: record.name,
+  //   }),
+  // };
   return (
-    <Modal
-      title={
-        <div
-          className="w-100x cursor-move"
-          onMouseOver={() => {
-            disabled && setDisabled(false)
-          }}
-          onMouseOut={() => {
-            setDisabled(true)
-          }}
-        >
-          标签管理
-            </div>
-      }
-      width="75rem"
-      className="mt-100"
-      visible={visible}
-      footer={null}
-      onCancel={() => showTagMagnge(false)}
-      modalRender={modal => <Draggable disabled={disabled}>{modal}</Draggable>}
-    >
-      <div className="w-100x h-550 y-auto">
-        {/* operation header */}
-        <div className="flex-row space-between align-center">
-          <div className="flex-row align-center">
-            <Input className="w-300" placeholder="输入标签内容" value={tagContent} onChange={onChange}/>
-            <Button type="primary" className="ml-10" onClick={()=>createTag(tagContent)}>  
-              创建标签
+    <div className="p-absolute lt-0 w-100x h-100x bg-main">
+      {/* operation header */}
+      <div className="flex-row space-between align-center mb-20">
+        <div className="flex-row align-center">
+          <Button type="primary" className="ml-10" onClick={() => showModal()} icon={<PlusOutlined />}>
+            创建标签
               {/* //icon={<PlusOutlined />} */}
-              </Button>
-          </div>
-          <Search placeholder="请输入标签名称进行搜索" className="w-300" onSearch={search} enterButton allowClear />
+          </Button>
         </div>
+        <Search placeholder="请输入标签名称进行搜索" className="w-300" onSearch={search} enterButton allowClear />
       </div>
-    </Modal>
+      <Table
+        // rowSelection={{
+        //   type: 'checkbox',
+        //   ...rowSelection,
+        // }}
+        columns={columns}
+        dataSource={tags}
+      />
+      <AddTag tag={tag ? tag.tag : ''} commit={tagConfirm} visible={visible} />
+    </div>
   );
 };
 
 export default connect(({ users }: any) => {
-  return ({ 
+  return ({
+    tags: users.tags,
   })
 }, {
-  createTag: (data: any) => ({
-    type: 'users/postTag',
+  addTag: (data: any) => ({
+    type: 'users/addTag',
     payload: data
-  }) 
+  }),
+  deleteTag: (data: any) => ({
+    type: 'users/deleteTag',
+    payload: data
+  }),
+  updateTag: (data: any) => ({
+    type: 'users/updateTag',
+    payload: data
+  }),
 })(TagManage);
 

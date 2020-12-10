@@ -19,12 +19,14 @@ export interface UsersModelType {
   state: UsersModelState;
   effects: {
     getUsers: Effect;
-    deleteTag: Effect;
-    addTag: Effect;
+    deleteUserTag: Effect;
+    addUserTag: Effect;
     freeze: Effect;
     unfreeze: Effect;
     getTags: Effect;
-    postTag: Effect;
+    addTag: Effect;
+    deleteTag: Effect;
+    updateTag: Effect;
   };
   reducers: {
     saveUsers: Reducer<UsersModelState>;
@@ -46,10 +48,25 @@ const UsersModel: UsersModelType = {
     ...defaultState
   },
   effects: {
-    *postTag(action, saga) {
+    *addTag(action, saga) {
       let { call, put } = saga
-      console.log(action)
-      yield call(frequest, 'admin.postTag', [],{type: 1,  tag: action.payload});
+      yield call(frequest, 'admin.postTag', [], { type: 1, tag: action.payload });
+      yield put({
+        type: 'getTags',
+        payload: ''
+      });
+    },
+    *updateTag({payload}, saga) {
+      let { call, put } = saga
+      yield call(frequest, 'admin.updateTag', [payload.tagId], payload.tagContent);
+      yield put({
+        type: 'getTags',
+        payload: ''
+      });
+    },
+    *deleteTag(action, saga) {
+      let { call, put } = saga
+      yield call(frequest, 'admin.deleteTag', [], { tagId: action.payload });
       yield put({
         type: 'getTags',
         payload: ''
@@ -120,7 +137,7 @@ const UsersModel: UsersModelType = {
         payload: false
       });
     },
-    *deleteTag(action, saga) {
+    *deleteUserTag(action, saga) {
       let { call, put } = action
       const response = yield call(frequest, 'user.queryCurrent', [], '');
       yield put({
@@ -128,7 +145,7 @@ const UsersModel: UsersModelType = {
         payload: response.data
       });
     },
-    *addTag(action, saga) {
+    *addUserTag(action, saga) {
       let { call, put } = action
       const response = yield call(frequest, 'user.queryCurrent', [], '');
       yield put({

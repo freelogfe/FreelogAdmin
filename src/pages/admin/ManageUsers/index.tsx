@@ -4,8 +4,10 @@ import styles from './index.less';
 import { connect } from 'dva';
 import { Table, Tag } from 'antd';
 import Filter from './_components/Filter';
-// import TagManage from './TagManage';
-import { history } from 'umi';
+import TagManage from './TagManage';
+import { history, Route } from 'umi';
+import { useLocation } from 'react-router-dom';
+
 import { Moment } from 'moment';
 import { PageContainer } from '@ant-design/pro-layout';
 import moment from 'moment';
@@ -21,6 +23,12 @@ interface manageUsersPropsType {
   loading: false
 }
 function ManageUsers({ users, tags, total, loading, getUsers, deleteTag, addTag, freeze, unfreeze }: manageUsersPropsType) {
+  // 标签路由显示之后 用户管理不显示
+  const [visible, setVisible] = React.useState(true);
+  const { pathname } = useLocation();
+  React.useEffect(() => {
+    setVisible(pathname === '/admin/ManageUsers')
+  }, [pathname])
   const [filterData, setFilterData] = React.useState({
     skip: 0,
     limit: 10,
@@ -31,12 +39,10 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteTag, addTag,
     sort: 1
   });
   // filter开始
-  const [visible, setVisible] = React.useState(false);
   let showTagMagnge = (flag: boolean) => {
     history.push({
       pathname: '/admin/ManageUsers/TagManage'
     });
-    setVisible(flag)
   }
   let selectChange = (sort: number) => {
     let data = Object.assign({}, filterData, { sort })
@@ -170,14 +176,18 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteTag, addTag,
     getUsers({ ...filterData })
   }, [filterData]);
   return (
+    // TODO 需要默认子路由是用户管理，因为有标签作为子路由，，这里暂时做成覆盖的
     <PageContainer className={styles.normal}>
-      <Filter  {...{ tags, sortData, sortSelected: filterData.sort, selectedTags: filterData.tagIds.split(',') }}
-        onSearch={search} onSelectChange={selectChange}
-        showTagMagnge={showTagMagnge}
-        onTagChange={tagChange} onDateChange={dateChange}></Filter>
+      <div className={visible ? '' : 'd-none'}>
+        <Filter  {...{ tags, sortData, sortSelected: filterData.sort, selectedTags: filterData.tagIds.split(',') }}
+          onSearch={search} onSelectChange={selectChange}
+          showTagMagnge={showTagMagnge}
+          onTagChange={tagChange} onDateChange={dateChange}></Filter>
+        <Table columns={columns} dataSource={users} loading={!!loading}
+          pagination={{ showQuickJumper: true, showSizeChanger: true, current: pageData.current, total: total, showTotal: showTotal, onChange: pageChange }} />
+      </div>
       {/* <TagManage {...{ tags, visible }} showTagMagnge={showTagMagnge} /> */}
-      <Table columns={columns} dataSource={users} loading={!!loading}
-        pagination={{ showQuickJumper: true, showSizeChanger: true, current: pageData.current, total: total, showTotal: showTotal, onChange: pageChange }} />
+      <Route exact path="/admin/ManageUsers/TagManage" component={TagManage} />
     </PageContainer>
   );
 }
