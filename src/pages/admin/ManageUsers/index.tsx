@@ -4,7 +4,7 @@ import styles from './index.less';
 import { connect } from 'dva';
 import { Table, Tag } from 'antd';
 import Filter from './_components/Filter';
-import TagManage from './_components/TagManage';
+import TagManage from './TagManage';
 import { Moment } from 'moment';
 import { PageContainer } from '@ant-design/pro-layout';
 import moment from 'moment';
@@ -19,7 +19,7 @@ interface manageUsersPropsType {
   tags: Array<object>;
   loading: false
 }
-function ManageUsers({ users, tags, total,loading, getUsers, deleteTag, addTag, freeze, unfreeze }: manageUsersPropsType) {
+function ManageUsers({ users, tags, total, loading, getUsers, deleteTag, addTag, freeze, unfreeze }: manageUsersPropsType) {
   const [filterData, setFilterData] = React.useState({
     skip: 0,
     limit: 10,
@@ -31,7 +31,7 @@ function ManageUsers({ users, tags, total,loading, getUsers, deleteTag, addTag, 
   });
   // filter开始
   const [visible, setVisible] = React.useState(false);
-  let showTagMagnge = (flag: boolean) =>{
+  let showTagMagnge = (flag: boolean) => {
     setVisible(flag)
   }
   let selectChange = (sort: number) => {
@@ -39,7 +39,8 @@ function ManageUsers({ users, tags, total,loading, getUsers, deleteTag, addTag, 
     setFilterData(data)
   }
   let tagChange = (tag: string, checked: boolean) => {
-    let tagIds = filterData.tagIds.split(',')
+    tag += ''
+    let tagIds = filterData.tagIds ? filterData.tagIds.split(',') : [];
     if (!tagIds.includes(tag)) {
       checked && tagIds.push(tag)
     } else {
@@ -151,7 +152,7 @@ function ManageUsers({ users, tags, total,loading, getUsers, deleteTag, addTag, 
     return `Total ${total} items`;
   }
   let pageData = {
-    current: (filterData.skip/filterData.limit) + 1,
+    current: (filterData.skip / filterData.limit) + 1,
     pageSize: filterData.limit
   }
   let pageChange = (current: number, pageSize: any) => {
@@ -163,17 +164,17 @@ function ManageUsers({ users, tags, total,loading, getUsers, deleteTag, addTag, 
   }
   // 表格结束
   React.useEffect(() => {
-    getUsers({...filterData})
-  },[filterData]);
+    getUsers({ ...filterData })
+  }, [filterData]);
   return (
     <PageContainer className={styles.normal}>
       <Filter  {...{ tags, sortData, sortSelected: filterData.sort, selectedTags: filterData.tagIds.split(',') }}
         onSearch={search} onSelectChange={selectChange}
         showTagMagnge={showTagMagnge}
         onTagChange={tagChange} onDateChange={dateChange}></Filter>
-      <TagManage {...{tags, visible}} showTagMagnge={showTagMagnge}/>
+      <TagManage {...{ tags, visible }} showTagMagnge={showTagMagnge} />
       <Table columns={columns} dataSource={users} loading={!!loading}
-        pagination={{ showQuickJumper: true,showSizeChanger: true, current: pageData.current,  total: total, showTotal: showTotal, onChange: pageChange }} />
+        pagination={{ showQuickJumper: true, showSizeChanger: true, current: pageData.current, total: total, showTotal: showTotal, onChange: pageChange }} />
     </PageContainer>
   );
 }

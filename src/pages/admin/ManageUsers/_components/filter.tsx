@@ -16,14 +16,14 @@ const { Search } = Input;
 
 interface filterProps {
   tags: Array<any>;
-  sortData: Array<{id: number, value: string}>;
+  sortData: Array<{ id: number, value: string }>;
   sortSelected: number;
   selectedTags: Array<string>;
   onTagChange(tag: string, checked: boolean): void;
-  onSelectChange(value:number):void;
-  onSearch(value:string): void;
+  onSelectChange(value: number): void;
+  onSearch(value: string): void;
   onDateChange(dates: any, dateString: [string, string]): void;
-  showTagMagnge(flag:boolean): void;
+  showTagMagnge(flag: boolean): void;
 }
 
 const Filter: React.FC<filterProps> = (props) => {
@@ -32,49 +32,53 @@ const Filter: React.FC<filterProps> = (props) => {
   return (
     // top and bottom
     <div className="px-10 pb-20">
-        {/* top.title sort: left right */}
-        <div className="flex-row space-between pb-20 d-none">
-          {/* left.title */}
-          <div className="fs-20 fw-bold"></div>
-          {/* right.sort */}
-          <div className="flex-row align-center">
-            <span className="fs-16" >排序：</span>
-            <Select defaultValue={sortSelected} style={{ width: 220 }} onSelect={onSelectChange}>
-              {
-                sortData.map((item, index) => {
-                    return <Option key={item.id} value={item.id}>{item.value}</Option>
-                })
-              }  
-            </Select> 
-          </div>
+      {/* top.title sort: left right */}
+      <div className="flex-row space-between pb-20 d-none">
+        {/* left.title */}
+        <div className="fs-20 fw-bold"></div>
+        {/* right.sort */}
+        <div className="flex-row align-center">
+          <span className="fs-16" >排序：</span>
+          <Select defaultValue={sortSelected} style={{ width: 220 }} onSelect={onSelectChange}>
+            {
+              sortData.map((item, index) => {
+                return <Option key={item.id} value={item.id}>{item.value}</Option>
+              })
+            }
+          </Select>
         </div>
-        {/* bottom:left  right */}
-        <div className="flex-row align-center space-between">
-          {/* left.tag date */}
-          <div className="flex-row align-center">
+      </div>
+      {/* bottom:left  right */}
+      <div className="flex-row align-center space-between flex-wrap">
+        {/* left.tag date */}
+        <div className="flex-row align-center mb-10 space-between">
+          <div className="flex-row align-center"> 
             <span className="pr-8 shrink-0">标签:</span>
             {tags.map((tag: any) => (
               <CheckableTag
                 className="br-samll b-1 d-inline  px-8 py-4"
-                key={tag}
-                checked={selectedTags.indexOf(tag.tagId) > -1}
+                key={tag.tagId}
+                checked={selectedTags.indexOf(tag.tagId + '') > -1}
                 onChange={checked => onTagChange(tag.tagId, checked)}
               >
                 {tag.tag}
               </CheckableTag>
             ))}
             <div className="flex-row align-center px-20 cursor-pointer"
-                 onClick={()=> showTagMagnge(true)}>
+              onClick={() => showTagMagnge(true)}>
               <SettingOutlined />
-              <div className="fc-blue fs-14 px-5" >管理标签</div>
-            </div>          
-            <div><RangePicker onChange={onDateChange}/></div>
+              <div className="fc-blue fs-14 px-5 shrink-0" >管理标签</div>
+            </div>
           </div>
-          {/* right */}
-          <Search placeholder="用户名/邮箱/手机号" className="w-300" onSearch={onSearch} enterButton  allowClear/>
+          <div><RangePicker onChange={onDateChange} /></div>
         </div>
+        {/* right */}
+        <div className="flex-1 flex-row align-center justify-end mb-10">
+          <Search placeholder="用户名/邮箱/手机号" className="w-300 self-end" onSearch={onSearch} enterButton allowClear />
+        </div>
+      </div>
     </div>
   );
-}; 
+};
 
 export default Filter;

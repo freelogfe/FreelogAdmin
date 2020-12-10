@@ -60,7 +60,7 @@ const request = extend({
 
 function toLogin(data: any) {
   if (window.location.pathname.startsWith('/user/login')) {
-    if (data.errcode !== 3) {
+    if (data.errcode !== 30) {
       const urlParams = new URL(window.location.href);
       const params = getPageQuery();
       // message.success('🎉 🎉 🎉  登录成功！');
@@ -89,11 +89,12 @@ function toLogin(data: any) {
     redirect: window.location.href,
   });
   if (data) {
-    if (data.errcode === 3) {
+    if (data.errcode === 30) {
       location.href = `/user/login?${queryString}`;
-    } else if( data.errcode === 30){
-      message.warning('Authority Denied');
-    }
+    } 
+    // else if( data.errcode === 30){
+    //   message.warning('Authority Denied');
+    // }
   }
 }
 // 判断是否登录
