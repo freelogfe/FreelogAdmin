@@ -42,6 +42,15 @@
                 name: 'management',
                 icon: 'usergroup-delete',
                 component: './admin/ManageUsers',
+                hideChildrenInMenu: true,
+                routes: [
+                  {
+                    path: '/admin/ManageUsers/TagManage',
+                    name: 'tagmanage',
+                    icon: 'usergroup-delete',
+                    component: './admin/ManageUsers/TagManage',
+                  }
+                ]
               },
               {
                 path: '/admin/Application',

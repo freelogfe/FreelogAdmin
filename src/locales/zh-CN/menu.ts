@@ -52,6 +52,7 @@ export default {
 
   'menu.user': '用户',
   'menu.user.management': '用户管理',
+  'menu.user.management.tagmanage': '标签管理',
   'menu.user.beta-application': '内测申请审核',
   'menu.user.inviteCode-management': '邀请码管理',
   'menu.node': '节点',

@@ -19,7 +19,7 @@ interface tagProps {
 }
 
 const TagManage: React.FC<tagProps> = (props) => {
-  const { createTag, visible, showTagMagnge } = props;
+  const { createTag, visible = true, showTagMagnge } = props;
   const [disabled, setDisabled] = React.useState(false);
   const [tagContent, setTagContent] = React.useState('');
 

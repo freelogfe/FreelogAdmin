@@ -124,9 +124,11 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
         ...routers,
       ]}}
       itemRender={(route, params, routes, paths) => {
-        const first = routes.indexOf(route) === 0;
-        return first ? (
-          <Link to={paths.join('/')}>{route.breadcrumbName}</Link>
+        const link = routes.indexOf(route) !== 1 && routes[routes.length - 1] !== route;
+        let path = paths[paths.length - 1]  || ''
+        path = '/' + path
+        return link ? (
+          <Link to={path}>{route.breadcrumbName}</Link>
         ) : (
           <span>{route.breadcrumbName}</span>
         );

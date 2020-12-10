@@ -4,7 +4,8 @@ import styles from './index.less';
 import { connect } from 'dva';
 import { Table, Tag } from 'antd';
 import Filter from './_components/Filter';
-import TagManage from './TagManage';
+// import TagManage from './TagManage';
+import { history } from 'umi';
 import { Moment } from 'moment';
 import { PageContainer } from '@ant-design/pro-layout';
 import moment from 'moment';
@@ -32,6 +33,9 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteTag, addTag,
   // filter开始
   const [visible, setVisible] = React.useState(false);
   let showTagMagnge = (flag: boolean) => {
+    history.push({
+      pathname: '/admin/ManageUsers/TagManage'
+    });
     setVisible(flag)
   }
   let selectChange = (sort: number) => {
@@ -61,7 +65,6 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteTag, addTag,
     let data = Object.assign({}, filterData, { startRegisteredDate: dateString[0], endRegisteredDate: dateString[1] })
     setFilterData(data)
   }
-  // let tags = ['cool', 'teacher', 'loser', 'nice', 'developer']
   let sortData = [{ id: 1, value: '最近注册' }, { id: 2, value: '资源发布最多' }, { id: 3, value: '展品发布最多' }, { id: 4, value: '消费合约最多' }];
   // filter结束
 
@@ -172,7 +175,7 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteTag, addTag,
         onSearch={search} onSelectChange={selectChange}
         showTagMagnge={showTagMagnge}
         onTagChange={tagChange} onDateChange={dateChange}></Filter>
-      <TagManage {...{ tags, visible }} showTagMagnge={showTagMagnge} />
+      {/* <TagManage {...{ tags, visible }} showTagMagnge={showTagMagnge} /> */}
       <Table columns={columns} dataSource={users} loading={!!loading}
         pagination={{ showQuickJumper: true, showSizeChanger: true, current: pageData.current, total: total, showTotal: showTotal, onChange: pageChange }} />
     </PageContainer>
