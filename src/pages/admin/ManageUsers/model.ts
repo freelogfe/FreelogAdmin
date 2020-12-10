@@ -49,7 +49,7 @@ const UsersModel: UsersModelType = {
   },
   effects: {
     *addTag(action, saga) {
-      let { call, put } = saga
+      const { call, put } = saga
       yield call(frequest, 'admin.postTag', [], { type: 1, tag: action.payload });
       yield put({
         type: 'getTags',
@@ -57,7 +57,7 @@ const UsersModel: UsersModelType = {
       });
     },
     *updateTag({payload}, saga) {
-      let { call, put } = saga
+      const { call, put } = saga
       yield call(frequest, 'admin.updateTag', [payload.tagId], payload.tagContent);
       yield put({
         type: 'getTags',
@@ -65,7 +65,7 @@ const UsersModel: UsersModelType = {
       });
     },
     *deleteTag(action, saga) {
-      let { call, put } = saga
+      const { call, put } = saga
       yield call(frequest, 'admin.deleteTag', [], { tagId: action.payload });
       yield put({
         type: 'getTags',
@@ -73,7 +73,7 @@ const UsersModel: UsersModelType = {
       });
     },
     *getTags(action, saga) {
-      let { call, put } = saga
+      const { call, put } = saga
       const tagsRes = yield call(frequest, 'admin.getTags', []);
       yield put({
         type: 'saveTags',
@@ -81,7 +81,7 @@ const UsersModel: UsersModelType = {
       });
     },
     *getUsers(action, saga) {
-      let { call, put, all, fork, select } = saga
+      const { call, put, all, fork, select } = saga
       yield put({
         type: 'toggleLoading',
         payload: true
@@ -99,7 +99,7 @@ const UsersModel: UsersModelType = {
       }
       const users = yield call(frequest, 'admin.getUsers', [], action.payload);
       users.data.dataList = users.data.dataList.map((item: any) => {
-        let _me = [item.mobile, item.email]
+        const _me = [item.mobile, item.email]
         currentUserIds ? currentUserIds += ',' + item.userId : currentUserIds = item.userId
         return { ...item, key: item.userId, _me }
       })
@@ -138,7 +138,7 @@ const UsersModel: UsersModelType = {
       });
     },
     *deleteUserTag(action, saga) {
-      let { call, put } = action
+      const { call, put } = action
       const response = yield call(frequest, 'user.queryCurrent', [], '');
       yield put({
         type: 'saveUsers',
@@ -146,7 +146,7 @@ const UsersModel: UsersModelType = {
       });
     },
     *addUserTag(action, saga) {
-      let { call, put } = action
+      const { call, put } = action
       const response = yield call(frequest, 'user.queryCurrent', [], '');
       yield put({
         type: 'saveUsers',
@@ -154,7 +154,7 @@ const UsersModel: UsersModelType = {
       });
     },
     *freeze(action, saga) {
-      let { call, put } = action
+      const { call, put } = action
       const response = yield call(frequest, 'user.queryCurrent', [], '');
       yield put({
         type: 'saveUsers',
@@ -162,7 +162,7 @@ const UsersModel: UsersModelType = {
       });
     },
     *unfreeze(action, saga) {
-      let { call, put } = action
+      const { call, put } = action
       const response = yield call(frequest, 'user.queryCurrent', [], '');
       yield put({
         type: 'saveUsers',

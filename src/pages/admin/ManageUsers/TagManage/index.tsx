@@ -24,8 +24,11 @@ const TagManage: React.FC<tagProps> = (props) => {
       return item.tag.indexOf((keywords + '').toLocaleLowerCase()) > -1
     }))
   }
-  const tagConfirm = (data: string, visible: boolean) => {
-    if (visible) {
+  React.useEffect(()=>{
+    setTableData([...tags])
+  },[tags])
+  const tagConfirm = (data: string, flag: boolean) => {
+    if (flag) {
       tag ? updateTag(tag.tagId, data) : addTag(data)
     }
     setVisible(false)
@@ -77,16 +80,6 @@ const TagManage: React.FC<tagProps> = (props) => {
       ),
     }
   ];
-
-  const data = [];
-  for (let i = 0; i < 46; i += 1) {
-    data.push({
-      key: i,
-      name: `Edward King ${i}`,
-      age: 32,
-      address: `London, Park Lane no. ${i}`,
-    });
-  } 
   // const rowSelection = {
   //   onChange: (selectedRowKeys: any, selectedRows: any) => {
   //     console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
@@ -113,6 +106,7 @@ const TagManage: React.FC<tagProps> = (props) => {
         //   type: 'checkbox',
         //   ...rowSelection,
         // }}
+        rowKey= {record => record.dataIndex}
         columns={columns}
         dataSource={tableData}
       />
