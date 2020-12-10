@@ -4,7 +4,7 @@ import { history, Route, connect } from 'umi';
 import { useLocation } from 'react-router-dom';
 import { Table, Tag } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
-import Filter from './_components/filter';
+import Filter from './_components/UsersFilter';
 import TagManage from './TagManage';
 import styles from './index.less';
 
