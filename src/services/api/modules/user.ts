@@ -1,4 +1,4 @@
-import { Api, placeHolder } from '../index'
+import { Api, placeHolder } from '../base'
 import { isDevelopmentEnv } from '@/utils/utils';
 
 interface User {

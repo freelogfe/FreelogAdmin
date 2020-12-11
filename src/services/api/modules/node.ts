@@ -1,5 +1,5 @@
 // TODO 使用namespace来做
-import { Api } from '../index'
+import { Api } from '../base'
 interface Node {
     [propName: string]: Api
 }

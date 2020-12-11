@@ -8,7 +8,7 @@ interface tagProps {
     commit(data: string, visible: boolean): void;
 }
 
-const AddTag: React.FC<tagProps> = (props) => {
+const SetTag: React.FC<tagProps> = (props) => {
     const { commit, visible, tag } = props;
     const [disabled, setDisabled] = React.useState(false);
     const [tagContent, setTagContent] = React.useState('');
@@ -55,5 +55,5 @@ const AddTag: React.FC<tagProps> = (props) => {
     );
 };
 
-export default AddTag;
+export default SetTag;
 

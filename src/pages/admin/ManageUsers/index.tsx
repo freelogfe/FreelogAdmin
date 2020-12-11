@@ -2,24 +2,26 @@ import React from 'react';
 import moment, { Moment } from 'moment';
 import { history, Route, connect } from 'umi';
 import { useLocation } from 'react-router-dom';
-import { Table, Tag } from 'antd';
+import { Table, Tag, Space } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import Filter from './_components/UsersFilter';
 import TagManage from './TagManage';
 import styles from './index.less';
+import { onCopy } from '@/utils/utils';
 
 interface manageUsersPropsType {
   users: Array<object>;
   getUsers: (data: any) => void;
-  deleteTag: () => void;
-  addTag: () => void;
+  deleteUserTag: (data: any) => void;
+  addUserTag: (data: any) => void;
   freeze: () => void;
   unfreeze: () => void;
   total: 0;
   tags: Array<object>;
   loading: false
 }
-function ManageUsers({ users, tags, total, loading, getUsers, deleteTag, addTag, freeze, unfreeze }: manageUsersPropsType) {
+function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, addUserTag, freeze, unfreeze }: manageUsersPropsType) {
   // 标签路由显示之后 用户管理不显示
   const [visible, setVisible] = React.useState(true);
   const { pathname } = useLocation();
@@ -48,8 +50,8 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteTag, addTag,
     const tag = _tag + ''
     let tagIds = filterData.tagIds ? filterData.tagIds.split(',') : [];
     if (!tagIds.includes(tag)) {
-      if(checked) tagIds.push(tag)
-    } else if(!checked) {
+      if (checked) tagIds.push(tag)
+    } else if (!checked) {
       tagIds = tagIds.filter((item) => {
         return item !== tag
       })
@@ -66,6 +68,13 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteTag, addTag,
   // filter结束
 
   // 表格开始
+
+  const showAddModal = () => {
+
+  }
+  const userTagClose = (tagId: number, userId: number) => {
+    deleteUserTag({tagId, userId}) 
+  }
   const columns = [
     {
       title: '用户',
@@ -73,23 +82,30 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteTag, addTag,
       key: 'username',
       render: (text: String) => <span>{text}</span>,
     },
+    // TODO 包装tag组件实现hover才出现X删除
     {
       title: '',
       key: 'tags',
       dataIndex: 'tags',
-      render: (_tags: Array<any>) => (
+      render: (_tags: Array<any>, record: any) => (
         <>
-          {_tags.map(tag => {
-            let color = tag.length > 5 ? 'geekblue' : 'green';
-            if (tag === 'loser') {
-              color = 'volcano';
-            }
-            return (
-              <Tag color={color} key={tag}>
-                {tag.toUpperCase()}
-              </Tag>
-            );
-          })}
+          <div className="flex-row">
+            {[{tag: 'hgytr2234', tagId: 1}, {tag: 'wwer2234', tagId: 2}, {tag: 'dfgdfg2234', tagId: 3} ].map(tag => {
+              return (
+                <Tag key={tag.tagId}
+                  closable
+                  onClose={e => {
+                    e.preventDefault();
+                    userTagClose(tag.tagId, record.userId);
+                  }}>
+                  {tag.tag}
+                </Tag>
+              );
+            })}
+            <Tag className="site-tag-plus" onClick={showAddModal}>
+              <PlusOutlined /> 标签
+            </Tag>
+          </div>
         </>
       ),
     },
@@ -123,8 +139,8 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteTag, addTag,
       key: '_me',
       render: (_me: Array<any>) => (
         <>
-          <p>{_me[0]}</p>
-          <p>{_me[1]}</p>
+          <p>{_me[0]} <a className="pl-10" onClick={(e) => { _me[0] && onCopy(_me[0]); return false; }}>{_me[0] ? '复制' : ''}</a></p>
+          <p>{_me[1]} <a className="pl-10" onClick={(e) => { _me[1] && onCopy(_me[1]); return false; }}>{_me[1] ? '复制' : ''}</a></p>
         </>
       ),
     },
@@ -173,7 +189,7 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteTag, addTag,
         <Filter  {...{ tags, sortData, sortSelected: filterData.sort, selectedTags: filterData.tagIds.split(',') }}
           onSearch={search} onSelectChange={selectChange}
           showTagMagnge={showTagMagnge}
-          onTagChange={tagChange} onDateChange={dateChange}/>
+          onTagChange={tagChange} onDateChange={dateChange} />
         <Table columns={columns} dataSource={users} loading={!!loading}
           pagination={{ showQuickJumper: true, showSizeChanger: true, current: pageData.current, total, showTotal, onChange: pageChange }} />
       </div>
@@ -197,11 +213,13 @@ export default connect(({ users }: any) => {
     type: 'users/getUsers',
     payload: data
   }),
-  deleteTag: () => ({
-    type: 'users/deleteTag',
+  deleteUserTag: (data: any) => ({
+    type: 'users/deleteUserTag',
+    payload: data
   }),
-  addTag: () => ({
-    type: 'users/addTag',
+  addUserTag: (data: any) => ({
+    type: 'users/addUserTag',
+    payload: data
   }),
   freeze: () => ({
     type: 'users/freeze',

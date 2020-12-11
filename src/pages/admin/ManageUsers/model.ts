@@ -56,9 +56,9 @@ const UsersModel: UsersModelType = {
         payload: ''
       });
     },
-    *updateTag({payload}, saga) {
+    *updateTag({ payload }, saga) {
       const { call, put } = saga
-      yield call(frequest, 'admin.updateTag', [payload.tagId], payload.tagContent);
+      yield call(frequest, 'admin.updateTag', [payload.tagId], { tag: payload.tag });
       yield put({
         type: 'getTags',
         payload: ''
@@ -66,7 +66,7 @@ const UsersModel: UsersModelType = {
     },
     *deleteTag(action, saga) {
       const { call, put } = saga
-      yield call(frequest, 'admin.deleteTag', [], { tagId: action.payload });
+      yield call(frequest, 'admin.deleteTag', [action.payload], '');
       yield put({
         type: 'getTags',
         payload: ''
@@ -137,21 +137,14 @@ const UsersModel: UsersModelType = {
         payload: false
       });
     },
-    *deleteUserTag(action, saga) {
-      const { call, put } = action
-      const response = yield call(frequest, 'user.queryCurrent', [], '');
-      yield put({
-        type: 'saveUsers',
-        payload: response.data
-      });
+    // TODO 删除和添加成功 需要修改 users
+    *deleteUserTag({ payload }, saga) {
+      const { call, put } = saga
+      const response = yield call(frequest, 'admin.cancelUserTag', [payload.userId], { tagId: payload.tagId });
     },
-    *addUserTag(action, saga) {
-      const { call, put } = action
-      const response = yield call(frequest, 'user.queryCurrent', [], '');
-      yield put({
-        type: 'saveUsers',
-        payload: response.data
-      });
+    *addUserTag({ payload }, saga) {
+      const { call, put } = saga
+      const response = yield call(frequest, 'admin.setUserTag', [payload.userId], { tagId: payload.tagId });
     },
     *freeze(action, saga) {
       const { call, put } = action

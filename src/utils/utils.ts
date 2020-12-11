@@ -1,6 +1,7 @@
 import { parse } from 'querystring';
 import pathRegexp from 'path-to-regexp';
 import { Route } from '@/models/connect';
+import { message } from 'antd';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
@@ -113,4 +114,18 @@ export function compareObjects(origin: object, data: object, diff: boolean = fal
     });
     isDelete && delete data[dkey]
   })
+}
+
+/**
+ * 复制内容到系统剪切板
+ * @param content 需要复制的内容 
+ */
+export function onCopy(content: string){
+  let oInput = document.createElement('input')
+  oInput.value = content;
+  document.body.appendChild(oInput)
+  oInput.select() // 选择对象
+  document.execCommand("Copy") // 执行浏览器复制命令
+  message.success("复制成功");
+  oInput.remove()
 }

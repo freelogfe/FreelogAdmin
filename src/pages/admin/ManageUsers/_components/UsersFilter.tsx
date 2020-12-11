@@ -51,30 +51,33 @@ const Filter: React.FC<filterProps> = (props) => {
       {/* bottom:left  right */}
       <div className="flex-row align-center space-between flex-wrap">
         {/* left.tag date */}
-        <div className="flex-row align-center mb-10 space-between">
-          <div className="flex-row align-center"> 
-            <span className="pr-8 shrink-0">标签:</span>
-            {tags.map((tag: any) => (
-              <CheckableTag
-                className="br-samll b-1 d-inline  px-8 py-4"
-                key={tag.tagId}
-                checked={selectedTags.indexOf(tag.tagId + '') > -1}
-                onChange={checked => onTagChange(tag.tagId, checked)}
-              >
-                {tag.tag}
-              </CheckableTag>
-            ))}
-            <div className="flex-row align-center px-20 cursor-pointer"
+        <div className="flex-row align-center  space-between align-center">
+          <div className="flex-row align-center "> 
+            <div className="flex-row align-center flex-wrap">
+              <span className="pr-8 shrink-0">标签:</span>
+              {tags.map((tag: any) => (
+                <CheckableTag
+                  className="br-samll b-1 d-inline  px-8 py-4 my-4"
+                  key={tag.tagId}
+                  checked={selectedTags.indexOf(tag.tagId + '') > -1}
+                  onChange={checked => onTagChange(tag.tagId, checked)}
+                >
+                  {tag.tag}
+                </CheckableTag>
+              ))}
+            </div>
+            
+            <div className="flex-row align-center px-20 cursor-pointer shrink-0"
               onClick={() => showTagMagnge(true)}>
               <SettingOutlined />
               <div className="fc-blue fs-14 px-5 shrink-0" >管理标签</div>
             </div>
           </div>
-          <div><RangePicker onChange={onDateChange} /></div>
+          <div className="shrink-0"><RangePicker onChange={onDateChange} /></div>
         </div>
         {/* right */}
-        <div className="flex-1 flex-row align-center justify-end mb-10">
-          <Search placeholder="用户名/邮箱/手机号" className="w-300 self-end" onSearch={onSearch} enterButton allowClear />
+        <div className="flex-1 flex-row align-center justify-end ">
+          <Search placeholder="用户名/邮箱/手机号" className="w-300 self-end" onSearch={onSearch} enterButton allowClear onPressEnter={(e) => onSearch(e.currentTarget.value)} />
         </div>
       </div>
     </div>

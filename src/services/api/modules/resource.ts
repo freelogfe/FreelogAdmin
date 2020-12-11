@@ -1,5 +1,5 @@
 
-import { Api } from '../index'
+import { Api } from '../base'
 interface Resource {
     [propName: string]: Api
 }

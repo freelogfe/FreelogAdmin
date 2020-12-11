@@ -1,5 +1,5 @@
 
-import { Api, placeHolder } from '../index'
+import { Api, placeHolder } from '../base'
 import { isDevelopmentEnv } from '@/utils/utils';
 // TODO 使用namespace来做
 interface Admin {
@@ -88,16 +88,16 @@ admin.getUsers = {
 admin.setUserTag = {
   url: `/api/users/${placeHolder}/setTag`,
   method: 'PUT',
-  dataModel: {
-    tagId: ''
+  dataModel:{
+    tagId: 'int',
   }
 }
 // 取消用户标签
 admin.cancelUserTag = {
   url: `/api/users/${placeHolder}/unsetTag`,
   method: 'PUT',
-  dataModel: {
-    tagId: ''
+  dataModel:{
+    tagId: 'int',
   }
 }
 // 获取标签列表
@@ -116,15 +116,15 @@ admin.postTag = {
 }
 // 删除标签
 admin.deleteTag = {
-  url: '/api/users/tags',
-  method: 'DELETE',
-  dataModel:{
-    tagId: 'string',
-  }
+  url: `/api/users/tags/${placeHolder}`,
+  method: 'DELETE', 
 }
 // 修改标签
 admin.updateTag = {
-  url: `/api/users/tags${placeHolder}`,
-  method: 'PUT'
+  url: `/api/users/tags/${placeHolder}`,
+  method: 'PUT',
+  dataModel: {
+    tag: 'string'
+  }
 }
 export default admin;

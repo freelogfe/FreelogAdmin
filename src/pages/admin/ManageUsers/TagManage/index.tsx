@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button, Modal, Input, Table } from 'antd';
+import { Button, Modal, Input, Table, Space } from 'antd';
 import { connect } from 'umi';
 import AddTag from '@/commons/AddTag';
-import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, ExclamationCircleOutlined, DeleteOutlined, DeleteTwoTone, EditOutlined } from '@ant-design/icons';
 
 const { Search } = Input;
 const { confirm } = Modal;
@@ -11,7 +11,7 @@ interface tagProps {
   tags: Array<any>;
   addTag(data: string): void;
   deleteTag(tagId: number): void;
-  updateTag(tagId: number, tagContent: string): void;
+  updateTag(tag: any): void;
 }
 
 const TagManage: React.FC<tagProps> = (props) => {
@@ -20,33 +20,41 @@ const TagManage: React.FC<tagProps> = (props) => {
   const [tag, setTag] = React.useState(null);
   const [tableData, setTableData] = React.useState([...tags]);
   const search = (keywords: string) => {
-    setTableData( tags.filter((item)=>{
+    setTableData(tags.filter((item) => {
       return item.tag.indexOf((keywords + '').toLocaleLowerCase()) > -1
     }))
   }
-  React.useEffect(()=>{
+  React.useEffect(() => {
     setTableData([...tags])
-  },[tags])
+  }, [tags])
   const tagConfirm = (data: string, flag: boolean) => {
     if (flag) {
-      tag ? updateTag(tag.tagId, data) : addTag(data)
+      if(tag){
+        updateTag({tagId: tag.tagId, tag: data})
+      }else{
+        addTag(data)
+      } 
     }
     setVisible(false)
   }
   const showModal = (tag?: any) => {
-    setTag(null)
+    if (tag) {
+      setTag({ ...tag })
+    } else {
+      setTag(null)
+    }
     setVisible(true)
   }
-  const showConfirm = (tagContent: string) => {
+  const showConfirm = (tag: any) => {
     confirm({
       title: '确定删除这个标签?',
       icon: <ExclamationCircleOutlined />,
-      content: tagContent,
+      content: tag.tag,
+      style: {top: 200},
       onOk() {
-        console.log('OK');
+        deleteTag(tag.tagId)
       },
       onCancel() {
-        console.log('Cancel');
       },
     });
   }
@@ -54,28 +62,32 @@ const TagManage: React.FC<tagProps> = (props) => {
     {
       title: '标签名',
       dataIndex: 'tag',
+      width: 280,
       key: 'tag'
     },
     {
-      title: 'Age',
-      dataIndex: 'age',
-      key: 'age'
-    },
-    {
-      title: 'Address',
-      dataIndex: 'address',
-      key: 'address'
+      title: '',
+      key: 'totalSetCount',
+      dataIndex: 'totalSetCount',
+      // 0 Normal, 1 Freeze, 2 BetaTestToBeAudit, 3 BetaTestApplyNotPass 
+      render: (text: string, record: any) => (
+        <>
+          <span className="fc-less">{record.totalSetCount} 用户 •  {record.type === 1 ? '手动标签' : '自动标签'}</span>
+        </>
+      ),
     },
     {
       title: '操作',
       key: 'status',
       dataIndex: 'operation',
+      width: 180,
       // 0 Normal, 1 Freeze, 2 BetaTestToBeAudit, 3 BetaTestApplyNotPass 
       render: (text: string, record: any) => (
         <>
-          <span className="pr-10">{['正常', '冻结', '测试资格待审核', '测试资格审核未通过'][text]}</span>
-          <a>Invite {record.name}</a>
-          <a>Delete</a>
+          <Space size="middle">
+            <a onClick={(e) => { showModal(record); return false; }}>编辑</a>
+            <a onClick={(e) => { showConfirm(record); return false; }}>删除</a>
+          </Space>
         </>
       ),
     }
@@ -99,14 +111,14 @@ const TagManage: React.FC<tagProps> = (props) => {
               {/* //icon={<PlusOutlined />} */}
           </Button>
         </div>
-        <Search placeholder="请输入标签名称进行搜索" className="w-300" onSearch={search} onPressEnter={(e)=> search(e.currentTarget.value)} enterButton allowClear />
+        <Search placeholder="请输入标签名称进行搜索" className="w-300" onSearch={search} onPressEnter={(e) => search(e.currentTarget.value)} enterButton allowClear />
       </div>
       <Table
         // rowSelection={{
         //   type: 'checkbox',
         //   ...rowSelection,
         // }}
-        rowKey= {record => record.dataIndex}
+        rowKey={record => { return record.tagId }}
         columns={columns}
         dataSource={tableData}
       />

@@ -1,7 +1,7 @@
 import request from '@/utils/request';
 import {createClient} from '@/utils/request';
 
-import { Api, placeHolder } from './api'
+import { Api, placeHolder } from './api/base'
 import apis from './api'
 import { compareObjects } from '@/utils/utils'
 
