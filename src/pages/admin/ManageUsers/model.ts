@@ -101,10 +101,12 @@ const UsersModel: UsersModelType = {
     },
     *getUsers(action, saga) {
       const { call, put, all, fork, select } = saga
-      yield put({
-        type: 'toggleLoading',
-        payload: true
-      });
+      if (action.payload) {
+        yield put({
+          type: 'toggleLoading',
+          payload: true
+        });
+      }
       // TODO 错误情况
       let currentUserIds = ''
       const tags = yield select(({ users }: any) => users.tags);
@@ -158,26 +160,34 @@ const UsersModel: UsersModelType = {
       });
     },
     *deleteUserTag({ payload }, saga) {
-      const { call, put } = saga
+      const { call, put, select } = saga
       // TODO 错误处理
       const response = yield call(frequest, 'admin.cancelUserTag', [payload.userId], { tagId: payload.tagId });
+      let users = yield select(({ users }: any) => users.users);
+      const currentUserIds = yield select(({ users }: any) => users.currentUserIds);
+      users.some((item: any) => {
+        if (item.userId === payload.userId) {
+          item.tags = item.tags.filter((tag: any) => payload.tagId !== tag.tagId)
+          return true
+        }
+        return false
+      })
       yield put({
         type: 'saveUsers',
-        payload: ''
+        payload: [[...users], currentUserIds]
       });
     },
     *addUserTag({ payload }, saga) {
       const { call, put } = saga
-      let {tagIds, newTags, userId} = payload
-      console.log(payload)
-      if(newTags.length){
+      let { tagIds, newTags, userId } = payload
+      if (newTags.length) {
         const savedTags = yield call(frequest, 'admin.postTag', [], {
           type: 1, tags: newTags
         });
         // TODO 错误处理
         console.log(savedTags);
-        (savedTags.data || []).forEach((item:any)=>{tagIds.push(item.tagId)})
-      } 
+        (savedTags.data || []).forEach((item: any) => { tagIds.push(item.tagId) })
+      }
       // TODO 错误处理
       const response = yield call(frequest, 'admin.setUserTag', [userId], { tagIds });
       message.success('设置成功')

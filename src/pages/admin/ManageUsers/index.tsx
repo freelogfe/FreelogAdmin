@@ -114,11 +114,12 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, fil
       dataIndex: 'tags',
       render: (_tags: Array<any>, record: any) => (
         <>
-          <div className="flex-row">
+          <div className="flex-row flex-wrap w-300">
             {_tags.map(tag => {
               return (
                 <Tag key={tag.tagId}
                   closable
+                  className="mb-10"
                   onClose={e => {
                     e.preventDefault();
                     userTagClose(tag.tagId, record.userId);
@@ -127,7 +128,7 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, fil
                 </Tag>
               );
             })}
-            <Tag className="site-tag-plus" onClick={() => showAddModal(true, record)}>
+            <Tag className="site-tag-plus mb-10" onClick={() => showAddModal(true, record)}>
               <PlusOutlined /> 标签
             </Tag>
           </div>
