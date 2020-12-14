@@ -89,7 +89,7 @@ admin.setUserTag = {
   url: `/api/users/${placeHolder}/setTag`,
   method: 'PUT',
   dataModel:{
-    tagId: 'int',
+    tagIds: 'array',
   }
 }
 // 取消用户标签
@@ -110,7 +110,7 @@ admin.postTag = {
   url: '/api/users/tags',
   method: 'POST',
   dataModel:{
-    tag: 'string',
+    tags: 'array',
     type: 'int' // 1 手动  2 自动
   }
 }

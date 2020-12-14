@@ -3,15 +3,24 @@ import { AnyAction } from 'redux';
 
 import frequest from '@/services/handler'
 import { ConsoleSqlOutlined } from '@ant-design/icons';
+import { message } from 'antd';
 
-
-
+export interface FilterDataType {
+  skip: number,
+  limit: number,
+  keywords: string,
+  tagIds: string,
+  startRegisteredDate: any,
+  endRegisteredDate: any,
+  sort: 1
+}
 export interface UsersModelState {
   users: Array<object>;
   currentUserIds: string;
   total: number;
   tags: Array<object>;
   loading: boolean;
+  filterData: FilterDataType
 }
 
 export interface UsersModelType {
@@ -33,6 +42,7 @@ export interface UsersModelType {
     saveTags: Reducer<UsersModelState>;
     saveTotal: Reducer<UsersModelState>;
     toggleLoading: Reducer<UsersModelState>;
+    saveFilterData: Reducer<UsersModelState>;
   };
 }
 const defaultState: UsersModelState = {
@@ -40,7 +50,16 @@ const defaultState: UsersModelState = {
   total: 0,
   currentUserIds: '',
   tags: [],
-  loading: false
+  loading: false,
+  filterData: {
+    skip: 0,
+    limit: 10,
+    keywords: '',
+    tagIds: '',
+    startRegisteredDate: '',
+    endRegisteredDate: '',
+    sort: 1
+  }
 }
 const UsersModel: UsersModelType = {
   namespace: 'users',
@@ -50,7 +69,7 @@ const UsersModel: UsersModelType = {
   effects: {
     *addTag(action, saga) {
       const { call, put } = saga
-      yield call(frequest, 'admin.postTag', [], { type: 1, tag: action.payload });
+      yield call(frequest, 'admin.postTag', [], { type: 1, tags: [action.payload] });
       yield put({
         type: 'getTags',
         payload: ''
@@ -97,7 +116,8 @@ const UsersModel: UsersModelType = {
           });
         })
       }
-      const users = yield call(frequest, 'admin.getUsers', [], action.payload);
+      const filterData = yield select(({ users }: any) => users.filterData);
+      const users = yield call(frequest, 'admin.getUsers', [], action.payload || filterData);
       users.data.dataList = users.data.dataList.map((item: any) => {
         const _me = [item.mobile, item.email]
         currentUserIds ? currentUserIds += ',' + item.userId : currentUserIds = item.userId
@@ -137,21 +157,41 @@ const UsersModel: UsersModelType = {
         payload: false
       });
     },
-    // TODO 删除和添加成功 需要修改 users
     *deleteUserTag({ payload }, saga) {
       const { call, put } = saga
+      // TODO 错误处理
       const response = yield call(frequest, 'admin.cancelUserTag', [payload.userId], { tagId: payload.tagId });
+      yield put({
+        type: 'saveUsers',
+        payload: ''
+      });
     },
     *addUserTag({ payload }, saga) {
       const { call, put } = saga
-      const response = yield call(frequest, 'admin.setUserTag', [payload.userId], { tagId: payload.tagId });
+      let {tagIds, newTags, userId} = payload
+      console.log(payload)
+      if(newTags.length){
+        const savedTags = yield call(frequest, 'admin.postTag', [], {
+          type: 1, tags: newTags
+        });
+        // TODO 错误处理
+        console.log(savedTags);
+        (savedTags.data || []).forEach((item:any)=>{tagIds.push(item.tagId)})
+      } 
+      // TODO 错误处理
+      const response = yield call(frequest, 'admin.setUserTag', [userId], { tagIds });
+      message.success('设置成功')
+      yield put({
+        type: 'getUsers',
+        payload: ''
+      });
     },
     *freeze(action, saga) {
       const { call, put } = action
       const response = yield call(frequest, 'user.queryCurrent', [], '');
       yield put({
-        type: 'saveUsers',
-        payload: response.data
+        type: 'getUsers',
+        payload: ''
       });
     },
     *unfreeze(action, saga) {
@@ -164,6 +204,12 @@ const UsersModel: UsersModelType = {
     },
   },
   reducers: {
+    saveFilterData(state: UsersModelState = defaultState, action: AnyAction) {
+      return {
+        ...state,
+        filterData: action.payload
+      };
+    },
     saveUsers(state: UsersModelState = defaultState, action: AnyAction) {
       return {
         ...state,

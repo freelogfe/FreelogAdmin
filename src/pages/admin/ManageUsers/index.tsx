@@ -2,41 +2,39 @@ import React from 'react';
 import moment, { Moment } from 'moment';
 import { history, Route, connect } from 'umi';
 import { useLocation } from 'react-router-dom';
-import { Table, Tag, Space } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Table, Tag, Space, Modal } from 'antd';
+import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import Filter from './_components/UsersFilter';
 import TagManage from './TagManage';
+import SetTag from '@/commons/SetTag';
+
 import styles from './index.less';
 import { onCopy } from '@/utils/utils';
+import { FilterDataType } from './model'
 
 interface manageUsersPropsType {
   users: Array<object>;
   getUsers: (data: any) => void;
   deleteUserTag: (data: any) => void;
   addUserTag: (data: any) => void;
+  saveFilterData: (data: any) => void;
   freeze: () => void;
   unfreeze: () => void;
   total: 0;
   tags: Array<object>;
-  loading: false
+  loading: false,
+  filterData: FilterDataType
 }
-function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, addUserTag, freeze, unfreeze }: manageUsersPropsType) {
+const { confirm } = Modal;
+
+function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, filterData, saveFilterData, addUserTag, freeze, unfreeze }: manageUsersPropsType) {
   // 标签路由显示之后 用户管理不显示
   const [visible, setVisible] = React.useState(true);
   const { pathname } = useLocation();
   React.useEffect(() => {
     setVisible(pathname === '/admin/ManageUsers')
   }, [pathname])
-  const [filterData, setFilterData] = React.useState({
-    skip: 0,
-    limit: 10,
-    keywords: '',
-    tagIds: '',
-    startRegisteredDate: '',
-    endRegisteredDate: '',
-    sort: 1
-  });
   // filter开始
   const showTagMagnge = () => {
     history.push({
@@ -44,7 +42,7 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, add
     });
   }
   const selectChange = (sort: number) => {
-    setFilterData({ ...filterData, sort })
+    saveFilterData({ ...filterData, sort })
   }
   const tagChange = (_tag: string | number, checked: boolean) => {
     const tag = _tag + ''
@@ -56,24 +54,51 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, add
         return item !== tag
       })
     }
-    setFilterData({ ...filterData, tagIds: tagIds.join(',') })
+    saveFilterData({ ...filterData, tagIds: tagIds.join(',') })
   }
   const search = (keywords: string) => {
-    setFilterData({ ...filterData, keywords })
+    saveFilterData({ ...filterData, keywords })
   }
   const dateChange = (date: [Moment, Moment], dateString: [string, string]) => {
-    setFilterData({ ...filterData, startRegisteredDate: dateString[0], endRegisteredDate: dateString[1] })
+    saveFilterData({ ...filterData, startRegisteredDate: dateString[0], endRegisteredDate: dateString[1] })
   }
   const sortData = [{ id: 1, value: '最近注册' }, { id: 2, value: '资源发布最多' }, { id: 3, value: '展品发布最多' }, { id: 4, value: '消费合约最多' }];
   // filter结束
 
   // 表格开始
-
-  const showAddModal = () => {
-
+  const [tagSetVisible, setTagSetVisible] = React.useState(false);
+  const [selectedUser, setSelectedUser] = React.useState({ tags: [] ,userId:''});
+  React.useEffect(() => {
+    setVisible(pathname === '/admin/ManageUsers')
+  }, [pathname])
+  const showAddModal = (flag: boolean, user: any) => {
+    setTagSetVisible(!!flag)
+    setSelectedUser(user)
+  }
+  const setUserTag = (data: Array<any>, visible: boolean) => {
+    if(visible) {
+      let tagIds:Array<number> = []
+      let newTags = data.filter((item: any) => {item.tagId && tagIds.push(item.tagId);  return !item.tagId}).map((item: any)=>item.tag)
+      addUserTag({userId: selectedUser.userId, newTags, tagIds })
+    }
+    // TODO 建立一个变量用于判断请求失败, 失败则不隐藏
+    setTagSetVisible(false)
   }
   const userTagClose = (tagId: number, userId: number) => {
-    deleteUserTag({tagId, userId}) 
+    deleteUserTag({ tagId, userId })
+  }
+  const opertaions = (data: any, type: number)=>{
+    let tips = ['确定冻结此账号?','确定恢复此账号']
+    confirm({
+      title: tips[type],
+      icon: <ExclamationCircleOutlined />,
+      content: '',
+      style: {top: 200},
+      onOk() {
+      },
+      onCancel() {
+      },
+    });
   }
   const columns = [
     {
@@ -90,7 +115,7 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, add
       render: (_tags: Array<any>, record: any) => (
         <>
           <div className="flex-row">
-            {[{tag: 'hgytr2234', tagId: 1}, {tag: 'wwer2234', tagId: 2}, {tag: 'dfgdfg2234', tagId: 3} ].map(tag => {
+            {_tags.map(tag => {
               return (
                 <Tag key={tag.tagId}
                   closable
@@ -102,7 +127,7 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, add
                 </Tag>
               );
             })}
-            <Tag className="site-tag-plus" onClick={showAddModal}>
+            <Tag className="site-tag-plus" onClick={() => showAddModal(true, record)}>
               <PlusOutlined /> 标签
             </Tag>
           </div>
@@ -172,7 +197,7 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, add
     pageSize: filterData.limit
   }
   const pageChange = (current: number, pageSize: any) => {
-    setFilterData({
+    saveFilterData({
       ...filterData,
       skip: (current - 1) * pageSize,
       limit: pageSize
@@ -192,8 +217,8 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, add
           onTagChange={tagChange} onDateChange={dateChange} />
         <Table columns={columns} dataSource={users} loading={!!loading}
           pagination={{ showQuickJumper: true, showSizeChanger: true, current: pageData.current, total, showTotal, onChange: pageChange }} />
+        <SetTag visible={tagSetVisible} selectedTags={ selectedUser.tags } tags={tags} commit={setUserTag} />
       </div>
-      {/* <TagManage {...{ tags, visible }} showTagMagnge={showTagMagnge} /> */}
       <Route exact path="/admin/ManageUsers/TagManage" component={TagManage} />
     </PageContainer>
   );
@@ -206,7 +231,8 @@ export default connect(({ users }: any) => {
     queryData: users.pagingData,
     total: users.total,
     tags: users.tags,
-    loading: users.loading
+    loading: users.loading,
+    filterData: users.filterData
   })
 }, {
   getUsers: (data: any) => ({
@@ -226,6 +252,10 @@ export default connect(({ users }: any) => {
   }),
   unfreeze: () => ({
     type: 'users/unfreeze',
+  }),
+  saveFilterData: (data: FilterDataType) => ({
+    type: 'users/saveFilterData',
+    payload: data
   })
 })(ManageUsers);
 
