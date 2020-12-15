@@ -45,7 +45,7 @@ user.login = {
 }
 
 user.loginOut = {
-    url: `/v2/passport/logout`,
+    url: `/v1/passport/logout`,
     method: 'get',
     getResponse: isDevelopmentEnv(),
 }

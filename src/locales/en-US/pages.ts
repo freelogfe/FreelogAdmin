@@ -2,7 +2,7 @@ export default {
   'pages.layouts.userLayout.title':
     'freelog admin',
   'pages.login.accountLogin.tab': 'Account Login',
-  'pages.login.accountLogin.errorMessage': 'Incorrect username/password（admin/ant.design)',
+  'pages.login.accountLogin.errorMessage': 'Incorrect username/password',
   'pages.login.username.placeholder': 'Username: admin or user',
   'pages.login.username.required': 'Please input your username!',
   'pages.login.password.placeholder': 'Password: ant.design',

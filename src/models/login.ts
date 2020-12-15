@@ -27,6 +27,7 @@ const Model: LoginModelType = {
   namespace: 'login',
   state: {
     status: undefined,
+    type: 'account'
   },
 
   effects: {
@@ -35,14 +36,14 @@ const Model: LoginModelType = {
       const { response, data } = datas
       yield put({
         type: 'changeLoginStatus',
-        payload: data && data.ret === 0 ? 'ok' : 'error',
+        payload: data && data.errcode === 0 ? 'ok' : 'error',
       });
       yield put({
         type: 'user/saveCurrentUser',
         payload: data && data.ret === 0 ? data.data:{},
       });
       // Login successfully
-      if (data && data.ret === 0) {
+      if (data && data.ret === 0 && data.errcode !== 30) {
         if (isDevelopmentEnv()) {
           window.document.cookie = `authInfo=${response.headers.get('authorization').replace('Bearer ', '')}; path=/`;
         }
@@ -90,7 +91,6 @@ const Model: LoginModelType = {
       return {
         ...state,
         status: payload,
-        type: payload.type,
       };
     },
   },
