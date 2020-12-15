@@ -1,6 +1,6 @@
 import React from 'react';
 import { PageLoading } from '@ant-design/pro-layout';
-import { connect, ConnectProps } from 'umi';
+import { connect, ConnectProps, history } from 'umi';
 import { ConnectState } from '@/models/connect';
 
 interface SecurityLayoutProps extends ConnectProps {
@@ -24,11 +24,13 @@ class SecurityLayout extends React.Component<SecurityLayoutProps, SecurityLayout
         payload: ''
       });
     }
-    this.setState({
-      isReady: true
-    });
   }
-
+  static getDerivedStateFromProps(nextProps: any, prevState: any){
+    const flag = history.location.pathname === '/user/login' && nextProps.loginStatus !== 'ok' || nextProps.loginStatus === 'ok'
+    return  {
+      isReady: flag
+    }
+  }
   render() {
     if (!this.state.isReady) {
       return <PageLoading />;

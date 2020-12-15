@@ -41,7 +41,7 @@ const UserModel: UserModelType = {
     *fetchCurrent(state, action) {
       let { call, put } = action
       const response = yield call(frequest, 'user.queryCurrent', [], '');
-      if (response) {
+      if (response.errcode !== 30) {
         yield put({
           type: 'login/changeLoginStatus',
           payload: 'ok'
@@ -49,6 +49,11 @@ const UserModel: UserModelType = {
         yield put({
           type: 'saveCurrentUser',
           payload: response.data
+        });
+      }else{
+        yield put({
+          type: 'login/changeLoginStatus',
+          payload: 'error'
         });
       }
     },
