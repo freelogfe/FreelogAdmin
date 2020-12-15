@@ -2,7 +2,7 @@ import React from 'react';
 import moment, { Moment } from 'moment';
 import { history, Route, connect } from 'umi';
 import { useLocation } from 'react-router-dom';
-import { Table, Tag, Space, Modal } from 'antd';
+import { Table, Tag, Popconfirm, Modal } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import Filter from './_components/UsersFilter';
@@ -23,12 +23,14 @@ interface manageUsersPropsType {
   unfreeze: () => void;
   total: 0;
   tags: Array<object>;
-  loading: false,
-  filterData: FilterDataType
+  loading: false;
+  filterData: FilterDataType;
+  unfreezeSubmitting: boolean;
+  freezeSubmitting: boolean;
 }
 const { confirm } = Modal;
 
-function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, filterData, saveFilterData, addUserTag, freeze, unfreeze }: manageUsersPropsType) {
+function ManageUsers({ users, tags, unfreezeSubmitting, total, loading, getUsers, deleteUserTag, filterData, saveFilterData, addUserTag, freeze, unfreeze }: manageUsersPropsType) {
   // 标签路由显示之后 用户管理不显示
   const [visible, setVisible] = React.useState(true);
   const { pathname } = useLocation();
@@ -67,7 +69,10 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, fil
 
   // 表格开始
   const [tagSetVisible, setTagSetVisible] = React.useState(false);
-  const [selectedUser, setSelectedUser] = React.useState({ tags: [] ,userId:''});
+  const [opUser, setOpUser] = React.useState({ tags: [], userId: '' });
+  const [opVisible, setOpVisible] = React.useState(false);
+
+  const [selectedUser, setSelectedUser] = React.useState({ tags: [], userId: '' });
   React.useEffect(() => {
     setVisible(pathname === '/admin/ManageUsers')
   }, [pathname])
@@ -76,10 +81,10 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, fil
     setSelectedUser(user)
   }
   const setUserTag = (data: Array<any>, visible: boolean) => {
-    if(visible) {
-      let tagIds:Array<number> = []
-      let newTags = data.filter((item: any) => {item.tagId && tagIds.push(item.tagId);  return !item.tagId}).map((item: any)=>item.tag)
-      addUserTag({userId: selectedUser.userId, newTags, tagIds })
+    if (visible) {
+      let tagIds: Array<number> = []
+      let newTags = data.filter((item: any) => { item.tagId && tagIds.push(item.tagId); return !item.tagId }).map((item: any) => item.tag)
+      addUserTag({ userId: selectedUser.userId, newTags, tagIds })
     }
     // TODO 建立一个变量用于判断请求失败, 失败则不隐藏
     setTagSetVisible(false)
@@ -87,18 +92,21 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, fil
   const userTagClose = (tagId: number, userId: number) => {
     deleteUserTag({ tagId, userId })
   }
-  const opertaions = (data: any, type: number)=>{
-    let tips = ['确定冻结此账号?','确定恢复此账号']
+  const opertaions = (data: any, type: number) => {
+    let tips = ['确定冻结此账号?', '确定恢复此账号']
     confirm({
       title: tips[type],
       icon: <ExclamationCircleOutlined />,
       content: '',
-      style: {top: 200},
+      style: { top: 200 },
       onOk() {
       },
       onCancel() {
       },
     });
+  }
+  const unfreezeFn = () => {
+
   }
   const columns = [
     {
@@ -180,12 +188,47 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, fil
       title: '账号状态',
       key: 'status',
       dataIndex: 'status',
+      width: 300,
       // 0 Normal, 1 Freeze, 2 BetaTestToBeAudit, 3 BetaTestApplyNotPass 
-      render: (text: string, record: any) => (
+      render: (status: number, record: any) => (
         <>
-          <span className="pr-10">{['正常', '冻结', '测试资格待审核', '测试资格审核未通过'][text]}</span>
-          <a>Invite {record.name}</a>
-          <a>Delete</a>
+          <span className="pr-10">{['正常', '冻结', '测试资格待审核', '测试资格审核未通过'][status]}</span>
+          {(() => {
+            switch (status) {
+              case 1: return <a onClick={() => {
+                opertaions(record, status)
+              }}>冻结</a>;
+              case 0: return <>
+                <Popconfirm
+                  title={record.mobile}
+                  visible={record.userId === opUser.userId && opVisible}
+                  onConfirm={unfreezeFn}
+                  okButtonProps={{ loading: unfreezeSubmitting }}
+                  onCancel={() => setOpVisible(false)}
+                >
+                  <a className="pr-10" onClick={() => {
+                    // setOpUser(record);
+                    // setOpVisible(true);
+                  }}>详情</a>
+                </Popconfirm>
+                <Popconfirm
+                  title="确定恢复此账号？"
+                  visible={record.userId === opUser.userId && opVisible}
+                  onConfirm={unfreezeFn}
+                  okButtonProps={{ loading: unfreezeSubmitting }}
+                  onCancel={() => setOpVisible(false)}
+                >
+                  <a onClick={() => {
+                    setOpUser(record);
+                    setOpVisible(true);
+                  }}>恢复</a>
+                </Popconfirm>  </>
+              case 2: return <a>审核</a>;
+              case 3: return <a>审核</a>;
+              default: return '';
+            }
+          }
+          )()}
         </>
       ),
     },
@@ -218,7 +261,7 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, fil
           onTagChange={tagChange} onDateChange={dateChange} />
         <Table columns={columns} dataSource={users} loading={!!loading}
           pagination={{ showQuickJumper: true, showSizeChanger: true, current: pageData.current, total, showTotal, onChange: pageChange }} />
-        <SetTag visible={tagSetVisible} selectedTags={ selectedUser.tags } tags={tags} commit={setUserTag} />
+        <SetTag visible={tagSetVisible} selectedTags={selectedUser.tags} tags={tags} commit={setUserTag} />
       </div>
       <Route exact path="/admin/ManageUsers/TagManage" component={TagManage} />
     </PageContainer>
@@ -226,14 +269,16 @@ function ManageUsers({ users, tags, total, loading, getUsers, deleteUserTag, fil
 }
 
 
-export default connect(({ users }: any) => {
+export default connect(({ users, loading }: any) => {
   return ({
     users: users.users,
     queryData: users.pagingData,
     total: users.total,
     tags: users.tags,
     loading: users.loading,
-    filterData: users.filterData
+    filterData: users.filterData,
+    freezeSubmitting: loading.effects['user/freeze'],
+    unfreezeSubmitting: loading.effects['user/unfreeze'],
   })
 }, {
   getUsers: (data: any) => ({

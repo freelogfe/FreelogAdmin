@@ -53,7 +53,7 @@ const UserModel: UserModelType = {
       }else{
         yield put({
           type: 'login/changeLoginStatus',
-          payload: 'error'
+          payload: ''
         });
       }
     },
