@@ -68,8 +68,8 @@ const Model: LoginModelType = {
     },
 
     *logout({ payload }, { call, put }) {
-      const { redirect } = getPageQuery();
-      yield call(frequest, 'user.loginOut', [redirect], {returnUrl: window.location.href});
+      const { redirect } = getPageQuery(); // {returnUrl: window.location.href}
+      yield call(frequest, 'user.loginOut', [redirect], '');
       yield put({
         type: 'changeLoginStatus',
         payload: '',
