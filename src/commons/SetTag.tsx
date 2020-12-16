@@ -60,7 +60,7 @@ const SetTag: React.FC<tagProps> = (props) => {
                         cursor: 'move',
                         top: 200
                     }}
-                    className="fs-14 fc-less fw-bold"
+                    className="fs-16 fc-less fw-bold"
                     onMouseOver={() => {
                         disabled && setDisabled(false)
                     }}

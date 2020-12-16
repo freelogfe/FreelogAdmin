@@ -10,7 +10,7 @@ interface tagProps {
 
 const AddTag: React.FC<tagProps> = (props) => {
     const { commit, visible, tag } = props;
-    const [disabled, setDisabled] = React.useState(false);
+    const [disabled, setDisabled] = React.useState(true);
     const [tagContent, setTagContent] = React.useState('');
     React.useEffect(()=>{
       setTagContent(tag);
@@ -33,6 +33,7 @@ const AddTag: React.FC<tagProps> = (props) => {
                         cursor: 'move',
                         top: 200
                     }}
+                    className="fs-16 fc-less fw-bold"
                     onMouseOver={() => {
                         disabled && setDisabled(false)
                     }}

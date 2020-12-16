@@ -205,9 +205,9 @@ const UsersModel: UsersModelType = {
         });
       }
     },
-    *freeze(action, saga) {
-      const { call, put } = action
-      const response = yield call(frequest, 'admin.freeze', [], {status: 1, remark: action.payload});
+    *freeze({payload}, saga) {
+      const { call, put } = saga
+      const response = yield call(frequest, 'admin.freeze', [payload.userId], {status: 1, remark: payload.remark}, { success: '冻结成功', fail: '冻结失败' });
       if (response.errcode === 0) {
         yield put({
           type: 'getUsers',
@@ -215,9 +215,9 @@ const UsersModel: UsersModelType = {
         });
       }
     },
-    *unfreeze(action, saga) {
-      const { call, put } = action
-      const response = yield call(frequest, 'admin.freeze', [], {status: 0, remark: action.payload});
+    *unfreeze({payload}, saga) {
+      const { call, put } = saga
+      const response = yield call(frequest, 'admin.freeze', [payload], {status: 0, remark: ''}, { success: '恢复成功', fail: '恢复失败' });
       if (response.errcode === 0) {
         yield put({
           type: 'getUsers',
@@ -243,7 +243,7 @@ const UsersModel: UsersModelType = {
     saveTags(state: UsersModelState = defaultState, action: AnyAction) {
       return {
         ...state,
-        tags: action.payload
+        tags: action.payload || []
       };
     },
     saveTotal(state: UsersModelState = defaultState, action: AnyAction) {

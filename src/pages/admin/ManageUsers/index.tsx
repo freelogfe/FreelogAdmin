@@ -2,10 +2,11 @@ import React from 'react';
 import moment, { Moment } from 'moment';
 import { history, Route, connect } from 'umi';
 import { useLocation } from 'react-router-dom';
-import { Table, Tag, Popconfirm, Modal } from 'antd';
+import { Table, Tag, Popconfirm, Modal, Popover } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import Filter from './_components/UsersFilter';
+import FreezeUser from './_components/FreezeUser';
 import TagManage from './TagManage';
 import SetTag from '@/commons/SetTag';
 
@@ -19,8 +20,8 @@ interface manageUsersPropsType {
   deleteUserTag: (data: any) => void;
   addUserTag: (data: any) => void;
   saveFilterData: (data: any) => void;
-  freeze: (data: string) => void;
-  unfreeze: () => void;
+  freeze: (userId: number, remark: string) => void;
+  unfreeze: (userId: number) => void;
   total: 0;
   tags: Array<object>;
   loading: false;
@@ -69,10 +70,10 @@ function ManageUsers({ users, tags, unfreezeSubmitting, total, loading, getUsers
 
   // 表格开始
   const [tagSetVisible, setTagSetVisible] = React.useState(false);
-  const [opUser, setOpUser] = React.useState({ tags: [], userId: '' });
-  const [opVisible, setOpVisible] = React.useState(false);
-
-  const [selectedUser, setSelectedUser] = React.useState({ tags: [], userId: '' });
+  const [opUser, setOpUser] = React.useState({ tags: [], userId: 0 });
+  const [unfreezeVisible, setUnfreezeVisible] = React.useState(false);
+  const [freezeVisible, setFreezeVisible] = React.useState(false);
+  const [selectedUser, setSelectedUser] = React.useState({ tags: [], userId: 0 });
   React.useEffect(() => {
     setVisible(pathname === '/admin/ManageUsers')
   }, [pathname])
@@ -92,22 +93,15 @@ function ManageUsers({ users, tags, unfreezeSubmitting, total, loading, getUsers
   const userTagClose = (tagId: number, userId: number) => {
     deleteUserTag({ tagId, userId })
   }
-  const opertaions = (data: any, type: number) => {
-    let tips = ['确定冻结此账号?', '确定恢复此账号']
-    confirm({
-      title: tips[type],
-      icon: <ExclamationCircleOutlined />,
-      content: '',
-      style: { top: 200 },
-      onOk() {
-      },
-      onCancel() {
-      },
-    });
+  const freezeCommit = (data: string, visible: boolean) => {
+    if(visible){
+      freeze(opUser.userId, data)
+    }
+    setFreezeVisible(false)
   }
   const unfreezeFn = () => {
-    unfreeze()
-    setOpVisible(false)
+    unfreeze(opUser.userId)
+    setUnfreezeVisible(false)
   }
   const columns = [
     {
@@ -196,32 +190,38 @@ function ManageUsers({ users, tags, unfreezeSubmitting, total, loading, getUsers
           <span className="pr-10">{['正常', '冻结', '测试资格待审核', '测试资格审核未通过'][status]}</span>
           {(() => {
             switch (status) {
-              case 1: return <a onClick={() => {
-                opertaions(record, status)
+              case 0: return <a onClick={() => {
+                setOpUser(record);
+                setUnfreezeVisible(false);
+                setFreezeVisible(true);
               }}>冻结</a>;
-              case 0: return <>
-                <Popconfirm
-                  title={record.mobile}
-                  visible={record.userId === opUser.userId && opVisible}
-                  onConfirm={unfreezeFn}
-                  okButtonProps={{ loading: unfreezeSubmitting }}
-                  onCancel={() => setOpVisible(false)}
+              case 1: return <>
+                <Popover
+                  title='冻结原因'
+                  placement="bottom"
+                  style={{maxWidth: 200}}
+                  className="freeze-detail"
+                  content={record.statusChangeRemark}
+                  trigger="click"
                 >
-                  <a className="pr-10" onClick={() => {
-                    // setOpUser(record);
-                    // setOpVisible(true);
+                  <a className="px-10" onClick={() => {
+                    setOpUser(record);
+                    setFreezeVisible(false);
+                    setUnfreezeVisible(false);
                   }}>详情</a>
-                </Popconfirm>
+                </Popover >
                 <Popconfirm
                   title="确定恢复该账号的使用吗？"
-                  visible={record.userId === opUser.userId && opVisible}
+                  placement="bottom"
+                  visible={record.userId === opUser.userId && unfreezeVisible}
                   onConfirm={unfreezeFn}
                   okButtonProps={{ loading: unfreezeSubmitting }}
-                  onCancel={() => setOpVisible(false)}
+                  onCancel={() => setUnfreezeVisible(false)}
                 >
                   <a onClick={() => {
                     setOpUser(record);
-                    setOpVisible(true);
+                    setFreezeVisible(false);
+                    setUnfreezeVisible(true);
                   }}>恢复</a>
                 </Popconfirm>  </>
               case 2: return <a>审核</a>;
@@ -263,6 +263,7 @@ function ManageUsers({ users, tags, unfreezeSubmitting, total, loading, getUsers
         <Table columns={columns} dataSource={users} loading={!!loading}
           pagination={{ showQuickJumper: true, showSizeChanger: true, current: pageData.current, total, showTotal, onChange: pageChange }} />
         <SetTag visible={tagSetVisible} selectedTags={selectedUser.tags} tags={tags} commit={setUserTag} />
+        <FreezeUser visible={freezeVisible} commit={freezeCommit} />
       </div>
       <Route exact path="/admin/ManageUsers/TagManage" component={TagManage} />
     </PageContainer>
@@ -294,13 +295,13 @@ export default connect(({ users, loading }: any) => {
     type: 'users/addUserTag',
     payload: data
   }),
-  freeze: (data: string) => ({
+  freeze: (userId: number, remark: string) => ({
     type: 'users/freeze',
-    payload: data
+    payload: { userId, remark }
   }),
-  unfreeze: () => ({
+  unfreeze: (userId: number) => ({
     type: 'users/unfreeze',
-    payload: ''
+    payload: userId
   }),
   saveFilterData: (data: FilterDataType) => ({
     type: 'users/saveFilterData',
