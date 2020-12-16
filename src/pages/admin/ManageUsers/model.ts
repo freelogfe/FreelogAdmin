@@ -1,9 +1,10 @@
 import { Effect, Reducer } from 'umi';
 import { AnyAction } from 'redux';
 
-import frequest from '@/services/handler'
+import frequest, { MessageInfo } from '@/services/handler'
 import { ConsoleSqlOutlined } from '@ant-design/icons';
 import { message } from 'antd';
+import { Response } from 'express';
 
 export interface FilterDataType {
   skip: number,
@@ -83,13 +84,17 @@ const UsersModel: UsersModelType = {
         payload: ''
       });
     },
+    // TODO 错误处理
     *deleteTag(action, saga) {
       const { call, put } = saga
-      yield call(frequest, 'admin.deleteTag', [action.payload], '');
-      yield put({
-        type: 'getTags',
-        payload: ''
-      });
+      const res = yield call(frequest, 'admin.deleteTag', [action.payload], '', { success: '删除成功', fail: '' });
+      // TODO 可以在全局处理，传递参数判断是否需要提示以及成功失败提示语 或直接取msg
+      if (res.errcode === 0) {
+        yield put({
+          type: 'getTags',
+          payload: ''
+        });
+      }
     },
     *getTags(action, saga) {
       const { call, put } = saga
@@ -162,20 +167,22 @@ const UsersModel: UsersModelType = {
     *deleteUserTag({ payload }, saga) {
       const { call, put, select } = saga
       // TODO 错误处理
-      const response = yield call(frequest, 'admin.cancelUserTag', [payload.userId], { tagId: payload.tagId });
-      let users = yield select(({ users }: any) => users.users);
-      const currentUserIds = yield select(({ users }: any) => users.currentUserIds);
-      users.some((item: any) => {
-        if (item.userId === payload.userId) {
-          item.tags = item.tags.filter((tag: any) => payload.tagId !== tag.tagId)
-          return true
-        }
-        return false
-      })
-      yield put({
-        type: 'saveUsers',
-        payload: [[...users], currentUserIds]
-      });
+      const response = yield call(frequest, 'admin.cancelUserTag', [payload.userId], { tagId: payload.tagId }, { success: '删除成功', fail: '' });
+      if (response.errcode === 0) {
+        let users = yield select(({ users }: any) => users.users);
+        const currentUserIds = yield select(({ users }: any) => users.currentUserIds);
+        users.some((item: any) => {
+          if (item.userId === payload.userId) {
+            item.tags = item.tags.filter((tag: any) => payload.tagId !== tag.tagId)
+            return true
+          }
+          return false
+        })
+        yield put({
+          type: 'saveUsers',
+          payload: [[...users], currentUserIds]
+        });
+      }
     },
     *addUserTag({ payload }, saga) {
       const { call, put } = saga
@@ -189,28 +196,34 @@ const UsersModel: UsersModelType = {
         (savedTags.data || []).forEach((item: any) => { tagIds.push(item.tagId) })
       }
       // TODO 错误处理
-      const response = yield call(frequest, 'admin.setUserTag', [userId], { tagIds });
-      message.success('设置成功')
-      yield put({
-        type: 'getUsers',
-        payload: ''
-      });
+      const response = yield call(frequest, 'admin.setUserTag', [userId], { tagIds }, { success: '设置成功', fail: '设置失败' });
+      console.log(response)
+      if (response.errcode === 0) {
+        yield put({
+          type: 'getUsers',
+          payload: ''
+        });
+      }
     },
     *freeze(action, saga) {
       const { call, put } = action
       const response = yield call(frequest, 'user.queryCurrent', [], '');
-      yield put({
-        type: 'getUsers',
-        payload: ''
-      });
+      if (response.errcode === 0) {
+        yield put({
+          type: 'getUsers',
+          payload: ''
+        });
+      }
     },
     *unfreeze(action, saga) {
       const { call, put } = action
       const response = yield call(frequest, 'user.queryCurrent', [], '');
-      yield put({
-        type: 'saveUsers',
-        payload: response.data
-      });
+      if (response.errcode === 0) {
+        yield put({
+          type: 'getUsers',
+          payload: ''
+        });
+      }
     },
   },
   reducers: {

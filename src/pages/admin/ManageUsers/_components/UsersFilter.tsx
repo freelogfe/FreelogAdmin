@@ -53,7 +53,7 @@ const Filter: React.FC<filterProps> = (props) => {
         {/* left.tag date */}
         <div className="flex-row align-center  space-between align-center">
           <div className="flex-row align-center "> 
-            <div className="flex-row align-center flex-wrap">
+            <div className="flex-row align-center flex-wrap w-800">
               <span className="pr-8 shrink-0">标签:</span>
               {tags.map((tag: any) => (
                 <CheckableTag

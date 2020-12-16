@@ -89,6 +89,7 @@ function toLogin(data: any) {
     redirect: window.location.href,
   });
   if (data) {
+    // TODO 需要区别未登录与没权限，未登录可弹框提示登录，而不是跳转
     if (data.errcode === 30) {
       location.href = `/user/login?${queryString}`;
     } 
