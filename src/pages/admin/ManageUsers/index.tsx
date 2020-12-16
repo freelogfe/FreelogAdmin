@@ -19,7 +19,7 @@ interface manageUsersPropsType {
   deleteUserTag: (data: any) => void;
   addUserTag: (data: any) => void;
   saveFilterData: (data: any) => void;
-  freeze: () => void;
+  freeze: (data: string) => void;
   unfreeze: () => void;
   total: 0;
   tags: Array<object>;
@@ -106,7 +106,8 @@ function ManageUsers({ users, tags, unfreezeSubmitting, total, loading, getUsers
     });
   }
   const unfreezeFn = () => {
-
+    unfreeze()
+    setOpVisible(false)
   }
   const columns = [
     {
@@ -212,7 +213,7 @@ function ManageUsers({ users, tags, unfreezeSubmitting, total, loading, getUsers
                   }}>详情</a>
                 </Popconfirm>
                 <Popconfirm
-                  title="确定恢复此账号？"
+                  title="确定恢复该账号的使用吗？"
                   visible={record.userId === opUser.userId && opVisible}
                   onConfirm={unfreezeFn}
                   okButtonProps={{ loading: unfreezeSubmitting }}
@@ -293,11 +294,13 @@ export default connect(({ users, loading }: any) => {
     type: 'users/addUserTag',
     payload: data
   }),
-  freeze: () => ({
+  freeze: (data: string) => ({
     type: 'users/freeze',
+    payload: data
   }),
   unfreeze: () => ({
     type: 'users/unfreeze',
+    payload: ''
   }),
   saveFilterData: (data: FilterDataType) => ({
     type: 'users/saveFilterData',

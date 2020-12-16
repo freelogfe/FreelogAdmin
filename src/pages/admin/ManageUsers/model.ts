@@ -207,7 +207,7 @@ const UsersModel: UsersModelType = {
     },
     *freeze(action, saga) {
       const { call, put } = action
-      const response = yield call(frequest, 'user.queryCurrent', [], '');
+      const response = yield call(frequest, 'admin.freeze', [], {status: 1, remark: action.payload});
       if (response.errcode === 0) {
         yield put({
           type: 'getUsers',
@@ -217,7 +217,7 @@ const UsersModel: UsersModelType = {
     },
     *unfreeze(action, saga) {
       const { call, put } = action
-      const response = yield call(frequest, 'user.queryCurrent', [], '');
+      const response = yield call(frequest, 'admin.freeze', [], {status: 0, remark: action.payload});
       if (response.errcode === 0) {
         yield put({
           type: 'getUsers',

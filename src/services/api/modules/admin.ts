@@ -127,4 +127,14 @@ admin.updateTag = {
     tag: 'string'
   }
 }
+ 
+// 冻结/解冻用户
+admin.freeze = {
+  url: `/api/users/${placeHolder}/freeOrRecoverUserStatus`,
+  method: 'PUT',
+  dataModel: {
+    status: 'int',
+    remark: 'string'
+  }
+}
 export default admin;
