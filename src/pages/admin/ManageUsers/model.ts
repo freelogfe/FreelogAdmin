@@ -2,9 +2,7 @@ import { Effect, Reducer } from 'umi';
 import { AnyAction } from 'redux';
 
 import frequest, { MessageInfo } from '@/services/handler'
-import { ConsoleSqlOutlined } from '@ant-design/icons';
-import { message } from 'antd';
-import { Response } from 'express';
+ 
 
 export interface FilterDataType {
   skip: number,
@@ -78,11 +76,17 @@ const UsersModel: UsersModelType = {
     },
     *updateTag({ payload }, saga) {
       const { call, put } = saga
-      yield call(frequest, 'admin.updateTag', [payload.tagId], { tag: payload.tag });
-      yield put({
-        type: 'getTags',
-        payload: ''
-      });
+      const res = yield call(frequest, 'admin.updateTag', [payload.tagId], { tag: payload.tag });
+      if (res.errcode === 0) {
+        yield put({
+          type: 'getTags',
+          payload: ''
+        });
+        yield put({
+          type: 'getUsers',
+          payload: ''
+        });
+      }
     },
     // TODO 错误处理
     *deleteTag(action, saga) {
@@ -94,6 +98,10 @@ const UsersModel: UsersModelType = {
           type: 'getTags',
           payload: ''
         });
+        yield put({
+          type: 'getUsers',
+          payload: ''
+        });
       }
     },
     *getTags(action, saga) {
@@ -101,7 +109,7 @@ const UsersModel: UsersModelType = {
       const tagsRes = yield call(frequest, 'admin.getTags', []);
       yield put({
         type: 'saveTags',
-        payload: tagsRes.data
+        payload: tagsRes.data || []
       });
     },
     *getUsers(action, saga) {
@@ -125,44 +133,46 @@ const UsersModel: UsersModelType = {
       }
       const filterData = yield select(({ users }: any) => users.filterData);
       const users = yield call(frequest, 'admin.getUsers', [], action.payload || filterData);
-      users.data.dataList = users.data.dataList.map((item: any) => {
-        const _me = [item.mobile, item.email]
-        currentUserIds ? currentUserIds += ',' + item.userId : currentUserIds = item.userId
-        return { ...item, key: item.userId, _me }
-      })
-      const [fresources, fnodes, fcontracts] = yield all([
-        call(frequest, 'resource.getResources', [], { userIds: currentUserIds }),
-        call(frequest, 'node.getNodes', [], { userIds: currentUserIds }),
-        call(frequest, 'contract.getContracts', [], { userIds: currentUserIds })
-      ])
-      function getValue(arr: [], obj: any, key: string, origin: any) {
-        obj[key] = origin
-        arr.some((item: any) => {
-          if (item.userId === obj.userId) {
-            obj[key] = item[key] || origin
-            return true
-          }
-          return false
+      if (users.errcode === 0) {
+        users.data.dataList = users.data.dataList.map((item: any) => {
+          const _me = [item.mobile, item.email]
+          currentUserIds ? currentUserIds += ',' + item.userId : currentUserIds = item.userId
+          return { ...item, key: item.userId, _me }
+        })
+        const [fresources, fnodes, fcontracts] = yield all([
+          call(frequest, 'resource.getResources', [], { userIds: currentUserIds }),
+          call(frequest, 'node.getNodes', [], { userIds: currentUserIds }),
+          call(frequest, 'contract.getContracts', [], { userIds: currentUserIds })
+        ])
+        function getValue(arr: [], obj: any, key: string, origin: any) {
+          obj[key] = origin
+          arr.some((item: any) => {
+            if (item.userId === obj.userId) {
+              obj[key] = item[key] || origin
+              return true
+            }
+            return false
+          });
+        }
+        users.data.dataList = users.data.dataList.map((user: any) => {
+          getValue(fresources.data || [], user, 'createdResourceCount', 0)
+          getValue(fnodes.data || [], user, 'createdNodeCount', 0)
+          getValue(fcontracts.data || [], user, 'signedContractCount', 0)
+          return user
+        })
+        yield put({
+          type: 'saveUsers',
+          payload: [users.data.dataList || [], currentUserIds]
         });
-      }
-      users.data.dataList = users.data.dataList.map((user: any) => {
-        getValue(fresources.data || [], user, 'createdResourceCount', 0)
-        getValue(fnodes.data || [], user, 'createdNodeCount', 0)
-        getValue(fcontracts.data || [], user, 'signedContractCount', 0)
-        return user
-      })
-      yield put({
-        type: 'saveUsers',
-        payload: [users.data.dataList || [], currentUserIds]
-      });
-      yield put({
-        type: 'saveTotal',
-        payload: users.data.totalItem
-      });
-      yield put({
-        type: 'toggleLoading',
-        payload: false
-      });
+        yield put({
+          type: 'saveTotal',
+          payload: users.data.totalItem
+        });
+        yield put({
+          type: 'toggleLoading',
+          payload: false
+        });
+      } 
     },
     *deleteUserTag({ payload }, saga) {
       const { call, put, select } = saga

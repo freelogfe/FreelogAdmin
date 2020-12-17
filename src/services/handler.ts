@@ -74,7 +74,8 @@ export default function frequest(action: string, urlData: Array<string | number>
             }
             resolve(response)
         }).catch((error) => {
-            reject(error)
+            // 防止error为空
+            reject({error})
             if(typeof error === 'string'){
                 message.error(error)
             }else{
