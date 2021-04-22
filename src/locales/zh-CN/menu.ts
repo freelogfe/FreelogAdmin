@@ -49,7 +49,6 @@ export default {
   'menu.editor.mind': '脑图编辑器',
   'menu.editor.koni': '拓扑编辑器',
 
-
   'menu.user': '用户',
   'menu.user.management': '用户管理',
   'menu.user.management.tagmanage': '标签管理',
@@ -58,4 +57,6 @@ export default {
   'menu.node': '节点',
   'menu.node.management': '节点管理',
   'menu.node.audited': '节点审核',
+  'menu.utils': '工具',
+  'menu.utils.i18n': '国际化管理',
 };

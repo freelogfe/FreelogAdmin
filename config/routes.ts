@@ -86,6 +86,19 @@
             ]
           },
           {
+            path: '/utils',
+            name: 'utils',
+            icon: 'global',
+            routes: [
+              {
+                name: 'i18n',
+                icon: 'edit',
+                path: '/utils/i18n',
+                component: './utils/i18n',
+              } 
+            ]
+          },
+          {
             component: './404',
           },
         ],
