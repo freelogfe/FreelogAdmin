@@ -16,7 +16,15 @@ export default {
     '/v1': {
       target: 'http://qi.testfreelog.com',
       changeOrigin: true, // pathRewrite: { '^/server': '' },
-    }
+    },
+    disableHostCheck: true,
+    overlay: {
+      warnings: false,
+      errors: true,
+    },
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+    },
   },
   test: {
     '/api/': {

@@ -98,6 +98,27 @@ function toLogin(data: any) {
     // }
   }
 }
+let { REACT_APP_ENV } = process.env;
+if(window.location.href.indexOf('freelog') === -1){
+    REACT_APP_ENV = 'dev'
+}
+let baseURL = 'http://qi.testfreelog.com'
+if (window.location.href.indexOf('testfreelog') === -1) {
+    baseURL = 'http://qi.freelog.com'
+}
+request.interceptors.request.use(
+  (url, options) => {
+    console.log(REACT_APP_ENV)
+    if(url.startsWith('/v1') && REACT_APP_ENV !=='dev'){
+      url = baseURL + url
+    }
+    return {
+      url: url,
+      options: { ...options, interceptors: true },
+    };
+  },
+  { global: true }
+);
 // 判断是否登录
 request.interceptors.response.use(async response => {
   const data = await response.clone().json();
@@ -111,6 +132,15 @@ export function createClient() {
     errorHandler, // 默认错误处理
     credentials: 'include', // 默认请求是否带上cookie
   })
+  req.interceptors.request.use(
+    (url, options) => {
+      return {
+        url: baseURL + url,
+        options: { ...options, interceptors: true },
+      };
+    },
+    { global: true }
+  );
   req.interceptors.response.use(async response => {
     const data = await response.clone().json();
     toLogin(data)

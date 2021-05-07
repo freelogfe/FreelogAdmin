@@ -10,7 +10,14 @@ export interface MessageInfo {
     success: string;
     fail: string;
 }
-
+let { REACT_APP_ENV } = process.env;
+if(window.location.href.indexOf('freelog') === -1){
+    REACT_APP_ENV = 'dev'
+}
+let baseURL = 'http://qi.testfreelog.com/'
+if (window.location.href.indexOf('testfreelog') === -1) {
+    baseURL = 'http://qi.freelog.com/'
+}
 /**
  * 
  * @param action api namespace.apiName
@@ -39,6 +46,15 @@ export default function frequest(action: string, urlData: Array<string | number>
             url = url.replace(placeHolder, item + '')
         })
     }
+    if(REACT_APP_ENV !== 'dev'){
+        if(url.startsWith('/api')){
+            url = baseURL + 'v2/' +   url.substring(5)
+            console.log(url)
+        } else {
+            url = baseURL + url
+        } 
+    }
+    
     // filter data if there is dataModel
     if (api.dataModel) {
         // TODO 需要用deepclone

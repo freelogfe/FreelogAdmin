@@ -183,13 +183,13 @@ export default {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: {
+        body: JSON.stringify({
           repositoryName: this.repositoryName,
           changedFiles: [{
             targetPath: _path, 
             targetJSONString: _JSONString,
           }]
-        }
+        })
       }).then(res => res.json())
       if (res.errcode === 0) {
         this.$emit('update-repository-changes', res.data)

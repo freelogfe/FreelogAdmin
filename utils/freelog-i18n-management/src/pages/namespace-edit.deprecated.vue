@@ -383,7 +383,7 @@ export default {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: saveData
+        body: JSON.stringify(saveData)
       }).then(res => res.json())
       if (res.errcode === 0) {
         this.$message.success(`保存成功！`)
