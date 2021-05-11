@@ -30,12 +30,12 @@
 
 <script>
 export default {
-  name: 'key-tags',
+  name: "key-tags",
   components: {},
   props: {
     size: {
       type: String,
-      default: 'small',
+      default: "small",
     },
     repositoryName: String,
     selectedTag: String,
@@ -50,16 +50,18 @@ export default {
   data() {
     return {
       tags: [],
-      inputValue: '',
+      inputValue: "",
       inputVisible: false,
     };
   },
   computed: {
     moduleName() {
-      return this.selectedKeyItem != null ? this.selectedKeyItem.moduleName : '';
+      return this.selectedKeyItem != null
+        ? this.selectedKeyItem.moduleName
+        : "";
     },
     keyName() {
-      return this.selectedKeyItem != null ? this.selectedKeyItem.key : '';
+      return this.selectedKeyItem != null ? this.selectedKeyItem.key : "";
     },
     values() {
       return this.languages.map((lang) => {
@@ -111,23 +113,23 @@ export default {
         }
       }
       this.inputVisible = false;
-      this.inputValue = '';
+      this.inputValue = "";
     },
     async updateKeyInfo(tags) {
       const postData = {
         name: this.keyName,
         moduleName: this.moduleName,
         repositoryName: this.repositoryName,
-        description: '',
+        description: "",
         tags,
         values: this.values,
       };
-
+      console.log('here')
       const result = await window
-        .fetch('//i18n-ts.testfreelog.com/v1/i18nKeyInfos', {
-          method: this.keyInfo != null ? 'PUT' : 'POST',
+        .fetch("//i18n-ts.testfreelog.com/v1/i18nKeyInfos", {
+          method: this.keyInfo != null ? "PUT" : "POST",
           headers: {
-            'content-type': 'application/json',
+            "content-type": "application/json",
           },
           body: JSON.stringify(postData),
         })
@@ -140,14 +142,11 @@ export default {
       }
     },
     selectTag(tag) {
-      this.$emit('update:selectedTag', tag);
+      this.$emit("update:selectedTag", tag);
     },
     resolveKeyInfo() {
-      let tags = [];
-      if (this.keyInfo != null) {
-        tags = this.keyInfo.tags;
-      }
-      this.tags = tags;
+      console.log(this.keyInfo)
+      this.tags = this.keyInfo.info? this.keyInfo.info.tags : [];
     },
   },
   async mounted() {
